@@ -1040,6 +1040,9 @@ app.get('/api/profile/:userId', async (req, res) => {
   });
 });
 
+// the client renders the grid from this, so the two lists can't drift apart
+app.get('/api/achievements', (_, res) => res.json({ list: achievements.LIST.map(({ id, e }) => ({ id, e })) }));
+
 app.get('/api/leaderboard', async (req, res) => {
   if (needsDb(res)) return;
   const me = auth.sessionFrom(req.headers);

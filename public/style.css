@@ -620,6 +620,51 @@ body[data-tint=emoji] .bg .b3 { background: var(--lilac); }
 .bubble-r.say::after { content: ''; position: absolute; bottom: -5px; left: 50%; margin-left: -5px; border: 5px solid transparent; border-top-color: #fff; border-bottom: 0; }
 .floater .say-f { font-size: 15px; font-weight: 800; background: #fff; color: var(--ink); padding: 6px 12px; border-radius: 14px; white-space: nowrap; }
 
+/* ================= v7 accounts & social ================= */
+.account { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.account.guest { flex-direction: column; gap: 6px; }
+.account.guest small { color: var(--muted); font-size: 12px; }
+.account .chip { cursor: pointer; border: 1px solid var(--line); }
+.account .chip:hover { background: rgba(168,131,255,.25); }
+
+.lobby-list { padding: 6px; display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
+.lobby-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); color: inherit; text-align: start; }
+.lobby-row:hover { background: var(--card2); border-color: var(--lilac); }
+.lobby-row .jelly { width: 34px; flex: 0 0 auto; }
+.lobby-row b { display: block; font-size: 14px; }
+.lobby-row small { color: var(--muted); font-size: 11px; }
+.lobby-row .code { font-weight: 900; letter-spacing: 2px; direction: ltr; color: var(--lemon); }
+
+/* clickable player names */
+.nm[data-act="profile"] { cursor: pointer; text-decoration: underline dotted rgba(255,255,255,.3); text-underline-offset: 3px; }
+.nm[data-act="profile"]:hover { color: var(--lemon); }
+.pcard .crown-give { position: absolute; bottom: 2px; inset-inline-start: 4px; font-size: 13px; opacity: .45; cursor: pointer; }
+.pcard .crown-give:hover { opacity: 1; transform: scale(1.2); }
+
+/* profile card */
+.prof-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.prof-head .jelly { width: 68px; flex: 0 0 auto; }
+.chip.gold { background: linear-gradient(90deg, var(--lemon), #ffb347); color: var(--ink); }
+.chip.bad { background: rgba(255,122,133,.3); color: var(--coral); }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+@media (max-width: 420px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 6px; text-align: center; }
+.stat b { display: block; font-size: 17px; font-variant-numeric: tabular-nums; }
+.stat small { color: var(--muted); font-size: 11px; }
+.trend { display: flex; align-items: flex-end; gap: 6px; height: 52px; padding: 0 4px; }
+.trend i { flex: 1; border-radius: 5px 5px 0 0; background: rgba(255,255,255,.18); }
+.trend i.w { background: linear-gradient(180deg, var(--lemon), var(--coral)); }
+
+/* leaderboard + admin rows */
+.brow .flag { border: none; background: none; font-size: 15px; opacity: .5; padding: 0 4px; }
+.brow .flag:hover { opacity: 1; }
+.adm-list { display: flex; flex-direction: column; gap: 8px; max-height: 56vh; overflow-y: auto; }
+.adm-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); }
+.adm-row b { display: block; font-size: 14px; }
+.adm-row small { display: block; color: var(--muted); font-size: 12px; }
+.adm-row b[data-act="profile"] { cursor: pointer; text-decoration: underline dotted rgba(255,255,255,.3); }
+textarea.input { resize: none; line-height: 1.6; }
+
 /* auto-advance countdown on reveal / score screens */
 .cd { display: inline-block; min-width: 1.4em; font-variant-numeric: tabular-nums; font-weight: 900; opacity: .75; }
 

@@ -49,6 +49,13 @@ import { getDiscordBootstrap } from './discord.js';
       a_liar: 'سيد المقالب', a_liar_d: 'خدع {n} مرة', a_detective: 'المحقق', a_detective_d: '{n} إجابات صحيحة', a_sniper: 'القناص', a_sniper_d: '{n} تخمينات دقيقة', a_lightning: 'البرق', a_lightning_d: 'الأسرع {n} مرات', a_gambler: 'المغامر', a_gambler_d: 'راهن بقوة {n} مرات', a_fire: 'ولّعت', a_fire_d: 'سلسلة {n} 🔥', a_star: 'نجم الشلة', a_star_d: 'اختاروه {n} مرات',
       ann_first: 'صرت الأول! 👑', ann_combo: 'كومبو ×{n} 🔥', ann_unstoppable: 'ما ينوقف!! 🔥🔥', ann_legend: 'مقلب أسطوري! 😈', ann_perfect: 'مثالي! 3 من 3 ✨', ann_golden: 'الجولة الذهبية! 👑',
       achievements: 'إنجازاتي', achUnlocked: 'إنجاز جديد! 🏅',
+      ach_games50: 'مدمن فعلي', achd_games50: 'العب ٥٠ لعبة', ach_wins25: 'بطل', achd_wins25: 'افز بـ٢٥ لعبة',
+      ach_liar50: 'أبو الكذب', achd_liar50: 'اخدع ٥٠ لاعب', ach_bull10: 'قنّاص محترف', achd_bull10: '١٠ مرات في الصميم',
+      ach_streak8: 'ما ينوقف', achd_streak8: 'سلسلة ٨ ورا بعض', ach_speedy25: 'برق مضاعف', achd_speedy25: 'كن الأسرع ٢٥ مرة',
+      ach_spy_hunter: 'صائد الجواسيس', achd_spy_hunter: 'لقّط الجاسوس ٥ مرات', ach_spy_ghost: 'شبح', achd_spy_ghost: 'اهرب كجاسوس ٥ مرات',
+      ach_winstreak3: 'ثلاثية', achd_winstreak3: 'افز ٣ ألعاب ورا بعض', ach_winstreak10: 'أسطورة حية', achd_winstreak10: 'افز ١٠ ألعاب ورا بعض',
+      ach_score10k: 'عشرة آلاف', achd_score10k: 'اجمع ١٠٬٠٠٠ نقطة', ach_score100k: 'مليونير', achd_score100k: 'اجمع ١٠٠٬٠٠٠ نقطة',
+      ach_crowded: 'نجم الحفلة', achd_crowded: 'افز بلعبة فيها ٦ لاعبين أو أكثر', ach_sniper: 'عين الصقر', achd_sniper: '٢٠ تخمين دقيق',
       ach_first_game: 'أول لعبة', achd_first_game: 'خلّص أول لعبة', ach_first_win: 'أول فوز', achd_first_win: 'اطلع الأول في لعبة', ach_liar5: 'كذّاب محترف', achd_liar5: 'اخدع 5 لاعبين', ach_bull: 'قنّاص', achd_bull: 'جيب «في الصميم» 🎯', ach_streak4: 'نار', achd_streak4: 'سلسلة 4 ورا بعض', ach_allin: 'كل شي أو لا شي', achd_allin: 'اكسب رهان ×3', ach_famous: 'المشهور', achd_famous: 'الشلة تختارك في «مين فينا؟»', ach_speedy: 'برق', achd_speedy: 'كن الأسرع 3 مرات', ach_games10: 'مدمن', achd_games10: 'العب 10 ألعاب', ach_wins5: 'أسطورة', achd_wins5: 'افز بـ 5 ألعاب',
       howSteps: ['أنشئ غرفة وشارك الكود أو الرابط مع الشلة.', 'كل جولة تبدأ بآلة الحظ: تحدد نوع الجولة ومضاعف النقاط.', '🤥 المقلب: اكتب كذبة مقنعة، بعدين اختار الصح وراهن عليه.', '🎯 أقرب رقم: خمّن، والأقرب ياخذ النقاط (والصميم +1000!).', '⚡ صح ولا خطأ و🔤 فكّ الإيموجي: جاوب بسرعة، كل ثانية تفرق.', '👥 مين فينا؟ صوّت على واحد من الشلة ووافق الأغلبية.', '🕵️ الجاسوس: واحد ما يعرف الكلمة، الكل يكتب تلميح، وبعدين صوتوا مين الجاسوس!', 'عندك قدرتين كل لعبة: 🔍 كشّاف يشيل خيارين غلط، و💎 دبل يضاعف نقاط جولة.', 'اجمع سلاسل 🔥 واكسب الألقاب والإنجازات وارفع مستواك!'],
       bullseye: 'في الصميم! 🎯', streakToast: 'سلسلة {n}! 🔥',
@@ -58,6 +65,23 @@ import { getDiscordBootstrap } from './discord.js';
       laughHint: 'اضحك على أحلى كذبة 😂 وصاحبها ياخذ +200', g_funniest: 'أضحك كذبة 😂',
       rivals: '⚔️ خصومك', nemesis: 'عدوك اللدود', nemesisD: 'قلبك {n} مرات 😤', victim: 'ضحيتك المفضلة', victimD: 'قلبته {n} مرات 😈',
       phrases: ['ما راح تعرفها 😏', 'أنا الفايز 🏆', 'يا ساتر 😂', 'ركّز يا بطل!', 'كذّاب! 🤥', 'يلا بسرعة ⏰', 'حظ أوفر 😅', 'الله عليك 👏', 'مستحيل! 😱', 'صدقني هذي الصح 😇', 'خلاص تعبت 😴', 'انتقامي قادم 😈'],
+      signIn: 'دخول بديسكورد', signOut: 'تسجيل خروج', guestNote: 'تلعب كضيف — تقدمك ما ينحفظ', signedInAs: 'مسجّل باسم',
+      profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
+      rank: 'الترتيب', games: 'ألعاب', wins: 'فوز', winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
+      curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: 'متابِعين', followingN: 'يتابع', memberSince: 'عضو منذ',
+      follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
+      report: 'بلاغ', reportTitle: 'بلاغ عن {n}', reportWhy: 'وش المشكلة؟', r_cheat: 'غش', r_name: 'اسم مسيء', r_chat: 'إساءة بالدردشة', r_other: 'غير ذلك',
+      reportDetails: 'تفاصيل (اختياري)', reportSent: 'وصلنا البلاغ، شكراً 🙏', suggestPlaceholder: 'وش تبي نضيف أو نغيّر؟',
+      sent: 'تم الإرسال ✅', signInFirst: 'سجّل دخول أول', slowDown: 'على مهلك شوي ⏳',
+      openRooms: 'غرف مفتوحة', noRooms: 'ما فيه غرف مفتوحة الحين — أنشئ وحدة!', refresh: 'تحديث', inLobby: 'باللوبي', playing: 'تلعب الحين',
+      publicRoom: 'الغرفة', roomPublic: 'ظاهرة للكل', roomPrivate: 'بالكود فقط',
+      makeHost: 'سلّمه التاج 👑', confirmHost: 'تسلّم الاستضافة لـ{n}؟', nowHost: '{n} صار المضيف 👑',
+      tab_reports: 'البلاغات', tab_suggestions: 'الاقتراحات', tab_banned: 'المحظورين', tab_search: 'بحث',
+      ban: 'حظر', unban: 'فك الحظر', resetProfile: 'تصفير البروفايل', markDone: 'تم', banWhy: 'سبب الحظر',
+      confirmReset: 'تصفير كل تقدم {n}؟ ما يمكن التراجع.', nothingHere: 'ما فيه شي هنا 👌', searchPlayers: 'ابحث باسم لاعب',
+      youAreBanned: 'حسابك محظور: {r}', achLocked: 'مقفل',
+      aboutBody: ['مقلب لعبة حفلات جماعية عربية/إنجليزية، تنلعب من الجوال مع الشلة في نفس الوقت.', '٦ أنواع جولات، آلة حظ تحدد المضاعف، وقدرات تستخدمها مرة وحدة باللعبة.', 'كل شي فيها أصلي: الأسئلة، الشخصيات، والأصوات تتولّد بالمتصفح بدون أي ملفات.'],
+      aboutMade: 'صُنعت بـ ❤️', version: 'الإصدار',
     },
     en: {
       appName: 'MAQLAB', tagline: 'Bluff smart. Catch the liars. 😏', yourName: 'Your name', create: 'Create room ✨', join: 'Join', or: 'or',
@@ -92,6 +116,13 @@ import { getDiscordBootstrap } from './discord.js';
       a_liar: 'Master Liar', a_liar_d: 'Fooled {n} times', a_detective: 'Detective', a_detective_d: '{n} correct answers', a_sniper: 'Sniper', a_sniper_d: '{n} spot-on guesses', a_lightning: 'Lightning', a_lightning_d: 'Fastest {n} times', a_gambler: 'High Roller', a_gambler_d: 'Bet big {n} times', a_fire: 'On Fire', a_fire_d: '{n} streak 🔥', a_star: 'Crowd Favorite', a_star_d: 'Picked {n} times',
       ann_first: "You're #1! 👑", ann_combo: 'Combo ×{n} 🔥', ann_unstoppable: 'UNSTOPPABLE!! 🔥🔥', ann_legend: 'Legendary bluff! 😈', ann_perfect: 'Perfect! 3 of 3 ✨', ann_golden: 'GOLDEN ROUND! 👑',
       achievements: 'Achievements', achUnlocked: 'Achievement unlocked! 🏅',
+      ach_games50: 'Veteran', achd_games50: 'Play 50 games', ach_wins25: 'Champion', achd_wins25: 'Win 25 games',
+      ach_liar50: 'Master of Lies', achd_liar50: 'Fool 50 players', ach_bull10: 'Dead Eye', achd_bull10: 'Hit 10 bullseyes',
+      ach_streak8: 'Unstoppable', achd_streak8: 'Get an 8 streak', ach_speedy25: 'Double Lightning', achd_speedy25: 'Be fastest 25 times',
+      ach_spy_hunter: 'Spy Hunter', achd_spy_hunter: 'Catch the spy 5 times', ach_spy_ghost: 'Ghost', achd_spy_ghost: 'Escape as the spy 5 times',
+      ach_winstreak3: 'Hat Trick', achd_winstreak3: 'Win 3 games in a row', ach_winstreak10: 'Living Legend', achd_winstreak10: 'Win 10 games in a row',
+      ach_score10k: 'Ten Thousand', achd_score10k: 'Earn 10,000 points', ach_score100k: 'Point Millionaire', achd_score100k: 'Earn 100,000 points',
+      ach_crowded: 'Life of the Party', achd_crowded: 'Win a game with 6+ players', ach_sniper: 'Hawk Eye', achd_sniper: '20 spot-on guesses',
       ach_first_game: 'First Game', achd_first_game: 'Finish your first game', ach_first_win: 'First Win', achd_first_win: 'Finish 1st in a game', ach_liar5: 'Pro Liar', achd_liar5: 'Fool 5 players', ach_bull: 'Sharpshooter', achd_bull: 'Hit a bullseye 🎯', ach_streak4: 'On Fire', achd_streak4: 'Get a 4 streak', ach_allin: 'All In', achd_allin: 'Win a ×3 bet', ach_famous: 'Famous', achd_famous: "Be the crowd's pick", ach_speedy: 'Lightning', achd_speedy: 'Be fastest 3 times', ach_games10: 'Regular', achd_games10: 'Play 10 games', ach_wins5: 'Legend', achd_wins5: 'Win 5 games',
       howSteps: ['Create a room and share the code or link with friends.', 'Every round starts with a slot machine: round type + point multiplier.', '🤥 The Bluff: write a convincing lie, then find the truth and bet on it.', '🎯 Closest Number: guess — closest wins (bullseye = +1000!).', '⚡ True or False & 🔤 Emoji Decode: answer fast, every second counts.', "👥 Who's Most Likely: vote for a friend and side with the crowd.", "🕵️ The Spy: one player doesn't know the word — everyone drops a clue, then vote who's the spy!", 'Two power-ups per game: 🔍 Peek removes two wrong options, 💎 Double doubles one round.', 'Build 🔥 streaks, win awards & achievements and level up!'],
       bullseye: 'BULLSEYE! 🎯', streakToast: '{n} streak! 🔥',
@@ -101,6 +132,23 @@ import { getDiscordBootstrap } from './discord.js';
       laughHint: 'Laugh at the funniest lie 😂 — its author gets +200', g_funniest: 'Funniest lie 😂',
       rivals: '⚔️ Your rivals', nemesis: 'Your nemesis', nemesisD: 'Fooled you {n} times 😤', victim: 'Favourite victim', victimD: 'You fooled them {n} times 😈',
       phrases: ["You'll never get it 😏", "I'm winning 🏆", 'LOL 😂', 'Focus!', 'Liar! 🤥', 'Hurry up ⏰', 'Better luck next time 😅', 'Nice one 👏', 'No way! 😱', "Trust me, that's it 😇", "I'm tired 😴", 'Revenge is coming 😈'],
+      signIn: 'Sign in with Discord', signOut: 'Sign out', guestNote: "Playing as a guest — progress isn't saved", signedInAs: 'Signed in as',
+      profile: 'Profile', leaderboard: 'Leaderboard', suggestBtn: 'Send a suggestion', about: 'About', adminPanel: 'Admin',
+      rank: 'Rank', games: 'Games', wins: 'Wins', winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
+      curStreak: 'Win streak', bestStreak: 'Longest streak', followers: 'Followers', followingN: 'Following', memberSince: 'Member since',
+      follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
+      report: 'Report', reportTitle: 'Report {n}', reportWhy: "What's wrong?", r_cheat: 'Cheating', r_name: 'Offensive name', r_chat: 'Abusive chat', r_other: 'Something else',
+      reportDetails: 'Details (optional)', reportSent: 'Report received, thank you 🙏', suggestPlaceholder: 'What should we add or change?',
+      sent: 'Sent ✅', signInFirst: 'Sign in first', slowDown: 'Slow down a little ⏳',
+      openRooms: 'Open rooms', noRooms: 'No open rooms right now — start one!', refresh: 'Refresh', inLobby: 'In lobby', playing: 'Playing',
+      publicRoom: 'Room', roomPublic: 'Listed publicly', roomPrivate: 'Code only',
+      makeHost: 'Make host 👑', confirmHost: 'Hand hosting to {n}?', nowHost: '{n} is the host now 👑',
+      tab_reports: 'Reports', tab_suggestions: 'Suggestions', tab_banned: 'Banned', tab_search: 'Search',
+      ban: 'Ban', unban: 'Unban', resetProfile: 'Reset profile', markDone: 'Done', banWhy: 'Ban reason',
+      confirmReset: "Reset all of {n}'s progress? This can't be undone.", nothingHere: 'Nothing here 👌', searchPlayers: 'Search by player name',
+      youAreBanned: 'Your account is banned: {r}', achLocked: 'Locked',
+      aboutBody: ['MAQLAB is a bilingual Arabic/English party game, played together on your phones.', '6 round types, a slot machine that sets the multiplier, and one-use power-ups.', 'Everything in it is original: the questions, the characters, and sound synthesized in the browser with no audio files.'],
+      aboutMade: 'Made with ❤️', version: 'Version',
     },
   };
 
@@ -118,6 +166,7 @@ import { getDiscordBootstrap } from './discord.js';
     room: null, code: null, joining: false,
     draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '' },
     bet: 1, showQR: false, reactOpen: false,
+    me: null, isAdmin: false, lobbies: null, achList: null,
     lastKey: '', phaseTotal: 1, timeouts: [], editor: null,
   };
   state.draft.name = state.profile.name;
@@ -268,12 +317,23 @@ import { getDiscordBootstrap } from './discord.js';
     }, 1400);
   }
   function bumpAch(k, n = 1) { state.ach[k] = (state.ach[k] || 0) + n; store.set('ach', state.ach); }
-  function showAchievements() {
-    const list = ACH.map(([id, e]) => {
-      const ok = state.ach.unlocked.includes(id);
+  async function showAchievements() {
+    modal(`<div class="center" style="padding:40px"><div class="spinner"></div></div>`);
+    if (!state.achList) state.achList = (await api('/api/achievements')).list || [];
+    let unlocked = [];
+    if (signedIn()) {
+      const d = await api('/api/profile/' + encodeURIComponent(state.me.id));
+      unlocked = (d.profile && d.profile.achievements) || [];
+    }
+    const have = new Set(unlocked);
+    const list = state.achList.map(({ id, e }) => {
+      const ok = have.has(id);
       return `<div class="ach-row ${ok ? 'ok' : ''}"><span class="e">${ok ? e : '🔒'}</span><div class="grow"><b>${t('ach_' + id)}</b><small>${t('achd_' + id)}</small></div>${ok ? '✅' : ''}</div>`;
     }).join('');
-    modal(`<h3>🏅 ${t('achievements')} (${state.ach.unlocked.length}/${ACH.length})</h3><div class="col" style="gap:8px">${list}</div><button class="btn block" data-close style="margin-top:14px">${t('close')}</button>`);
+    modal(`<h3>🏅 ${t('achievements')} (${fmt(have.size)}/${fmt(state.achList.length)})</h3>
+      ${signedIn() ? '' : `<div class="center muted" style="font-size:13px;margin-bottom:10px">${t('guestNote')}</div>`}
+      <div class="col" style="gap:8px;max-height:56vh;overflow-y:auto">${list}</div>
+      <button class="btn block" data-close style="margin-top:14px">${t('close')}</button>`);
   }
 
   // ================= socket =================
@@ -338,6 +398,14 @@ import { getDiscordBootstrap } from './discord.js';
     $app.querySelectorAll('.laugh[data-id]').forEach(b => { b.querySelector('b').textContent = fmt(counts[b.dataset.id] || 0); });
     tone(1000 + Math.random() * 300, 0.05, 'triangle', 0.03);
   });
+  socket.on('achievements', ids => ids.forEach((id, i) => later(1400 + i * 1200, () => {
+    const found = (state.achList || []).find(a => a.id === id);
+    const el = document.createElement('div');
+    el.className = 'ach-pop';
+    el.innerHTML = `<span class="e">${found ? found.e : '🏅'}</span><div><small>${t('achUnlocked')}</small><b>${esc(t('ach_' + id))}</b></div>`;
+    document.body.appendChild(el); setTimeout(() => el.remove(), 3600);
+    sfx.ach(); buzz([30, 30, 30]); confetti(40);
+  })));
   socket.on('kicked', () => { forget(state.code); state.room = null; state.code = null; toast(t('kicked'), 'err'); navigate('/'); });
 
   function onPhase(prev, s) {
@@ -540,7 +608,16 @@ import { getDiscordBootstrap } from './discord.js';
             <button class="btn sky" data-act="join-code">${t('join')}</button>
           </div>
         </div>
-        <div class="links"><button data-act="how">❓ ${t('how')}</button><button data-act="edit">🎨 ${t('editAvatar')}</button><button data-act="achievements">🏅 ${t('achievements')} <span class="chip" style="padding:1px 8px">${state.ach.unlocked.length}/${ACH.length}</span></button></div>
+        ${accountBar()}
+        ${lobbyList()}
+        <div class="links">
+          <button data-act="how">❓ ${t('how')}</button>
+          <button data-act="edit">🎨 ${t('editAvatar')}</button>
+          <button data-act="achievements">🏅 ${t('achievements')}</button>
+          <button data-act="leaderboard">🏆 ${t('leaderboard')}</button>
+          <button data-act="suggest">💡 ${t('suggestBtn')}</button>
+          <button data-act="about">ℹ️ ${t('about')}</button>
+        </div>
       </div>
     </div></div>`;
   }
@@ -561,7 +638,7 @@ import { getDiscordBootstrap } from './discord.js';
     const seg = (key, vals, lab) => `<div class="seg">${vals.map(v => `<button class="${st[key] === v ? 'on' : ''}" data-act="set" data-k="${key}" data-v="${v}" ${dis}>${lab(v)}</button>`).join('')}</div>`;
     const players = online.map(p => `
       <div class="pcard ${p.id === mid ? 'me' : ''} ${p.team ? 'team-' + p.team : ''}" data-pid="${esc(p.id)}" ${p.id !== mid ? `data-act="poke" data-id="${esc(p.id)}"` : ''}>
-        ${p.id === s.hostId ? '<span class="crown">👑</span>' : ''}${host && p.id !== mid ? `<span class="kick-x" data-act="kick" data-id="${esc(p.id)}">✕</span>` : ''}${p.ready ? '<span class="rdy">✅</span>' : ''}${J(p.avatar)}<span class="nm">${esc(p.name)}</span>
+        ${p.id === s.hostId ? '<span class="crown">👑</span>' : ''}${host && p.id !== mid ? `<span class="kick-x" data-act="kick" data-id="${esc(p.id)}">✕</span><span class="crown-give" data-act="makehost" data-id="${esc(p.id)}" title="${t('makeHost')}">👑</span>` : ''}${p.ready ? '<span class="rdy">✅</span>' : ''}${J(p.avatar)}<span class="nm" ${p.userId ? `data-act="profile" data-uid="${esc(p.userId)}"` : ''}>${esc(p.name)}</span>
       </div>`).join('');
     const invite = online.length < 12 ? `<div class="pcard empty" data-act="copy">＋<span style="font-size:12px;font-weight:700">${t('invite')}</span></div>` : '';
     return `<div class="screen">
@@ -590,6 +667,7 @@ import { getDiscordBootstrap } from './discord.js';
           </div></div>
           <div class="set-row"><div class="lbl">${t('pace')}</div>${seg('pace', ['chill', 'normal', 'fast'], v => t(v))}</div>
           <div class="set-row"><div class="lbl">${t('teams')}</div><div class="seg">${[false, true].map(v => `<button class="${st.teams === v ? 'on' : ''}" data-act="teams" data-v="${v}" ${dis}>${v ? t('teamsOn') : t('teamsOff')}</button>`).join('')}</div></div>
+          <div class="set-row"><div class="lbl">${t('publicRoom')}</div><div class="seg">${[true, false].map(v => `<button class="${st.public === v ? 'on' : ''}" data-act="public" data-v="${v}" ${dis}>${v ? t('roomPublic') : t('roomPrivate')}</button>`).join('')}</div></div>
         </div>
       </div></div>
       ${dock(host
@@ -1015,7 +1093,7 @@ import { getDiscordBootstrap } from './discord.js';
       const pr = s.prevRank[p.id];
       const mv = pr == null ? '' : pr > i ? `<span class="mv up">▲${pr - i}</span>` : pr < i ? `<span class="mv down">▼${i - pr}</span>` : '<span class="mv"></span>';
       return `<div class="brow ${p.id === mid ? 'me' : ''} ${p.team ? 'team-' + p.team : ''}" data-from="${pr == null ? i : pr}" data-to="${i}" data-old="${p.score - d}" data-new="${p.score}">
-        <span class="rk">${i === 0 ? '👑' : i + 1}</span>${J(p.avatar)}<span class="nm">${esc(p.name)}${p.streak >= 2 ? `<span class="streak">🔥${p.streak}</span>` : ''}</span>
+        <span class="rk">${i === 0 ? '👑' : i + 1}</span>${J(p.avatar)}<span class="nm" ${p.userId ? `data-act="profile" data-uid="${esc(p.userId)}"` : ''}>${esc(p.name)}${p.streak >= 2 ? `<span class="streak">🔥${p.streak}</span>` : ''}</span>
         <span class="delta ${d < 0 ? 'neg' : ''}">${d ? (d > 0 ? '+' : '') + fmt(d) : ''}</span><span class="sc">${fmt(p.score - d)}</span>${mv}
       </div>`;
     }).join('');
@@ -1050,7 +1128,7 @@ import { getDiscordBootstrap } from './discord.js';
   function finalView() {
     const s = state.room, mid = myId();
     const ranked = [...s.players].filter(p => p.connected || p.score > 0).sort((a, b) => b.score - a.score);
-    const pod = (p, n) => p ? `<div class="pod p${n}">${J(p.avatar)}<span class="nm">${esc(p.name)}</span><span class="sc">${fmt(p.score)}</span><div class="blk">${n}</div></div>` : '<div class="pod"></div>';
+    const pod = (p, n) => p ? `<div class="pod p${n}">${J(p.avatar)}<span class="nm" ${p.userId ? `data-act="profile" data-uid="${esc(p.userId)}"` : ''}>${esc(p.name)}</span><span class="sc">${fmt(p.score)}</span><div class="blk">${n}</div></div>` : '<div class="pod"></div>';
     const awards = (s.awards || []).map((a, i) => { const p = P(a.pid); return p ? `<div class="award"><div class="flip" style="animation-delay:${1.8 + i * 0.35}s"><div class="face"><span class="e">${AWARD_E[a.key]}</span><span class="t">${t('a_' + a.key)}</span>${J(p.avatar)}<span class="who">${esc(p.name)}</span><span class="n">${t('a_' + a.key + '_d', { n: fmt(a.value) })}</span></div></div></div>` : ''; }).join('');
     const bl = s.bestLie;
     const L = levelInfo(state.xp);
@@ -1284,6 +1362,10 @@ import { getDiscordBootstrap } from './discord.js';
       <button class="btn ghost block" data-m="lang">🌐 ${t('uiLang')}</button>
       <button class="btn ghost block" data-m="how">❓ ${t('how')}</button>
       <button class="btn ghost block" data-m="ach">🏅 ${t('achievements')}</button>
+      <button class="btn ghost block" data-m="board">🏆 ${t('leaderboard')}</button>
+      <button class="btn ghost block" data-m="suggest">💡 ${t('suggestBtn')}</button>
+      <button class="btn ghost block" data-m="about">ℹ️ ${t('about')}</button>
+      ${state.isAdmin ? `<button class="btn lilac block" data-m="admin">🛡️ ${t('adminPanel')}</button>` : ''}
       ${inGame && isHost() ? `<button class="btn lilac block" data-m="end">🏁 ${t('endGame')}</button>` : ''}
       ${state.code ? `<button class="btn coral block" data-m="leave">🚪 ${t('leave')}</button>` : ''}
     </div>`, m => m.addEventListener('click', e => {
@@ -1294,6 +1376,10 @@ import { getDiscordBootstrap } from './discord.js';
       if (k === 'lang') { switchLang(); openMenu(); }
       if (k === 'how') howTo();
       if (k === 'ach') showAchievements();
+      if (k === 'board') openLeaderboard();
+      if (k === 'suggest') { closeModal(); openSuggest(); }
+      if (k === 'about') openAbout();
+      if (k === 'admin') { closeModal(); openAdmin(); }
       if (k === 'end') { closeModal(); emit('end'); }
       if (k === 'leave') { closeModal(); confirmBox(t('leave') + '?', leaveRoom); }
     }));
@@ -1301,6 +1387,275 @@ import { getDiscordBootstrap } from './discord.js';
   function howTo() { modal(`<h3>${t('how')}</h3><ol>${STR[state.lang].howSteps.map(s => `<li>${s}</li>`).join('')}</ol><button class="btn block" data-close>${t('close')}</button>`); }
   function switchLang() { state.lang = state.lang === 'ar' ? 'en' : 'ar'; store.set('uiLang', state.lang); state.lastKey = ''; render(); }
   function toggleMusic() { state.music = !state.music; store.set('music', state.music); if (state.music) { ctx(); startMusic(); } }
+
+  // ================= account & social =================
+  async function api(path, opts = {}) {
+    try {
+      const r = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+      const d = await r.json().catch(() => ({}));
+      return r.ok ? d : { ...d, status: r.status };
+    } catch { return { error: 'network' }; }
+  }
+  const post = (path, body) => api(path, { method: 'POST', body: JSON.stringify(body || {}) });
+
+  async function loadMe() {
+    const r = await api('/api/auth/me');
+    state.me = r.user || null;
+    state.isAdmin = !!r.isAdmin;
+    if (r.banned) toast(t('youAreBanned', { r: r.banned }), 'err');
+  }
+
+  const signedIn = () => !!state.me;
+  function needAccount() {
+    if (signedIn()) return true;
+    toast(t('signInFirst'), 'err');
+    return false;
+  }
+  const apiErr = d => toast(d.error === 'slow_down' ? t('slowDown') : t('err_bad'), 'err');
+
+  function accountBar() {
+    if (!signedIn()) {
+      return `<div class="account guest">
+        <button class="btn sm lilac" data-act="signin">💬 ${t('signIn')}</button>
+        <small>${t('guestNote')}</small></div>`;
+    }
+    return `<div class="account">
+      <button class="chip" data-act="profile" data-uid="${esc(state.me.id)}">👤 ${esc(state.me.name)}</button>
+      ${state.isAdmin ? `<button class="chip" data-act="admin">🛡️</button>` : ''}
+      <button class="chip" data-act="signout">${t('signOut')}</button></div>`;
+  }
+
+  // ---------- open rooms ----------
+  function lobbyList() {
+    const ls = state.lobbies;
+    if (ls === null) return '';
+    const rows = ls.length ? ls.map(l => `
+      <button class="lobby-row" data-act="join-lobby" data-code="${esc(l.code)}">
+        ${l.avatar ? J(l.avatar) : ''}
+        <div class="grow">
+          <b>${esc(l.host || '')}</b>
+          <small>${l.phase === 'lobby' ? t('inLobby') : `${t('playing')} · ${l.round}/${l.rounds}`}</small>
+        </div>
+        <span class="chip">${fmt(l.players)}/12</span>
+        <span class="code">${esc(l.code)}</span>
+      </button>`).join('') : `<div class="center muted" style="padding:14px;font-size:13px">${t('noRooms')}</div>`;
+    return `<div class="section-title"><span>🚪 ${t('openRooms')}</span><button class="chip" data-act="rooms-refresh">↻ ${t('refresh')}</button></div>
+      <div class="glass lobby-list">${rows}</div>`;
+  }
+  async function loadLobbies() {
+    const r = await api('/api/lobbies');
+    state.lobbies = r.lobbies || [];
+    if (state.route.name === 'home') { state.lastKey = ''; render(); }
+  }
+
+  // ---------- profile ----------
+  async function openProfile(userId) {
+    if (!userId) return;
+    modal(`<div class="center" style="padding:40px"><div class="spinner"></div></div>`);
+    const d = await api('/api/profile/' + encodeURIComponent(userId));
+    if (d.error || d.status) { closeModal(); toast(d.status === 503 ? t('err_bad') : t('err_noroom'), 'err'); return; }
+    drawProfile(d);
+  }
+
+  function drawProfile(d) {
+    const p = d.profile;
+    const games = Number(p.games) || 0;
+    const rate = games ? Math.round((Number(p.wins) / games) * 100) : 0;
+    const L = levelInfo(Number(p.xp) || 0);
+    const tile = (label, value) => `<div class="stat"><b>${value}</b><small>${label}</small></div>`;
+    const recent = (d.games || []).slice(0, 7);
+    const trend = recent.length
+      ? `<div class="trend">${recent.slice().reverse().map(g => `<i class="${g.won ? 'w' : ''}" style="height:${Math.max(8, Math.min(46, (g.score / 4000) * 46))}px" title="${fmt(g.score)}"></i>`).join('')}</div>`
+      : `<div class="center muted" style="font-size:12px">${t('noGames')}</div>`;
+    const ach = (p.achievements || []).length;
+
+    modal(`
+      <div class="prof-head">
+        ${J(p.avatar && p.avatar.s != null ? p.avatar : Jelly.random())}
+        <div>
+          <h3 style="margin:0;text-align:start">${esc(p.name)}</h3>
+          <div class="row" style="gap:6px;margin-top:4px">
+            <span class="chip">${t('level')} ${L.level}</span>
+            ${d.rank ? `<span class="chip gold">#${fmt(d.rank)}</span>` : ''}
+            ${p.banned_at ? `<span class="chip bad">${t('ban')}</span>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        ${tile(t('winRate'), rate + '%')}
+        ${tile(t('totalScore'), fmt(p.total_score))}
+        ${tile(t('games'), fmt(games))}
+        ${tile(t('wins'), fmt(p.wins))}
+        ${tile(t('bestScore'), fmt(p.best_score))}
+        ${tile(t('curStreak'), '🔥 ' + fmt(p.win_streak))}
+        ${tile(t('bestStreak'), fmt(p.best_win_streak))}
+        ${tile(t('achievements'), `${fmt(ach)}/24`)}
+      </div>
+      <div class="section-title"><span>${t('lastGames')}</span><span class="chip">${t('followers')} ${fmt(d.follows.followers)} · ${t('followingN')} ${fmt(d.follows.following)}</span></div>
+      ${trend}
+      <div class="row" style="margin-top:16px;flex-wrap:wrap">
+        ${d.isMe ? '' : `<button class="btn sm ${d.isFollowing ? 'ghost' : 'mint'} grow" data-pf="follow">${d.isFollowing ? t('unfollow') : t('follow')}</button>`}
+        ${d.isMe ? '' : `<button class="btn sm ghost" data-pf="report">🚩 ${t('report')}</button>`}
+        ${d.viewerIsAdmin && !d.isMe ? `<button class="btn sm coral" data-pf="${p.banned_at ? 'unban' : 'ban'}">${p.banned_at ? t('unban') : t('ban')}</button>
+        <button class="btn sm ghost" data-pf="reset">${t('resetProfile')}</button>` : ''}
+        <button class="btn sm ghost grow" data-close>${t('close')}</button>
+      </div>`,
+    m => m.addEventListener('click', async e => {
+      const b = e.target.closest('[data-pf]'); if (!b) return;
+      const k = b.dataset.pf;
+      if (k === 'follow') {
+        if (!needAccount()) return;
+        const r = await post('/api/follow', { userId: p.user_id, follow: !d.isFollowing });
+        if (r.ok) { d.isFollowing = r.following; sfx.tap(); drawProfile(d); }
+      } else if (k === 'report') { closeModal(); openReport(p); }
+      else if (k === 'ban') { closeModal(); openBan(p); }
+      else if (k === 'unban') { await post('/api/admin/action', { action: 'unban', userId: p.user_id }); toast(t('sent'), 'ok'); closeModal(); }
+      else if (k === 'reset') {
+        closeModal();
+        confirmBox(t('confirmReset', { n: p.name }), async () => {
+          await post('/api/admin/action', { action: 'reset', userId: p.user_id });
+          toast(t('sent'), 'ok');
+        });
+      }
+    }));
+  }
+
+  // ---------- leaderboard ----------
+  async function openLeaderboard() {
+    modal(`<div class="center" style="padding:40px"><div class="spinner"></div></div>`);
+    const d = await api('/api/leaderboard');
+    if (d.error || d.status) { closeModal(); toast(t('err_bad'), 'err'); return; }
+    const rows = d.entries.length ? d.entries.map((e, i) => `
+      <div class="brow ${e.user_id === d.meId ? 'me' : ''}">
+        <span class="rk">${i === 0 ? '👑' : i + 1}</span>${J(e.avatar && e.avatar.s != null ? e.avatar : {})}
+        <span class="nm" data-act="profile" data-uid="${esc(e.user_id)}">${esc(e.name)}</span>
+        <span class="sc">${fmt(e.total_score)}</span>
+        ${e.user_id === d.meId ? '' : `<button class="flag" data-lb-report="${esc(e.user_id)}" data-lb-name="${esc(e.name)}">🚩</button>`}
+      </div>`).join('') : `<div class="center muted" style="padding:20px">${t('nothingHere')}</div>`;
+    modal(`<h3>🏆 ${t('leaderboard')}</h3>
+      ${d.myRank ? `<div class="center muted" style="font-size:13px;margin-bottom:8px">${t('rank')}: #${fmt(d.myRank)}</div>` : ''}
+      <div class="board" data-scroll="lb" style="max-height:58vh;overflow-y:auto">${rows}</div>
+      <button class="btn block ghost" data-close style="margin-top:14px">${t('close')}</button>`,
+    m => m.addEventListener('click', e => {
+      const f = e.target.closest('[data-lb-report]');
+      if (f) { closeModal(); openReport({ user_id: f.dataset.lbReport, name: f.dataset.lbName }); return; }
+      const n = e.target.closest('[data-act="profile"]');
+      if (n) { closeModal(); openProfile(n.dataset.uid); }
+    }));
+  }
+
+  // ---------- report / suggest ----------
+  function openReport(target) {
+    if (!needAccount()) return;
+    const reasons = [['cheat', 'r_cheat'], ['name', 'r_name'], ['chat', 'r_chat'], ['other', 'r_other']];
+    modal(`<h3>🚩 ${t('reportTitle', { n: esc(target.name) })}</h3>
+      <div class="lbl" style="font-weight:700;margin-bottom:8px">${t('reportWhy')}</div>
+      <div class="types">${reasons.map(([v, k], i) => `<button class="type-tog ${i === 0 ? 'on' : ''}" data-reason="${v}">${t(k)}</button>`).join('')}</div>
+      <textarea id="rep-details" class="input" style="height:80px;text-align:start;padding:12px;margin-top:12px" maxlength="500" placeholder="${t('reportDetails')}"></textarea>
+      <div class="row" style="margin-top:14px"><button class="btn coral grow" data-send>${t('report')}</button><button class="btn ghost grow" data-close>${t('cancel')}</button></div>`,
+    m => {
+      let reason = 'cheat';
+      m.addEventListener('click', async e => {
+        const r = e.target.closest('[data-reason]');
+        if (r) { reason = r.dataset.reason; m.querySelectorAll('[data-reason]').forEach(b => b.classList.toggle('on', b === r)); return; }
+        if (!e.target.closest('[data-send]')) return;
+        const d = await post('/api/report', { userId: target.user_id, reason, details: m.querySelector('#rep-details').value });
+        closeModal();
+        d.ok ? toast(t('reportSent'), 'ok') : apiErr(d);
+      });
+    });
+  }
+
+  function openBan(target) {
+    modal(`<h3>${t('ban')} — ${esc(target.name)}</h3>
+      <input id="ban-why" class="input" maxlength="200" placeholder="${t('banWhy')}" style="text-align:start">
+      <div class="row" style="margin-top:14px"><button class="btn coral grow" data-send>${t('ban')}</button><button class="btn ghost grow" data-close>${t('cancel')}</button></div>`,
+    m => m.addEventListener('click', async e => {
+      if (!e.target.closest('[data-send]')) return;
+      const d = await post('/api/admin/action', { action: 'ban', userId: target.user_id, reason: m.querySelector('#ban-why').value });
+      closeModal();
+      d.ok ? toast(t('sent'), 'ok') : apiErr(d);
+    }));
+  }
+
+  function openSuggest() {
+    if (!needAccount()) return;
+    modal(`<h3>💡 ${t('suggestBtn')}</h3>
+      <textarea id="sug-body" class="input" style="height:120px;text-align:start;padding:12px" maxlength="2000" placeholder="${t('suggestPlaceholder')}"></textarea>
+      <div class="row" style="margin-top:14px"><button class="btn mint grow" data-send>${t('send')}</button><button class="btn ghost grow" data-close>${t('cancel')}</button></div>`,
+    m => m.addEventListener('click', async e => {
+      if (!e.target.closest('[data-send]')) return;
+      const d = await post('/api/suggest', { body: m.querySelector('#sug-body').value });
+      closeModal();
+      d.ok ? toast(t('sent'), 'ok') : apiErr(d);
+    }));
+  }
+
+  // ---------- admin ----------
+  async function openAdmin(tab = 'reports') {
+    const d = await api('/api/admin/state');
+    if (d.status === 404) { toast(t('err_host'), 'err'); return; }
+    const tabs = [['reports', d.reports.length], ['suggestions', d.suggestions.length], ['banned', d.banned.length], ['search', '']];
+    const card = (inner, actions) => `<div class="adm-row"><div class="grow">${inner}</div><div class="row">${actions}</div></div>`;
+    let body = '';
+    if (tab === 'reports') {
+      body = d.reports.length ? d.reports.map(r => card(
+        `<b data-act="profile" data-uid="${esc(r.reported_id)}">${esc(r.reported_name)}</b>
+         <small>${esc(r.reason)}${r.details ? ' — ' + esc(r.details) : ''}</small>
+         <small class="muted">${esc(r.reporter_name)}</small>`,
+        `<button class="btn sm coral" data-adm="ban" data-id="${esc(r.reported_id)}" data-name="${esc(r.reported_name)}">${t('ban')}</button>
+         <button class="btn sm ghost" data-adm="handleReport" data-rid="${r.id}">${t('markDone')}</button>`)).join('') : '';
+    } else if (tab === 'suggestions') {
+      body = d.suggestions.length ? d.suggestions.map(s => card(
+        `<b>${esc(s.name)}</b><small>${esc(s.body)}</small>`,
+        `<button class="btn sm ghost" data-adm="handleSuggestion" data-rid="${s.id}">${t('markDone')}</button>`)).join('') : '';
+    } else if (tab === 'banned') {
+      body = d.banned.length ? d.banned.map(b => card(
+        `<b data-act="profile" data-uid="${esc(b.user_id)}">${esc(b.name)}</b><small>${esc(b.ban_reason || '')}</small>`,
+        `<button class="btn sm mint" data-adm="unban" data-id="${esc(b.user_id)}">${t('unban')}</button>`)).join('') : '';
+    } else {
+      body = `<input id="adm-q" class="input" placeholder="${t('searchPlayers')}" style="text-align:start"><div id="adm-results" class="col" style="gap:8px;margin-top:10px"></div>`;
+    }
+    modal(`<h3>🛡️ ${t('adminPanel')}</h3>
+      <div class="tabs">${tabs.map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" data-adm-tab="${k}">${t('tab_' + k)}${n ? ` (${n})` : ''}</button>`).join('')}</div>
+      <div class="adm-list">${body || `<div class="center muted" style="padding:20px">${t('nothingHere')}</div>`}</div>
+      <button class="btn block ghost" data-close style="margin-top:14px">${t('close')}</button>`,
+    m => {
+      const q = m.querySelector('#adm-q');
+      if (q) {
+        let timer = 0;
+        q.addEventListener('input', () => {
+          clearTimeout(timer);
+          timer = setTimeout(async () => {
+            const r = await post('/api/admin/action', { action: 'search', term: q.value });
+            m.querySelector('#adm-results').innerHTML = (r.results || []).map(u =>
+              `<div class="adm-row"><div class="grow"><b data-act="profile" data-uid="${esc(u.user_id)}">${esc(u.name)}</b><small>${fmt(u.games)} ${t('games')} · ${fmt(u.total_score)}</small></div>
+               <button class="btn sm ${u.banned_at ? 'mint' : 'coral'}" data-adm="${u.banned_at ? 'unban' : 'ban'}" data-id="${esc(u.user_id)}" data-name="${esc(u.name)}">${u.banned_at ? t('unban') : t('ban')}</button></div>`).join('');
+          }, 350);
+        });
+      }
+      m.addEventListener('click', async e => {
+        const tb = e.target.closest('[data-adm-tab]');
+        if (tb) { openAdmin(tb.dataset.admTab); return; }
+        const pr = e.target.closest('[data-act="profile"]');
+        if (pr) { closeModal(); openProfile(pr.dataset.uid); return; }
+        const b = e.target.closest('[data-adm]'); if (!b) return;
+        const act = b.dataset.adm;
+        if (act === 'ban') { closeModal(); openBan({ user_id: b.dataset.id, name: b.dataset.name }); return; }
+        await post('/api/admin/action', { action: act, userId: b.dataset.id, id: b.dataset.rid ? +b.dataset.rid : undefined });
+        openAdmin(tab);
+      });
+    });
+  }
+
+  // ---------- about ----------
+  function openAbout() {
+    modal(`<div class="center"><div class="logo sm">${t('appName')}</div></div>
+      ${STR[state.lang].aboutBody.map(p => `<p>${esc(p)}</p>`).join('')}
+      <div class="mode-strip" style="margin:14px 0">${Object.keys(TYPES).map(k => `<span class="chip">${TYPES[k]} ${t('type_' + k)}</span>`).join('')}</div>
+      <div class="center muted" style="font-size:12px">${t('aboutMade')} · ${t('version')} 2.0</div>
+      <button class="btn block ghost" data-close style="margin-top:14px">${t('close')}</button>`);
+  }
 
   // ================= actions =================
   function needName() {
@@ -1320,6 +1675,26 @@ import { getDiscordBootstrap } from './discord.js';
   const actions = {
     menu: openMenu, how: howTo, edit: openEditor, achievements: showAchievements,
     home: () => navigate('/'),
+    signin: () => { location.href = '/api/auth/discord/start'; },
+    async signout() { await post('/api/auth/logout'); state.me = null; state.isAdmin = false; state.lastKey = ''; render(); },
+    profile: el => openProfile(el.dataset.uid),
+    leaderboard: openLeaderboard,
+    suggest: openSuggest,
+    about: openAbout,
+    admin: () => openAdmin(),
+    'rooms-refresh'() { sfx.tap(); loadLobbies(); },
+    'join-lobby'(el) {
+      if (!needName()) return;
+      sfx.send();
+      history.pushState(null, '', `/room/${el.dataset.code}`);
+      state.route = parseRoute();
+      join(el.dataset.code);
+    },
+    makehost(el, e) {
+      e.stopPropagation();
+      const p = P(el.dataset.id); if (!p) return;
+      confirmBox(t('confirmHost', { n: p.name }), () => emit('makeHost', p.id));
+    },
     sound() { state.sound = !state.sound; store.set('sound', state.sound); render(); sfx.tap(); },
     music() { toggleMusic(); render(); },
     lang: switchLang,
@@ -1346,6 +1721,7 @@ import { getDiscordBootstrap } from './discord.js';
     poke(el, e) { if (e.target.closest('[data-act="kick"]')) return actions.kick(e.target.closest('[data-act="kick"]'), e); socket.emit('poke', el.dataset.id); buzz(15); },
     start() { sfx.send(); buzz(30); emit('start'); },
     teams(el) { sfx.tap(); emit('settings', { teams: el.dataset.v === 'true' }); },
+    public(el) { sfx.tap(); emit('settings', { public: el.dataset.v === 'true' }); },
     team(el) { sfx.join(); socket.emit('team', el.dataset.t); },
     ready() { const r = !(me() && me().ready); if (r) { sfx.win(); buzz([20, 30]); } else sfx.tap(); socket.emit('ready'); },
     pump() {
@@ -1423,6 +1799,10 @@ import { getDiscordBootstrap } from './discord.js';
   });
 
   // ================= boot =================
+  loadMe().then(() => { state.lastKey = ''; render(); });
+  loadLobbies();
+  setInterval(() => { if (state.route.name === 'home' && !document.hidden) loadLobbies(); }, 15000);
+
   getDiscordBootstrap().then(info => {
     if (!info) return onRoute();
     // Launched as a Discord Activity: skip the home screen, use the
