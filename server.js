@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const http = require('http');
 const crypto = require('crypto');
@@ -924,6 +925,41 @@ setInterval(() => {
 // ---------------- http ----------------
 app.set('trust proxy', 1); // Render terminates TLS ahead of us; needed for secure cookies + req.protocol
 app.use(express.json());
+
+// Link previews. Crawlers don't run our JS, so the share card has to be in the
+// HTML they receive — and og:image has to be absolute, which we only know at
+// request time. The page keeps a placeholder block we swap out per route.
+const INDEX_HTML = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
+const OG_BLOCK = /<!--og-->[\s\S]*?<!--\/og-->/;
+const attr = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const SITE_TITLE = 'مقلب | MAQLAB';
+const SITE_DESC = 'لعبة حفلات جماعية: اكذب بذكاء، اكشف الكذابين، وخمّن أسرع من ربعك.';
+
+function page(req, title, desc) {
+  const base = `${req.protocol}://${req.get('host')}`;
+  return INDEX_HTML.replace(OG_BLOCK, [
+    '<meta property="og:type" content="website">',
+    '<meta property="og:site_name" content="MAQLAB">',
+    `<meta property="og:title" content="${attr(title)}">`,
+    `<meta property="og:description" content="${attr(desc)}">`,
+    `<meta property="og:image" content="${base}/og.jpg">`,
+    `<meta property="og:url" content="${base}${req.originalUrl}">`,
+    '<meta name="twitter:card" content="summary_large_image">',
+    `<meta name="twitter:image" content="${base}/og.jpg">`,
+  ].join('\n  '));
+}
+
+app.get('/', (req, res) => res.type('html').send(page(req, SITE_TITLE, SITE_DESC)));
+app.get('/room/:code', (req, res) => {
+  const code = String(req.params.code).toUpperCase();
+  const room = rooms.get(code);
+  const n = room ? connected(room).length : 0;
+  res.type('html').send(page(req,
+    `🎈 ادخل غرفة ${code} · MAQLAB`,
+    n ? `${n} من ربعك ينتظرونك بالغرفة الحين — اضغط وادخل على طول.` : SITE_DESC));
+});
+app.get('/profile', (req, res) => res.type('html').send(page(req, SITE_TITLE, SITE_DESC)));
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/room/:code', (req, res) => {
   const r = rooms.get(String(req.params.code).toUpperCase());
@@ -1196,7 +1232,6 @@ app.post('/api/discord/room', (req, res) => {
   res.json({ code: room.code });
 });
 
-app.get(['/room/:code', '/profile'], (_, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 db.init()
   .then(ok => console.log(ok ? 'database connected' : 'no DATABASE_URL — profiles, leaderboard and moderation are off'))
