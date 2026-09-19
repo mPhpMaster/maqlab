@@ -14,7 +14,7 @@ if (Test-Path $pidFile) {
     Remove-Item $pidFile -Force -ErrorAction SilentlyContinue
 }
 
-$proc = Start-Process -FilePath 'node' -ArgumentList 'server.js' -WorkingDirectory $root `
+$proc = Start-Process -FilePath 'node' -ArgumentList '--env-file-if-exists=.env', 'server.js' -WorkingDirectory $root `
     -WindowStyle Hidden -PassThru `
     -RedirectStandardOutput $logFile -RedirectStandardError $errFile
 

@@ -2,3 +2,4 @@ node_modules/
 .server.pid
 server.log
 server.err.log
+.env

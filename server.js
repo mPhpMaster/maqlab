@@ -5,6 +5,7 @@ const express = require('express');
 const QRCode = require('qrcode');
 const { Server } = require('socket.io');
 const content = require('./content');
+const db = require('./db');
 
 const PORT = process.env.PORT || 3000;
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
@@ -919,5 +920,9 @@ app.post('/api/discord/room', (req, res) => {
 });
 
 app.get(['/room/:code', '/profile'], (_, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+
+db.init()
+  .then(ok => console.log(ok ? 'database connected' : 'no DATABASE_URL — profiles, leaderboard and moderation are off'))
+  .catch(e => console.error('database unavailable, running without it:', e.message));
 
 server.listen(PORT, () => console.log(`MAQLAB running on http://localhost:${PORT}`));
