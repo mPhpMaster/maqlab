@@ -104,6 +104,12 @@ async function recordGame({ userId, roomCode, gameNo, score, place, players, rou
   }
 }
 
+const addAchievements = (userId, ids) =>
+  q(`update profiles set achievements = (
+       select coalesce(jsonb_agg(distinct a), '[]'::jsonb)
+         from jsonb_array_elements(achievements || $2::jsonb) a
+     ) where user_id = $1`, [userId, JSON.stringify(ids)]);
+
 // ---------------- social ----------------
 const follow = (followerId, followeeId) =>
   q(`insert into follows (follower_id, followee_id) values ($1,$2) on conflict do nothing`, [followerId, followeeId]);
@@ -165,7 +171,7 @@ const searchProfiles = term =>
     [`%${term.replace(/[%_\\]/g, m => '\\' + m)}%`, term]).then(r => r.rows);
 
 module.exports = {
-  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, recordGame,
+  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, recordGame, addAchievements,
   follow, unfollow, following, followCounts, isFollowing,
   createReport, createSuggestion,
   isBanned, setBan, unban, resetProfile,

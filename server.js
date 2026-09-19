@@ -6,6 +6,8 @@ const QRCode = require('qrcode');
 const { Server } = require('socket.io');
 const content = require('./content');
 const db = require('./db');
+const auth = require('./auth');
+const achievements = require('./achievements');
 
 const PORT = process.env.PORT || 3000;
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
@@ -68,12 +70,12 @@ function cleanAvatar(a) {
   return { s: n(a.s, 6), c: n(a.c, 14), e: n(a.e, 10), m: n(a.m, 10), h: n(a.h, 12) };
 }
 const connected = room => [...room.players.values()].filter(p => p.connected);
-const freshStats = () => ({ fooled: 0, correct: 0, snipes: 0, bullseyes: 0, fastest: 0, highBets: 0, bestStreak: 0, famous: 0 });
+const freshStats = () => ({ fooled: 0, correct: 0, snipes: 0, bullseyes: 0, fastest: 0, highBets: 0, bestStreak: 0, famous: 0, spyCaught: 0, spyEvaded: 0 });
 const freshPowers = () => ({ peek: 1, double: 1 });
 
 // ---------------- snapshots ----------------
 function publicPlayer(p) {
-  return { id: p.id, name: p.name, avatar: p.avatar, score: p.score, connected: p.connected, streak: p.streak, powers: p.powers, team: p.team, ready: p.ready };
+  return { id: p.id, name: p.name, avatar: p.avatar, score: p.score, connected: p.connected, streak: p.streak, powers: p.powers, team: p.team, ready: p.ready, userId: p.userId || null };
 }
 
 function snapshot(room, pid) {
@@ -243,7 +245,7 @@ function finishRound(room) {
 function createRoom() {
   const room = {
     code: newCode(), hostId: null, phase: 'lobby',
-    settings: { lang: 'ar', rounds: 8, types: { bluff: true, number: true, blitz: true, likely: true, emoji: true, spy: true }, pace: 'normal', teams: false },
+    settings: { lang: 'ar', rounds: 8, types: { bluff: true, number: true, blitz: true, likely: true, emoji: true, spy: true }, pace: 'normal', teams: false, public: true },
     players: new Map(), round: 0, gameNo: 0, current: null, deadline: null, timer: null,
     used: {}, plan: [], gains: {}, prevRank: {}, awards: [], bestLie: null, pairs: {}, rivals: {}, touched: Date.now(),
     balloon: { size: 0, target: 20 + rnd(20), pops: {} },
@@ -548,11 +550,11 @@ function revealSpy(room) {
   for (const p of ps) {
     if (p.id === spyId) continue;
     const correct = c.votes[p.id] === spyId;
-    if (correct) { gain(room, p.id, 'spyCatch', 350); p.stats.correct += 1; }
+    if (correct) { gain(room, p.id, 'spyCatch', 350); p.stats.correct += 1; p.stats.spyCaught += 1; }
     streakResult(room, p.id, correct);
   }
   if (room.players.has(spyId)) {
-    if (!caught) gain(room, spyId, 'spyEvade', 500);
+    if (!caught) { gain(room, spyId, 'spyEvade', 500); room.players.get(spyId).stats.spyEvaded += 1; }
     streakResult(room, spyId, !caught);
     if (guessRight) gain(room, spyId, 'spyGuess', 300);
   }
@@ -679,6 +681,37 @@ function computeAwards(room) {
   return out;
 }
 
+// Lifetime totals are written once, here, and only for signed-in players.
+// Guests keep playing exactly as before — they just leave no trace.
+async function recordResults(room) {
+  if (!db.on()) return;
+  const ranked = [...room.players.values()].filter(p => p.score > 0 || p.connected).sort((a, b) => b.score - a.score);
+  const top = ranked.length ? ranked[0].score : 0;
+  for (let i = 0; i < ranked.length; i++) {
+    const p = ranked[i];
+    if (!p.userId) continue;
+    const won = p.score > 0 && p.score === top;
+    const awards = room.awards.filter(a => a.pid === p.id).length;
+    const game = {
+      userId: p.userId, roomCode: room.code, gameNo: room.gameNo, score: p.score,
+      place: i + 1, players: ranked.length, rounds: room.settings.rounds, won,
+      xp: 50 + Math.floor(p.score / 10) + awards * 100 + (won ? 200 : 0),
+      stats: p.stats, achievements: [],
+    };
+    try {
+      if (!await db.recordGame(game)) continue; // already recorded
+      const profile = await db.getProfile(p.userId);
+      const fresh = profile ? achievements.earned(profile, game) : [];
+      if (fresh.length) {
+        await db.addAchievements(p.userId, fresh);
+        if (p.socketId) io.to(p.socketId).emit('achievements', fresh);
+      }
+    } catch (e) {
+      console.error('could not record game for', p.userId, e.message);
+    }
+  }
+}
+
 function finishGame(room) {
   clearTimer(room);
   room.deadline = null;
@@ -693,6 +726,7 @@ function finishGame(room) {
   }
   room.phase = 'final';
   broadcast(room);
+  recordResults(room).catch(e => console.error('recordResults', e.message));
 }
 
 function backToLobby(room) {
@@ -717,6 +751,10 @@ function checkProgress(room) {
 // ---------------- sockets ----------------
 io.on('connection', socket => {
   let room = null, player = null;
+  // The Activity iframe can't rely on cookies, so it passes the same token in
+  // socket auth instead.
+  const hs = socket.handshake;
+  const session = auth.sessionFrom(hs.auth && hs.auth.token ? { authorization: `Bearer ${hs.auth.token}` } : hs.headers);
   const reply = (cb, d) => typeof cb === 'function' && cb(d);
   const host = () => room && player && room.hostId === player.id;
   const limits = {};
@@ -724,18 +762,23 @@ io.on('connection', socket => {
 
   socket.on('create', (_, cb) => reply(cb, { code: createRoom().code }));
 
-  socket.on('join', ({ code, token, name, avatar } = {}, cb) => {
+  socket.on('join', async ({ code, token, name, avatar } = {}, cb) => {
     const r = rooms.get(String(code || '').toUpperCase());
     if (!r) return reply(cb, { error: 'noroom' });
+    if (session && db.on()) {
+      const banned = await db.isBanned(session.id).catch(() => null);
+      if (banned) return reply(cb, { error: 'banned' });
+    }
     name = String(name || '').trim().slice(0, 14) || 'Player';
     avatar = cleanAvatar(avatar);
     let p = token && r.players.get(token);
     if (!p) {
       if (connected(r).length >= MAX_PLAYERS) return reply(cb, { error: 'full' });
-      p = { id: rid(), name, avatar, score: 0, streak: 0, stats: freshStats(), powers: freshPowers(), connected: true, socketId: null, team: null, ready: false };
+      p = { id: rid(), name, avatar, score: 0, streak: 0, stats: freshStats(), powers: freshPowers(), connected: true, socketId: null, team: null, ready: false, userId: session ? session.id : null };
       if (r.settings.teams) p.team = smallerTeam(r);
       r.players.set(p.id, p);
-    } else { p.name = name; p.avatar = avatar; }
+    } else { p.name = name; p.avatar = avatar; if (session) p.userId = session.id; }
+    if (session && db.on()) db.touchProfile({ userId: session.id, name, avatar }).catch(() => {});
     if (room && player && room !== r) leave(false);
     room = r; player = p;
     p.connected = true; p.socketId = socket.id;
@@ -753,6 +796,7 @@ io.on('connection', socket => {
     if ([3, 5, 8, 12].includes(patch.rounds)) s.rounds = patch.rounds;
     if (['chill', 'normal', 'fast'].includes(patch.pace)) s.pace = patch.pace;
     if (typeof patch.teams === 'boolean') { s.teams = patch.teams; if (s.teams) balanceTeams(room); }
+    if (typeof patch.public === 'boolean') s.public = patch.public;
     if (patch.types && typeof patch.types === 'object') {
       const t = Object.fromEntries(TYPES.map(k => [k, !!patch.types[k]]));
       if (Object.values(t).some(Boolean)) s.types = t;
@@ -794,6 +838,15 @@ io.on('connection', socket => {
     if (t.socketId) io.to(t.socketId).emit('kicked');
     room.players.delete(pid);
     checkProgress(room); broadcast(room);
+    reply(cb, { ok: true });
+  });
+
+  socket.on('makeHost', (pid, cb) => {
+    if (!host()) return reply(cb, { error: 'host' });
+    const t = room.players.get(pid);
+    if (!t || !t.connected || pid === player.id) return reply(cb, { error: 'bad' });
+    room.hostId = pid;
+    broadcast(room);
     reply(cb, { ok: true });
   });
 
@@ -869,6 +922,7 @@ setInterval(() => {
 }, 60 * 1000);
 
 // ---------------- http ----------------
+app.set('trust proxy', 1); // Render terminates TLS ahead of us; needed for secure cookies + req.protocol
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/room/:code', (req, res) => {
@@ -881,6 +935,225 @@ app.get('/api/qr', async (req, res) => {
     const svg = await QRCode.toString(String(req.query.text || '').slice(0, 300), { type: 'svg', margin: 1, color: { dark: '#1d1842', light: '#ffffff' } });
     res.type('image/svg+xml').send(svg);
   } catch { res.status(400).end(); }
+});
+
+// ---- sign in ----
+const origin = req => `${req.protocol}://${req.get('host')}`;
+const OAUTH_STATE = 'maqlab_oauth';
+
+async function signIn(res, { id, name, avatar }) {
+  if (db.on()) {
+    const banned = await db.isBanned(id);
+    if (banned) return { error: 'banned', reason: banned.ban_reason };
+    await db.touchProfile({ userId: id, name, avatar: avatar || {} });
+  }
+  auth.setCookie(res, auth.mint({ id, name }));
+  return { ok: true };
+}
+
+app.get('/api/auth/discord/start', (req, res) => {
+  if (!DISCORD_CLIENT_ID) return res.status(500).send('Discord sign-in is not configured');
+  const state = crypto.randomBytes(16).toString('base64url');
+  res.cookie(OAUTH_STATE, state, { httpOnly: true, sameSite: 'lax', maxAge: 10 * 60 * 1000 });
+  const params = new URLSearchParams({
+    client_id: DISCORD_CLIENT_ID, redirect_uri: `${origin(req)}/api/auth/discord/callback`,
+    response_type: 'code', scope: 'identify', state,
+  });
+  res.redirect(`https://discord.com/oauth2/authorize?${params}`);
+});
+
+app.get('/api/auth/discord/callback', async (req, res) => {
+  const expected = auth.readCookie(req.headers.cookie, OAUTH_STATE);
+  if (!req.query.code || !req.query.state || req.query.state !== expected) return res.redirect('/?login=failed');
+  res.clearCookie(OAUTH_STATE);
+  try {
+    const tok = await fetch('https://discord.com/api/oauth2/token', {
+      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: DISCORD_CLIENT_ID, client_secret: DISCORD_CLIENT_SECRET,
+        grant_type: 'authorization_code', code: String(req.query.code),
+        redirect_uri: `${origin(req)}/api/auth/discord/callback`,
+      }),
+    }).then(r => r.json());
+    if (!tok.access_token) return res.redirect('/?login=failed');
+    const me = await fetch('https://discord.com/api/v10/users/@me', {
+      headers: { Authorization: `Bearer ${tok.access_token}` },
+    }).then(r => r.json());
+    if (!me.id) return res.redirect('/?login=failed');
+    const r = await signIn(res, { id: me.id, name: (me.global_name || me.username || 'Player').slice(0, 14) });
+    res.redirect(r.error === 'banned' ? '/?login=banned' : '/?login=ok');
+  } catch {
+    res.redirect('/?login=failed');
+  }
+});
+
+app.post('/api/auth/logout', (_, res) => { auth.clearCookie(res); res.json({ ok: true }); });
+
+app.get('/api/auth/me', async (req, res) => {
+  const s = auth.sessionFrom(req.headers);
+  if (!s) return res.json({ user: null, isAdmin: false });
+  const profile = db.on() ? await db.getProfile(s.id) : null;
+  if (profile && profile.banned_at) { auth.clearCookie(res); return res.json({ user: null, isAdmin: false, banned: profile.ban_reason }); }
+  res.json({ user: { id: s.id, name: profile ? profile.name : s.name }, isAdmin: auth.isAdmin(s.id) });
+});
+
+// Local-only shortcut so the signed-in UI can be developed without a Discord
+// app. Needs DEV_LOGIN=1 *and* a loopback caller, and is never set in prod.
+app.post('/api/auth/dev', async (req, res) => {
+  const loopback = ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.ip);
+  if (process.env.DEV_LOGIN !== '1' || !loopback) return res.status(404).end();
+  const id = String(req.body?.id || 'dev-1');
+  await signIn(res, { id, name: String(req.body?.name || 'Dev').slice(0, 14) });
+  res.json({ ok: true });
+});
+
+// ---- profiles, leaderboard, social ----
+const needsDb = (res) => { if (db.on()) return false; res.status(503).json({ error: 'no_db' }); return true; };
+const sessionOr401 = (req, res) => {
+  const s = auth.sessionFrom(req.headers);
+  if (!s) res.status(401).json({ error: 'sign_in' });
+  return s;
+};
+const lastPost = new Map(); // userId -> ts, so reports/suggestions can't be spammed
+const tooSoon = (id, ms) => {
+  const n = Date.now();
+  if (n - (lastPost.get(id) || 0) < ms) return true;
+  lastPost.set(id, n);
+  return false;
+};
+
+app.get('/api/profile/:userId', async (req, res) => {
+  if (needsDb(res)) return;
+  const me = auth.sessionFrom(req.headers);
+  const profile = await db.getProfile(req.params.userId);
+  if (!profile) return res.status(404).json({ error: 'not_found' });
+  const [rank, games, follows] = await Promise.all([
+    db.rankOf(profile.user_id),
+    db.recentGames(profile.user_id, 10),
+    db.followCounts(profile.user_id),
+  ]);
+  res.json({
+    profile, rank, games, follows,
+    isMe: !!me && me.id === profile.user_id,
+    isFollowing: me ? await db.isFollowing(me.id, profile.user_id) : false,
+    viewerIsAdmin: auth.isAdmin(me && me.id),
+  });
+});
+
+app.get('/api/leaderboard', async (req, res) => {
+  if (needsDb(res)) return;
+  const me = auth.sessionFrom(req.headers);
+  res.json({
+    entries: await db.leaderboard(50),
+    meId: me ? me.id : null,
+    myRank: me ? await db.rankOf(me.id) : null,
+    isAdmin: auth.isAdmin(me && me.id),
+  });
+});
+
+app.post('/api/follow', async (req, res) => {
+  if (needsDb(res)) return;
+  const s = sessionOr401(req, res); if (!s) return;
+  const target = String(req.body?.userId || '');
+  if (!target || target === s.id) return res.status(400).json({ error: 'bad_target' });
+  await (req.body?.follow ? db.follow(s.id, target) : db.unfollow(s.id, target));
+  res.json({ ok: true, following: !!req.body?.follow });
+});
+
+app.get('/api/following', async (req, res) => {
+  if (needsDb(res)) return;
+  const s = sessionOr401(req, res); if (!s) return;
+  res.json({ following: await db.following(s.id) });
+});
+
+app.post('/api/report', async (req, res) => {
+  if (needsDb(res)) return;
+  const s = sessionOr401(req, res); if (!s) return;
+  if (tooSoon(`report:${s.id}`, 30_000)) return res.status(429).json({ error: 'slow_down' });
+  const target = await db.getProfile(String(req.body?.userId || ''));
+  if (!target || target.user_id === s.id) return res.status(400).json({ error: 'bad_target' });
+  const me = await db.getProfile(s.id);
+  await db.createReport({
+    reporterId: s.id, reporterName: me ? me.name : s.name,
+    reportedId: target.user_id, reportedName: target.name,
+    reason: String(req.body?.reason || 'other').slice(0, 40),
+    details: String(req.body?.details || ''),
+  });
+  res.json({ ok: true });
+});
+
+app.post('/api/suggest', async (req, res) => {
+  if (needsDb(res)) return;
+  const s = sessionOr401(req, res); if (!s) return;
+  if (tooSoon(`suggest:${s.id}`, 30_000)) return res.status(429).json({ error: 'slow_down' });
+  const body = String(req.body?.body || '').trim();
+  if (body.length < 3) return res.status(400).json({ error: 'too_short' });
+  const me = await db.getProfile(s.id);
+  await db.createSuggestion({ userId: s.id, name: me ? me.name : s.name, body });
+  res.json({ ok: true });
+});
+
+// ---- admin ----
+// Non-admins get a 404 rather than a 403, so these routes don't advertise
+// that they exist.
+const adminOr404 = (req, res) => {
+  const s = auth.sessionFrom(req.headers);
+  if (!s || !auth.isAdmin(s.id)) { res.status(404).end(); return null; }
+  return s;
+};
+
+app.get('/api/admin/state', async (req, res) => {
+  const s = adminOr404(req, res); if (!s) return;
+  if (needsDb(res)) return;
+  const [reports, suggestions, banned] = await Promise.all([db.openReports(), db.openSuggestions(), db.bannedUsers()]);
+  res.json({ reports, suggestions, banned });
+});
+
+app.post('/api/admin/action', async (req, res) => {
+  const s = adminOr404(req, res); if (!s) return;
+  if (needsDb(res)) return;
+  const { action, userId, id, reason, term } = req.body || {};
+  if (action === 'ban') {
+    if (auth.isAdmin(userId)) return res.status(400).json({ error: 'cannot_ban_admin' });
+    await db.setBan(userId, reason, s.id);
+    kickEverywhere(userId);
+  } else if (action === 'unban') await db.unban(userId);
+  else if (action === 'reset') await db.resetProfile(userId);
+  else if (action === 'handleReport') await db.handleReport(id, s.id);
+  else if (action === 'handleSuggestion') await db.handleSuggestion(id, s.id);
+  else if (action === 'search') return res.json({ results: await db.searchProfiles(String(term || '')) });
+  else return res.status(400).json({ error: 'unknown_action' });
+  res.json({ ok: true });
+});
+
+// A ban has to take effect now, not on their next visit.
+function kickEverywhere(userId) {
+  for (const r of rooms.values()) {
+    for (const p of r.players.values()) {
+      if (p.userId !== userId) continue;
+      if (p.socketId) io.to(p.socketId).emit('kicked');
+      r.players.delete(p.id);
+      checkProgress(r); broadcast(r);
+    }
+  }
+}
+
+// ---- public lobbies ----
+// Straight off the in-memory rooms; no database needed.
+app.get('/api/lobbies', (_, res) => {
+  const list = [];
+  for (const r of rooms.values()) {
+    const online = connected(r);
+    if (!r.settings.public || !online.length || online.length >= MAX_PLAYERS) continue;
+    const host = r.players.get(r.hostId);
+    list.push({
+      code: r.code, players: online.length, phase: r.phase, round: r.round,
+      rounds: r.settings.rounds, lang: r.settings.lang,
+      host: host ? host.name : '', avatar: host ? host.avatar : null,
+    });
+  }
+  list.sort((a, b) => (a.phase === 'lobby' ? -1 : 1) - (b.phase === 'lobby' ? -1 : 1) || b.players - a.players);
+  res.json({ lobbies: list.slice(0, 30) });
 });
 
 // ---- Discord Activity support ----
@@ -914,9 +1187,10 @@ app.post('/api/discord/room', (req, res) => {
   if (!instanceId) return res.status(400).json({ error: 'missing_instance' });
   const existing = discordInstanceRooms.get(instanceId);
   if (existing && rooms.has(existing)) return res.json({ code: existing });
-  const code = createRoom().code;
-  discordInstanceRooms.set(instanceId, code);
-  res.json({ code });
+  const room = createRoom();
+  room.settings.public = false; // a voice-channel game isn't advertised to strangers
+  discordInstanceRooms.set(instanceId, room.code);
+  res.json({ code: room.code });
 });
 
 app.get(['/room/:code', '/profile'], (_, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
