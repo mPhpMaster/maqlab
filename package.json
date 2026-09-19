@@ -1,8 +1,8 @@
 {
-  "name": "khudaa-party-game",
+  "name": "maqlab",
   "version": "1.0.0",
   "private": true,
-  "description": "Arabic multiplayer bluffing trivia party game",
+  "description": "MAQLAB (مقلب) — bilingual (ar/en) multiplayer party game",
   "main": "server.js",
   "engines": {
     "node": ">=18.18.0"
