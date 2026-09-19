@@ -1,3 +1,5 @@
+import { getDiscordBootstrap } from './discord.js';
+
 (() => {
   'use strict';
 
@@ -1407,5 +1409,15 @@
   });
 
   // ================= boot =================
-  onRoute();
+  getDiscordBootstrap().then(info => {
+    if (!info) return onRoute();
+    // Launched as a Discord Activity: skip the home screen, use the
+    // player's Discord name, and drop straight into the channel's room.
+    state.profile.name = info.name;
+    state.draft.name = info.name;
+    store.set('profile', state.profile);
+    history.replaceState(null, '', `/room/${info.roomCode}`);
+    state.route = parseRoute();
+    join(info.roomCode);
+  }).catch(() => onRoute());
 })();

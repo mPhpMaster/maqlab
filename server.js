@@ -7,6 +7,8 @@ const { Server } = require('socket.io');
 const content = require('./content');
 
 const PORT = process.env.PORT || 3000;
+const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
+const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || '';
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -32,6 +34,7 @@ const MODS = [
 ];
 
 const rooms = new Map();
+const discordInstanceRooms = new Map(); // Discord Activity instanceId -> room code, so a whole voice channel lands in one room
 
 // ---------------- helpers ----------------
 const rid = (n = 16) => crypto.randomBytes(24).toString('base64url').slice(0, n);
@@ -859,9 +862,13 @@ setInterval(() => {
   for (const [code, r] of rooms) {
     if (!connected(r).length && now - r.touched > (r.players.size ? ROOM_TTL_MS : 5 * 60 * 1000)) { clearTimer(r); rooms.delete(code); }
   }
+  for (const [instanceId, code] of discordInstanceRooms) {
+    if (!rooms.has(code)) discordInstanceRooms.delete(instanceId);
+  }
 }, 60 * 1000);
 
 // ---------------- http ----------------
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/room/:code', (req, res) => {
   const r = rooms.get(String(req.params.code).toUpperCase());
@@ -874,6 +881,43 @@ app.get('/api/qr', async (req, res) => {
     res.type('image/svg+xml').send(svg);
   } catch { res.status(400).end(); }
 });
+
+// ---- Discord Activity support ----
+// Public, non-secret config the client needs to boot the Discord SDK.
+app.get('/api/discord/config', (_, res) => res.json({ clientId: DISCORD_CLIENT_ID || null }));
+
+// Exchanges a Discord OAuth `code` (from the client's authorize() call) for an
+// access token, using the client secret which must never reach the browser.
+app.post('/api/discord/token', async (req, res) => {
+  if (!DISCORD_CLIENT_ID || !DISCORD_CLIENT_SECRET) return res.status(500).json({ error: 'not_configured' });
+  const code = String(req.body?.code || '');
+  if (!code) return res.status(400).json({ error: 'missing_code' });
+  try {
+    const r = await fetch('https://discord.com/api/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ client_id: DISCORD_CLIENT_ID, client_secret: DISCORD_CLIENT_SECRET, grant_type: 'authorization_code', code }),
+    });
+    const data = await r.json();
+    if (!r.ok || !data.access_token) return res.status(502).json({ error: 'exchange_failed' });
+    res.json({ access_token: data.access_token });
+  } catch {
+    res.status(502).json({ error: 'exchange_failed' });
+  }
+});
+
+// One room per Discord Activity instance (= one per voice channel session),
+// so everyone who launches the Activity from the same channel lands together.
+app.post('/api/discord/room', (req, res) => {
+  const instanceId = String(req.body?.instanceId || '').slice(0, 80);
+  if (!instanceId) return res.status(400).json({ error: 'missing_instance' });
+  const existing = discordInstanceRooms.get(instanceId);
+  if (existing && rooms.has(existing)) return res.json({ code: existing });
+  const code = createRoom().code;
+  discordInstanceRooms.set(instanceId, code);
+  res.json({ code });
+});
+
 app.get(['/room/:code', '/profile'], (_, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 server.listen(PORT, () => console.log(`MAQLAB running on http://localhost:${PORT}`));
