@@ -620,6 +620,9 @@ body[data-tint=emoji] .bg .b3 { background: var(--lilac); }
 .bubble-r.say::after { content: ''; position: absolute; bottom: -5px; left: 50%; margin-left: -5px; border: 5px solid transparent; border-top-color: #fff; border-bottom: 0; }
 .floater .say-f { font-size: 15px; font-weight: 800; background: #fff; color: var(--ink); padding: 6px 12px; border-radius: 14px; white-space: nowrap; }
 
+/* auto-advance countdown on reveal / score screens */
+.cd { display: inline-block; min-width: 1.4em; font-variant-numeric: tabular-nums; font-weight: 900; opacity: .75; }
+
 /* ================= v6 spy round ================= */
 .q-card .type-tag.spy { background: var(--lilac); color: #fff; box-shadow: 0 3px 0 var(--lilac-d); }
 .spy-card { padding-top: 30px; }

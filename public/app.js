@@ -35,7 +35,7 @@ import { getDiscordBootstrap } from './discord.js';
       mdesc_normal: 'نقاط عادية', mdesc_double: 'كل النقاط مضاعفة!', mdesc_speed: 'الوقت أقصر والنقاط ×1.5', mdesc_jackpot: 'أعلى لاعب بالجولة ياخذ صندوق مفاجآت 🎁', mdesc_golden: 'آخر جولة… كل شيء ×3!',
       writeLie: 'اكتب إجابة كاذبة مقنعة…', lieHint: 'كل واحد ينخدع بكذبتك = +300', send: 'أرسل 😈', yourLie: 'كذبتك', waitOthers: 'ننتظر الباقين',
       pickTruth: 'وين الإجابة الصحيحة؟ 🤔', bet1: 'آمن', bet2: 'واثق', bet3: 'متأكد 100%', yours: 'كذبتك', betInfo: 'صح = 500 × رهانك • غلط = −150 لكل مستوى زيادة', voted: 'تم التصويت ✓',
-      lieBy: 'كذبة {n}', houseLie: 'كذبة اللعبة 🤖', truth: 'الصح ✅', fooledN: 'انخدع {n} 😈', gotIt: 'عرفوها 🧠', nobody: 'ما أحد عرفها! 😱', next: 'التالي ⏭', gotFooledBy: 'انقلبت على يد {n} 😂',
+      lieBy: 'كذبة {n}', houseLie: 'كذبة اللعبة 🤖', truth: 'الصح ✅', fooledN: 'انخدع {n} 😈', gotIt: 'عرفوها 🧠', nobody: 'ما أحد عرفها! 😱', next: 'التالي ⏭', nextIn: 'التالي بعد', gotFooledBy: 'انقلبت على يد {n} 😂',
       yourGuess: 'تخمينك', typeNumber: 'اكتب رقم', true: 'صح', false: 'خطأ', rightAns: 'أصبت! 🎉', wrongAns: 'أخطأت 😬', noAns: 'ما جاوبت ⏰', fastestIs: '⚡ الأسرع: {n}',
       pickPlayer: 'اختار واحد من الشلة 👇', youPicked: 'اخترت {n}', likelyWinner: 'الشلة اختارت: {n}!', votesN: '{n} صوت', withCrowd: 'مع الأغلبية +300 👥', noVotes: 'ما أحد صوّت',
       whatEmoji: 'وش تعني هالإيموجيات؟', answerWas: 'الجواب: {v}',
@@ -78,7 +78,7 @@ import { getDiscordBootstrap } from './discord.js';
       mdesc_normal: 'Regular points', mdesc_double: 'Every point is doubled!', mdesc_speed: 'Less time, points ×1.5', mdesc_jackpot: "The round's top player wins a mystery box 🎁", mdesc_golden: 'Final round… everything ×3!',
       writeLie: 'Type a convincing fake answer…', lieHint: 'Every player you fool = +300', send: 'Send 😈', yourLie: 'Your lie', waitOthers: 'Waiting for others',
       pickTruth: 'Which one is the truth? 🤔', bet1: 'Safe', bet2: 'Sure', bet3: 'All in', yours: 'yours', betInfo: 'Right = 500 × bet • Wrong = −150 per extra level', voted: 'Voted ✓',
-      lieBy: "{n}'s lie", houseLie: 'House lie 🤖', truth: 'TRUTH ✅', fooledN: '{n} fooled 😈', gotIt: 'Got it 🧠', nobody: 'Nobody got it! 😱', next: 'Next ⏭', gotFooledBy: '{n} got you! 😂',
+      lieBy: "{n}'s lie", houseLie: 'House lie 🤖', truth: 'TRUTH ✅', fooledN: '{n} fooled 😈', gotIt: 'Got it 🧠', nobody: 'Nobody got it! 😱', next: 'Next ⏭', nextIn: 'Next in', gotFooledBy: '{n} got you! 😂',
       yourGuess: 'Your guess', typeNumber: 'Type a number', true: 'True', false: 'False', rightAns: 'Correct! 🎉', wrongAns: 'Wrong 😬', noAns: 'No answer ⏰', fastestIs: '⚡ Fastest: {n}',
       pickPlayer: 'Pick someone 👇', youPicked: 'You picked {n}', likelyWinner: 'The crowd picked: {n}!', votesN: '{n} votes', withCrowd: 'With the crowd +300 👥', noVotes: 'No votes',
       whatEmoji: 'What do these emojis mean?', answerWas: 'Answer: {v}',
@@ -506,7 +506,15 @@ import { getDiscordBootstrap } from './discord.js';
     </div>`;
   }
   const dock = inner => `<div class="dock"><div class="wrap">${inner}</div></div>`;
-  const hostNext = () => isHost() ? dock(`<button class="btn ghost block" data-act="next">${t('next')}</button>`) : '';
+  // Reveal/score screens auto-advance on a server timer. Show that countdown so
+  // it never looks frozen, and let the host jump ahead early.
+  function hostNext() {
+    const dl = state.room.deadline || 0;
+    const cd = dl ? `<span class="cd" data-count="${dl}"></span>` : '';
+    return dock(isHost()
+      ? `<button class="btn ghost block" data-act="next">${t('next')}${cd}</button>`
+      : `<div class="center muted" style="font-size:13px">${t('nextIn')}${cd}</div>`);
+  }
   const quickDots = (c, final) => `<div class="blitz-dots">${Array.from({ length: c.total }, (_, i) => `<i class="${i < c.idx || (final && i === c.idx) ? 'done' : i === c.idx ? 'on' : ''}"></i>`).join('')}</div>`;
 
   // ---------- home ----------
@@ -1126,7 +1134,7 @@ import { getDiscordBootstrap } from './discord.js';
     const r = e.target.closest('[data-react]');
     if (r) { socket.emit('react', r.dataset.react); buzz(10); return; }
     const sy = e.target.closest('[data-say]');
-    if (sy) { socket.emit('say', +sy.dataset.say); state.chatOpen = false; renderReactBar(); buzz(10); return; }
+    if (sy) { socket.emit('say', +sy.dataset.say); buzz(10); return; }
     if (e.target.closest('[data-chat-toggle]')) { state.chatOpen = !state.chatOpen; state.reactOpen = false; sfx.tap(); renderReactBar(); return; }
     if (e.target.closest('[data-react-toggle]')) { state.reactOpen = !state.reactOpen; state.chatOpen = false; sfx.tap(); renderReactBar(); }
   });
@@ -1225,6 +1233,12 @@ import { getDiscordBootstrap } from './discord.js';
     document.querySelectorAll('[data-bar]').forEach(el => {
       const left = Math.max(0, +el.dataset.bar - now());
       el.style.transform = `scaleX(${left / state.phaseTotal})`;
+    });
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const left = Math.max(0, +el.dataset.count - now());
+      el.textContent = ` ${Math.ceil(left / 1000)}`;
+      // safety net: if the server's own timer is late, the host nudges it along
+      if (left <= 0 && isHost() && !el.dataset.sent) { el.dataset.sent = '1'; emit('next'); }
     });
   }
   setInterval(tick, 100);
