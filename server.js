@@ -20,6 +20,7 @@ const server = http.createServer(app);
 const io = new Server(server, { maxHttpBufferSize: 64 * 1024 });
 
 const MAX_PLAYERS = 12;
+const GHOST_MS = 25 * 1000; // grace for a lobby refresh before the seat is freed
 const ROOM_TTL_MS = 30 * 60 * 1000;
 const ITEMS_PER_QUICK_ROUND = 3; // blitz & emoji rounds have 3 quick items
 const REACTIONS = ['😂', '🔥', '😱', '👏', '🤡', '💀', '😈', '❤️'];
@@ -734,13 +735,16 @@ async function recordResults(room) {
   if (!db.on()) return;
   const ranked = [...room.players.values()].filter(p => p.score > 0 || p.connected).sort((a, b) => b.score - a.score);
   const top = ranked.length ? ranked[0].score : 0;
+  // Every row of this game shares one id, so /match/<id> can gather them back
+  // into a single scoreboard that anyone holding the link can open.
+  const matchId = crypto.randomUUID();
   for (let i = 0; i < ranked.length; i++) {
     const p = ranked[i];
     if (!p.userId) continue;
     const won = p.score > 0 && p.score === top;
     const awards = room.awards.filter(a => a.pid === p.id).length;
     const game = {
-      userId: p.userId, roomCode: room.code, gameNo: room.gameNo, score: p.score,
+      userId: p.userId, roomCode: room.code, gameNo: room.gameNo, matchId, score: p.score,
       place: i + 1, players: ranked.length, rounds: room.settings.rounds, won,
       xp: 50 + Math.floor(p.score / 10) + awards * 100 + (won ? 200 : 0),
       stats: p.stats, achievements: [],
@@ -959,12 +963,27 @@ io.on('connection', socket => {
   socket.on('leave', () => leave(false));
   socket.on('disconnect', () => { if (player && player.socketId === socket.id) leave(true); });
 
+  // A player who drops out of the lobby and does not come back is a ghost:
+  // an empty seat that still counts towards the room. We wait long enough for
+  // a page refresh or a phone waking up, then clear it. Mid-game seats are
+  // never swept, because the score in them belongs to someone.
+  function sweepGhost(r, pid) {
+    setTimeout(() => {
+      const cur = r.players.get(pid);
+      if (!cur || cur.connected || r.phase !== 'lobby') return;
+      r.players.delete(pid);
+      if (r.hostId === pid) { const n = connected(r)[0]; if (n) r.hostId = n.id; }
+      if (rooms.has(r.code)) broadcast(r);
+    }, GHOST_MS);
+  }
+
   function leave(soft) {
     if (!room || !player) return;
     const r = room, p = player;
     p.connected = false; p.socketId = null;
     socket.leave(r.code);
     if (!soft && r.phase === 'lobby') r.players.delete(p.id);
+    else if (soft && r.phase === 'lobby') sweepGhost(r, p.id);
     if (r.hostId === p.id) { const n = connected(r)[0]; if (n) r.hostId = n.id; }
     checkProgress(r); broadcast(r);
     room = null; player = null;
@@ -1016,6 +1035,16 @@ app.get('/room/:code', (req, res) => {
   res.type('html').send(page(req,
     `🎈 ادخل غرفة ${code} · MAQLAB`,
     n ? `${n} من ربعك ينتظرونك بالغرفة الحين — اضغط وادخل على طول.` : SITE_DESC));
+});
+app.get('/match/:id', async (req, res) => {
+  let title = SITE_TITLE, desc = SITE_DESC;
+  if (db.on() && UUID.test(req.params.id)) {
+    const rows = await db.getMatch(req.params.id).catch(() => []);
+    const win = rows.find(r => r.won) || rows[0];
+    if (win) title = `🏆 ${win.name} — ${win.score} نقطة · MAQLAB`;
+    if (rows.length) desc = `نتيجة مباراة بين ${rows.length} لاعبين. تقدر تشوف الترتيب كامل.`;
+  }
+  res.type('html').send(page(req, title, desc));
 });
 app.get('/profile', (req, res) => res.type('html').send(page(req, SITE_TITLE, SITE_DESC)));
 
@@ -1136,6 +1165,27 @@ app.get('/api/profile/:userId', async (req, res) => {
     isMe: !!me && me.id === profile.user_id,
     isFollowing: me ? await db.isFollowing(me.id, profile.user_id) : false,
     viewerIsAdmin: auth.isAdmin(me && me.id),
+  });
+});
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// A finished scoreboard, readable by anyone with the link. Names and avatars
+// are already public on profiles, and nothing here is per-viewer, so there is
+// no session check — that is what makes the link shareable.
+app.get('/api/match/:id', async (req, res) => {
+  if (needsDb(res)) return;
+  if (!UUID.test(req.params.id)) return res.status(404).json({ error: 'not_found' });
+  const rows = await db.getMatch(req.params.id);
+  if (!rows.length) return res.status(404).json({ error: 'not_found' });
+  res.json({
+    id: req.params.id,
+    finishedAt: rows[0].finished_at,
+    rounds: rows[0].rounds,
+    players: rows.map(r => ({
+      userId: r.user_id, name: r.name, avatar: r.avatar,
+      score: r.score, place: r.place, won: r.won,
+    })),
   });
 });
 

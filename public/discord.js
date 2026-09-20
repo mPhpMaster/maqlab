@@ -5,7 +5,7 @@
 
 const SDK_URL = 'https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@2.5.0/+esm';
 
-export async function getDiscordBootstrap() {
+export async function getDiscordBootstrap({ onLeave } = {}) {
   const params = new URLSearchParams(location.search);
   if (!params.has('frame_id')) return null;
 
@@ -36,6 +36,24 @@ export async function getDiscordBootstrap() {
     // by code point, so an emoji in a Discord name is never cut in half
     const raw = auth?.user?.global_name || auth?.user?.username || 'Player';
     const name = [...raw.replace(/\s+/g, ' ').trim()].slice(0, 14).join('').trim() || 'Player';
+
+    // Leaving the voice channel should leave the lobby too, otherwise the
+    // player sits in the room as a ghost until the iframe finally dies.
+    // Discord hands every client the full participant list, but we only ever
+    // act on our OWN absence from it — a client that could evict other people
+    // would be a griefing tool, and the host already has a kick button.
+    const meId = auth && auth.user && auth.user.id;
+    if (meId && onLeave) {
+      try {
+        await discordSdk.subscribe('ACTIVITY_INSTANCE_PARTICIPANTS_UPDATE', ({ participants }) => {
+          if (Array.isArray(participants) && !participants.some(u => u && u.id === meId)) onLeave();
+        });
+      } catch (e) {
+        // Older Discord clients do not emit this; the socket disconnect that
+        // follows when the window closes still cleans the player up.
+        console.warn('participants updates unavailable', e && e.message);
+      }
+    }
 
     const { code: roomCode } = await fetch('/api/discord/room', {
       method: 'POST',

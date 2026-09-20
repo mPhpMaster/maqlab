@@ -59,7 +59,7 @@ async function rankOf(userId) {
 }
 
 const recentGames = (userId, limit = 10) =>
-  q(`select score, place, players, won, rounds, finished_at from game_results
+  q(`select match_id, score, place, players, won, rounds, finished_at from game_results
       where user_id = $1 order by finished_at desc limit $2`, [userId, limit]).then(r => r.rows);
 
 const leaderboard = (limit = 50) =>
@@ -69,14 +69,14 @@ const leaderboard = (limit = 50) =>
 
 // Written once, when a game ends. Idempotent per (user, room, game_no) so a
 // double-fire can't inflate anyone's lifetime totals.
-async function recordGame({ userId, roomCode, gameNo, score, place, players, rounds, won, xp, stats, achievements }) {
+async function recordGame({ userId, roomCode, gameNo, matchId, score, place, players, rounds, won, xp, stats, achievements }) {
   const client = await pool.connect();
   try {
     await client.query('begin');
     const ins = await client.query(
-      `insert into game_results (user_id, room_code, game_no, score, place, players, rounds, won)
-       values ($1,$2,$3,$4,$5,$6,$7,$8) on conflict do nothing returning id`,
-      [userId, roomCode, gameNo, score, place, players, rounds, won]
+      `insert into game_results (user_id, room_code, game_no, match_id, score, place, players, rounds, won)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9) on conflict do nothing returning id`,
+      [userId, roomCode, gameNo, matchId, score, place, players, rounds, won]
     );
     if (!ins.rowCount) { await client.query('rollback'); return false; } // already recorded
     const s = stats || {};
@@ -120,6 +120,13 @@ const addAchievements = (userId, ids) =>
        select coalesce(jsonb_agg(distinct a), '[]'::jsonb)
          from jsonb_array_elements(achievements || $2::jsonb) a
      ) where user_id = $1`, [userId, JSON.stringify(ids)]);
+
+// Everyone who played one game, for the shareable match page.
+const getMatch = matchId =>
+  q(`select r.user_id, r.score, r.place, r.won, r.rounds, r.players, r.finished_at,
+            p.name, p.avatar
+       from game_results r left join profiles p on p.user_id = r.user_id
+      where r.match_id = $1 order by r.place asc`, [matchId]).then(r => r.rows);
 
 // ---------------- social ----------------
 const follow = (followerId, followeeId) =>
@@ -182,7 +189,7 @@ const searchProfiles = term =>
     [`%${term.replace(/[%_\\]/g, m => '\\' + m)}%`, term]).then(r => r.rows);
 
 module.exports = {
-  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, recordGame, addAchievements,
+  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, recordGame, addAchievements, getMatch,
   follow, unfollow, following, followCounts, isFollowing,
   createReport, createSuggestion,
   isBanned, setBan, unban, resetProfile,

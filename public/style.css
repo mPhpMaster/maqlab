@@ -690,3 +690,15 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 .who-name { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
 .who-name small { color: var(--muted); font-size: 11px; font-weight: 700; }
 .who-name b { font-size: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* image search on a revealed answer */
+.img-search { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; padding: 4px 12px; border-radius: 99px; background: rgba(255,255,255,.1); border: 1px solid var(--line); color: var(--muted); font-size: 12px; font-weight: 700; text-decoration: none; }
+.img-search:hover { background: rgba(90,174,255,.22); border-color: var(--sky); color: var(--text); }
+
+/* clickable match history on a profile */
+.mrow { display: flex; align-items: center; gap: 10px; padding: 9px 12px; margin-top: 6px; border-radius: 12px; background: rgba(255,255,255,.05); border: 1px solid var(--line); cursor: pointer; }
+.mrow:hover { background: rgba(90,174,255,.16); border-color: var(--sky); }
+.mrow .rk { min-width: 26px; font-weight: 800; font-size: 13px; }
+.mrow .nm { flex: 1; font-size: 13px; font-weight: 700; }
+.mrow .dt { font-size: 11px; color: var(--muted); }
+.mrow .sc { font-weight: 800; font-size: 13px; min-width: 52px; text-align: end; }

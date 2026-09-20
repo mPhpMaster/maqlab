@@ -64,6 +64,12 @@ create table if not exists game_results (
 );
 create index if not exists game_results_user_idx on game_results (user_id, finished_at desc);
 
+-- One shared id per finished game, so every player's row points at the same
+-- match and a link to it can be handed to someone who was not in the room.
+-- Added after the table shipped, hence the ALTER rather than a column above.
+alter table game_results add column if not exists match_id uuid;
+create index if not exists game_results_match_idx on game_results (match_id);
+
 create table if not exists follows (
   follower_id text not null references profiles(user_id) on delete cascade,
   followee_id text not null references profiles(user_id) on delete cascade,

@@ -35,7 +35,7 @@ import { getDiscordBootstrap } from './discord.js';
       mdesc_normal: 'نقاط عادية', mdesc_double: 'كل النقاط مضاعفة!', mdesc_speed: 'الوقت أقصر والنقاط ×1.5', mdesc_jackpot: 'أعلى لاعب بالجولة ياخذ صندوق مفاجآت 🎁', mdesc_golden: 'آخر جولة… كل شيء ×3!',
       writeLie: 'اكتب إجابة كاذبة مقنعة…', lieHint: 'كل واحد ينخدع بكذبتك = +300', send: 'أرسل 😈', yourLie: 'كذبتك', waitOthers: 'ننتظر الباقين',
       pickTruth: 'وين الإجابة الصحيحة؟ 🤔', bet1: 'آمن', bet2: 'واثق', bet3: 'متأكد 100%', yours: 'كذبتك', betInfo: 'صح = 500 × رهانك • غلط = −150 لكل مستوى زيادة', voted: 'تم التصويت ✓',
-      lieBy: 'كذبة {n}', houseLie: 'كذبة اللعبة 🤖', truth: 'الصح ✅', fooledN: 'انخدع {n} 😈', gotIt: 'عرفوها 🧠', nobody: 'ما أحد عرفها! 😱', next: 'التالي ⏭', nextIn: 'التالي بعد', gotFooledBy: 'انقلبت على يد {n} 😂',
+      lieBy: 'كذبة {n}', houseLie: 'كذبة اللعبة 🤖', truth: 'الصح ✅', fooledN: 'انخدع {n} 😈', gotIt: 'عرفوها 🧠', nobody: 'ما أحد عرفها! 😱', next: 'التالي ⏭', nextIn: 'التالي بعد', seeImages: 'شوف صور', gotFooledBy: 'انقلبت على يد {n} 😂',
       yourGuess: 'تخمينك', typeNumber: 'اكتب رقم', true: 'صح', false: 'خطأ', rightAns: 'أصبت! 🎉', wrongAns: 'أخطأت 😬', noAns: 'ما جاوبت ⏰', fastestIs: '⚡ الأسرع: {n}',
       pickPlayer: 'اختار واحد من الشلة 👇', youPicked: 'اخترت {n}', likelyWinner: 'الشلة اختارت: {n}!', votesN: '{n} صوت', withCrowd: 'مع الأغلبية +300 👥', noVotes: 'ما أحد صوّت',
       whatEmoji: 'وش تعني هالإيموجيات؟', answerWas: 'الجواب: {v}',
@@ -70,6 +70,7 @@ import { getDiscordBootstrap } from './discord.js';
       rank: 'الترتيب', games: 'ألعاب', wins: 'فوز', winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
       curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: 'متابِعين', followingN: 'يتابع', memberSince: 'عضو منذ',
       follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
+      matchResult: 'نتيجة المباراة', shareMatch: 'انسخ رابط المباراة', matchGone: 'المباراة هذي ما عادت موجودة', place1: 'الأول', placeN: 'المركز {n}', roundsN: '{n} جولات', openMatch: 'افتح',
       report: 'بلاغ', reportTitle: 'بلاغ عن {n}', reportWhy: 'وش المشكلة؟', r_cheat: 'غش', r_name: 'اسم مسيء', r_chat: 'إساءة بالدردشة', r_other: 'غير ذلك',
       reportDetails: 'تفاصيل (اختياري)', reportSent: 'وصلنا البلاغ، شكراً 🙏', suggestPlaceholder: 'وش تبي نضيف أو نغيّر؟',
       sent: 'تم الإرسال ✅', signInFirst: 'سجّل دخول أول', slowDown: 'على مهلك شوي ⏳',
@@ -102,7 +103,7 @@ import { getDiscordBootstrap } from './discord.js';
       mdesc_normal: 'Regular points', mdesc_double: 'Every point is doubled!', mdesc_speed: 'Less time, points ×1.5', mdesc_jackpot: "The round's top player wins a mystery box 🎁", mdesc_golden: 'Final round… everything ×3!',
       writeLie: 'Type a convincing fake answer…', lieHint: 'Every player you fool = +300', send: 'Send 😈', yourLie: 'Your lie', waitOthers: 'Waiting for others',
       pickTruth: 'Which one is the truth? 🤔', bet1: 'Safe', bet2: 'Sure', bet3: 'All in', yours: 'yours', betInfo: 'Right = 500 × bet • Wrong = −150 per extra level', voted: 'Voted ✓',
-      lieBy: "{n}'s lie", houseLie: 'House lie 🤖', truth: 'TRUTH ✅', fooledN: '{n} fooled 😈', gotIt: 'Got it 🧠', nobody: 'Nobody got it! 😱', next: 'Next ⏭', nextIn: 'Next in', gotFooledBy: '{n} got you! 😂',
+      lieBy: "{n}'s lie", houseLie: 'House lie 🤖', truth: 'TRUTH ✅', fooledN: '{n} fooled 😈', gotIt: 'Got it 🧠', nobody: 'Nobody got it! 😱', next: 'Next ⏭', nextIn: 'Next in', seeImages: 'See images', gotFooledBy: '{n} got you! 😂',
       yourGuess: 'Your guess', typeNumber: 'Type a number', true: 'True', false: 'False', rightAns: 'Correct! 🎉', wrongAns: 'Wrong 😬', noAns: 'No answer ⏰', fastestIs: '⚡ Fastest: {n}',
       pickPlayer: 'Pick someone 👇', youPicked: 'You picked {n}', likelyWinner: 'The crowd picked: {n}!', votesN: '{n} votes', withCrowd: 'With the crowd +300 👥', noVotes: 'No votes',
       whatEmoji: 'What do these emojis mean?', answerWas: 'Answer: {v}',
@@ -137,6 +138,7 @@ import { getDiscordBootstrap } from './discord.js';
       rank: 'Rank', games: 'Games', wins: 'Wins', winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
       curStreak: 'Win streak', bestStreak: 'Longest streak', followers: 'Followers', followingN: 'Following', memberSince: 'Member since',
       follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
+      matchResult: 'Match result', shareMatch: 'Copy match link', matchGone: 'That match is no longer around', place1: '1st', placeN: 'Place {n}', roundsN: '{n} rounds', openMatch: 'Open',
       report: 'Report', reportTitle: 'Report {n}', reportWhy: "What's wrong?", r_cheat: 'Cheating', r_name: 'Offensive name', r_chat: 'Abusive chat', r_other: 'Something else',
       reportDetails: 'Details (optional)', reportSent: 'Report received, thank you 🙏', suggestPlaceholder: 'What should we add or change?',
       sent: 'Sent ✅', signInFirst: 'Sign in first', slowDown: 'Slow down a little ⏳',
@@ -453,7 +455,9 @@ import { getDiscordBootstrap } from './discord.js';
   // ================= routing =================
   function parseRoute() {
     const m = location.pathname.match(/^\/room\/([A-Za-z]{4,5})/);
-    return m ? { name: 'room', code: m[1].toUpperCase() } : { name: 'home' };
+    if (m) return { name: 'room', code: m[1].toUpperCase() };
+    const g = location.pathname.match(/^\/match\/([0-9a-f-]{36})/i);
+    return g ? { name: 'match', id: g[1] } : { name: 'home' };
   }
   function navigate(path) { history.pushState(null, '', path); onRoute(); }
   window.addEventListener('popstate', onRoute);
@@ -466,6 +470,9 @@ import { getDiscordBootstrap } from './discord.js';
     }
     if (state.route.name === 'room' && state.code !== state.route.code && state.tokens[state.route.code] && state.profile.name) join(state.route.code, false);
     render();
+    // A shared /match/<id> link lands on the home screen with the scoreboard
+    // on top of it, so closing it leaves the visitor somewhere they can play.
+    if (state.route.name === 'match') openMatch(state.route.id, true);
   }
 
   // ================= render =================
@@ -579,6 +586,11 @@ import { getDiscordBootstrap } from './discord.js';
       <button class="pw double ${doubled ? 'on' : ''}" data-act="power" data-k="double" ${!m.powers.double || doubled ? 'disabled' : ''}><span class="e">💎</span><b>${doubled ? t('powerOn') : t('power_double')}</b>${doubled ? '' : `<i>×${m.powers.double}</i>`}</button>
     </div>`;
   }
+  // Half the fun of a reveal is 'what does that even look like'. Opens the
+  // answer in an image search rather than trying to ship pictures ourselves.
+  const imgSearch = term => term
+    ? `<a class="img-search" href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(term)}" target="_blank" rel="noopener noreferrer" title="${t('seeImages')}">🔍 ${t('seeImages')}</a>`
+    : '';
   const dock = inner => `<div class="dock"><div class="wrap">${inner}</div></div>`;
   // Reveal/score screens auto-advance on a server timer. Show that countdown so
   // it never looks frozen, and let the host jump ahead early.
@@ -829,7 +841,7 @@ import { getDiscordBootstrap } from './discord.js';
       ${qCard('bluff', c.question)}
       ${lies.some(o => o.authors.length) ? `<div class="center muted" style="font-size:12px;margin-top:10px">${t('laughHint')}</div>` : ''}
       <div class="rv-list">${cards}
-        <div class="rv truth" style="animation-delay:${d}s"><span class="stamp" style="animation-delay:${d + 0.4}s">${t('truth')}</span><div class="txt">${esc(truth.text)}</div><div class="voters">${voterList(truth.voters, d)}</div>
+        <div class="rv truth" style="animation-delay:${d}s"><span class="stamp" style="animation-delay:${d + 0.4}s">${t('truth')}</span><div class="txt">${esc(truth.text)}</div>${imgSearch(truth.text)}<div class="voters">${voterList(truth.voters, d)}</div>
           <div class="gainline" style="animation-delay:${d + 1}s">${truth.voters.length ? t('gotIt') : t('nobody')}</div></div>
       </div>
     </div></div></div>${hostNext()}</div>`;
@@ -970,7 +982,7 @@ import { getDiscordBootstrap } from './discord.js';
     return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
       ${quickDots(c, true)}
       <div class="q-card glass emoji-card"><span class="type-tag emoji">${TYPES.emoji} ${t('type_emoji')}</span><div class="big-emoji">${esc(c.emoji)}</div></div>
-      ${quickResult(c, `<div class="verdict t">${esc(right ? right.text : '')}</div>`)}
+      ${quickResult(c, `<div class="verdict t">${esc(right ? right.text : '')}</div>${imgSearch(right ? right.text : '')}`)}
     </div></div></div></div>`;
   }
 
@@ -1071,7 +1083,7 @@ import { getDiscordBootstrap } from './discord.js';
         <div class="lk-voters">${voters.map(vp => J(vp.avatar)).join('')}</div></div></div>`;
     }).join('');
     return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll" data-scroll="spr"><div class="wrap">
-      <div class="q-card glass spy-card"><span class="type-tag spy">${TYPES.spy} ${t('type_spy')}</span><div class="spy-word">${esc(c.word)}</div></div>
+      <div class="q-card glass spy-card"><span class="type-tag spy">${TYPES.spy} ${t('type_spy')}</span><div class="spy-word">${esc(c.word)}</div>${imgSearch(c.word)}</div>
       <div class="lk-winner" id="spy-reveal-line">${spyP ? t('spyWas', { n: esc(spyP.name) }) : ''}</div>
       <div class="center" style="margin-top:6px"><span class="chip" style="background:${c.caught ? 'rgba(79,224,176,.2)' : 'rgba(255,122,133,.2)'}">${c.caught ? t('spyCaught') : t('spyEscaped')}</span></div>
       ${c.guess ? `<div class="center muted" style="margin-top:8px">${t('spyGuessWas', { n: esc(c.guess) })} ${c.guessRight ? '✅' : '❌'}</div>` : ''}
@@ -1461,6 +1473,56 @@ import { getDiscordBootstrap } from './discord.js';
     drawProfile(d);
   }
 
+  // Dates come back as ISO strings; only the day matters on a scoreboard.
+  const shortDate = v => {
+    const d = new Date(v);
+    return isNaN(d) ? '' : d.toLocaleDateString(state.lang === 'ar' ? 'ar-SA' : 'en-GB', { day: 'numeric', month: 'short' });
+  };
+  const medal = n => (n === 1 ? '🥇' : n === 2 ? '🥈' : n === 3 ? '🥉' : '#' + n);
+
+  // The scoreboard of one finished game. Reachable from a profile and from a
+  // /match/<id> link, which is the whole point — it has to stand on its own
+  // for someone who was never in the room.
+  async function openMatch(id, fromRoute) {
+    modal(`<div class="center" style="padding:40px"><div class="spinner"></div></div>`);
+    const d = await api('/api/match/' + encodeURIComponent(id));
+    if (d.error || d.status) {
+      closeModal();
+      toast(t('matchGone'), 'err');
+      if (fromRoute) navigate('/');
+      return;
+    }
+    const url = `${location.origin}/match/${d.id}`;
+    const rows = d.players.map(g => `
+      <div class="brow ${g.won ? 'me' : ''}" data-mt-uid="${esc(g.userId)}">
+        <span class="rk">${medal(g.place)}</span>${J(g.avatar && g.avatar.s != null ? g.avatar : {})}
+        <span class="nm">${esc(g.name || '—')}</span>
+        <span class="sc">${fmt(g.score)}</span>
+      </div>`).join('');
+    modal(`<h3>🏁 ${t('matchResult')}</h3>
+      <div class="center muted" style="font-size:12px;margin-bottom:10px">${shortDate(d.finishedAt)} · ${t('roundsN', { n: d.rounds })}</div>
+      <div class="board" style="max-height:52vh;overflow-y:auto">${rows}</div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn sm mint grow" data-mt="share">🔗 ${t('shareMatch')}</button>
+        <button class="btn sm ghost grow" data-close>${t('close')}</button>
+      </div>`,
+    m => m.addEventListener('click', async e => {
+      if (e.target.closest('[data-mt="share"]')) {
+        if (navigator.share) { try { await navigator.share({ title: 'MAQLAB', url }); return; } catch {} }
+        try { await navigator.clipboard.writeText(url); toast(t('copied'), 'ok'); } catch { toast(url); }
+        return;
+      }
+      const r = e.target.closest('[data-mt-uid]');
+      if (r) { closeModal(); openProfile(r.dataset.mtUid); }
+    }));
+    // Closing a match that the URL points at should return home, not leave the
+    // address bar pointing at a modal that is no longer open.
+    if (fromRoute) {
+      const bg = $modal.firstElementChild;
+      bg.addEventListener('click', e => { if (e.target === bg || e.target.closest('[data-close]')) navigate('/'); });
+    }
+  }
+
   function drawProfile(d) {
     const p = d.profile;
     const games = Number(p.games) || 0;
@@ -1472,6 +1534,15 @@ import { getDiscordBootstrap } from './discord.js';
       ? `<div class="trend">${recent.slice().reverse().map(g => `<i class="${g.won ? 'w' : ''}" style="height:${Math.max(8, Math.min(46, (g.score / 4000) * 46))}px" title="${fmt(g.score)}"></i>`).join('')}</div>`
       : `<div class="center muted" style="font-size:12px">${t('noGames')}</div>`;
     const ach = (p.achievements || []).length;
+    // Games recorded before match ids existed have nothing to link to, so they
+    // stay in the trend bars above and out of this list.
+    const history = (d.games || []).filter(g => g.match_id).slice(0, 5).map(g => `
+      <div class="mrow" data-match="${esc(g.match_id)}">
+        <span class="rk">${medal(g.place)}</span>
+        <span class="nm">${g.place === 1 ? t('place1') : t('placeN', { n: g.place })} · ${fmt(g.players)} 👥</span>
+        <span class="dt">${shortDate(g.finished_at)}</span>
+        <span class="sc">${fmt(g.score)}</span>
+      </div>`).join('');
 
     modal(`
       <div class="prof-head">
@@ -1497,6 +1568,7 @@ import { getDiscordBootstrap } from './discord.js';
       </div>
       <div class="section-title"><span>${t('lastGames')}</span><span class="chip">${t('followers')} ${fmt(d.follows.followers)} · ${t('followingN')} ${fmt(d.follows.following)}</span></div>
       ${trend}
+      ${history}
       <div class="row" style="margin-top:16px;flex-wrap:wrap">
         ${d.isMe ? '' : `<button class="btn sm ${d.isFollowing ? 'ghost' : 'mint'} grow" data-pf="follow">${d.isFollowing ? t('unfollow') : t('follow')}</button>`}
         ${d.isMe ? '' : `<button class="btn sm ghost" data-pf="report">🚩 ${t('report')}</button>`}
@@ -1505,6 +1577,8 @@ import { getDiscordBootstrap } from './discord.js';
         <button class="btn sm ghost grow" data-close>${t('close')}</button>
       </div>`,
     m => m.addEventListener('click', async e => {
+      const mt = e.target.closest('[data-match]');
+      if (mt) { closeModal(); openMatch(mt.dataset.match); return; }
       const b = e.target.closest('[data-pf]'); if (!b) return;
       const k = b.dataset.pf;
       if (k === 'follow') {
@@ -1806,7 +1880,7 @@ import { getDiscordBootstrap } from './discord.js';
   loadLobbies();
   setInterval(() => { if (state.route.name === 'home' && !document.hidden) loadLobbies(); }, 15000);
 
-  getDiscordBootstrap().then(info => {
+  getDiscordBootstrap({ onLeave: () => { if (state.code) leaveRoom(); } }).then(info => {
     if (!info) return onRoute();
     // Launched as a Discord Activity: skip the home screen, use the
     // player's Discord name, and drop straight into the channel's room.
