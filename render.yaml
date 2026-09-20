@@ -2,6 +2,10 @@ services:
   - type: web
     name: maqlab
     runtime: node
+    # Sit next to the players, not next to us. Every tap in a timed party game
+    # round-trips to this server, so the ocean between Oregon and the Gulf is
+    # felt on every single action. The database goes in the same region.
+    region: frankfurt
     plan: free
     buildCommand: npm install
     startCommand: npm start
