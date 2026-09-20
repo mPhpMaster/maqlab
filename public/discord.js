@@ -33,7 +33,9 @@ export async function getDiscordBootstrap() {
     if (!access_token) return null;
 
     const auth = await discordSdk.commands.authenticate({ access_token });
-    const name = (auth?.user?.global_name || auth?.user?.username || 'Player').slice(0, 14);
+    // by code point, so an emoji in a Discord name is never cut in half
+    const raw = auth?.user?.global_name || auth?.user?.username || 'Player';
+    const name = [...raw.replace(/\s+/g, ' ').trim()].slice(0, 14).join('').trim() || 'Player';
 
     const { code: roomCode } = await fetch('/api/discord/room', {
       method: 'POST',

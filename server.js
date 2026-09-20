@@ -70,6 +70,9 @@ function cleanAvatar(a) {
   a = a && typeof a === 'object' ? a : {};
   return { s: n(a.s, 6), c: n(a.c, 14), e: n(a.e, 10), m: n(a.m, 10), h: n(a.h, 12) };
 }
+// Names are cut to fit the UI, but by code point, not UTF-16 unit: slicing a
+// Discord display name mid-emoji splits a surrogate pair and leaves mojibake.
+const cleanName = s => [...String(s == null ? '' : s).replace(/\s+/g, ' ').trim()].slice(0, 14).join('').trim() || 'Player';
 const connected = room => [...room.players.values()].filter(p => p.connected);
 const freshStats = () => ({ fooled: 0, correct: 0, snipes: 0, bullseyes: 0, fastest: 0, highBets: 0, bestStreak: 0, famous: 0, spyCaught: 0, spyEvaded: 0 });
 const freshPowers = () => ({ peek: 1, double: 1 });
@@ -770,7 +773,7 @@ io.on('connection', socket => {
       const banned = await db.isBanned(session.id).catch(() => null);
       if (banned) return reply(cb, { error: 'banned' });
     }
-    name = String(name || '').trim().slice(0, 14) || 'Player';
+    name = cleanName(name);
     avatar = cleanAvatar(avatar);
     let p = token && r.players.get(token);
     if (!p) {
@@ -1023,7 +1026,7 @@ app.get('/api/auth/discord/callback', async (req, res) => {
       headers: { Authorization: `Bearer ${tok.access_token}` },
     }).then(r => r.json());
     if (!me.id) return res.redirect('/?login=failed');
-    const r = await signIn(res, { id: me.id, name: (me.global_name || me.username || 'Player').slice(0, 14) });
+    const r = await signIn(res, { id: me.id, name: cleanName(me.global_name || me.username) });
     res.redirect(r.error === 'banned' ? '/?login=banned' : '/?login=ok');
   } catch {
     res.redirect('/?login=failed');
@@ -1046,7 +1049,7 @@ app.post('/api/auth/dev', async (req, res) => {
   const loopback = ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.ip);
   if (process.env.DEV_LOGIN !== '1' || !loopback) return res.status(404).end();
   const id = String(req.body?.id || 'dev-1');
-  await signIn(res, { id, name: String(req.body?.name || 'Dev').slice(0, 14) });
+  await signIn(res, { id, name: cleanName(req.body?.name || 'Dev') });
   res.json({ ok: true });
 });
 
