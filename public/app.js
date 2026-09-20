@@ -69,7 +69,7 @@ import { getDiscordBootstrap } from './discord.js';
       profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
       rank: 'الترتيب', games: 'ألعاب', wins: 'فوز', winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
       curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: 'متابِعين', followingN: 'يتابع', memberSince: 'عضو منذ',
-      follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
+      discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
       matchResult: 'نتيجة المباراة', shareMatch: 'انسخ رابط المباراة', matchGone: 'المباراة هذي ما عادت موجودة', place1: 'الأول', placeN: 'المركز {n}', roundsN: '{n} جولات', openMatch: 'افتح',
       report: 'بلاغ', reportTitle: 'بلاغ عن {n}', reportWhy: 'وش المشكلة؟', r_cheat: 'غش', r_name: 'اسم مسيء', r_chat: 'إساءة بالدردشة', r_other: 'غير ذلك',
       reportDetails: 'تفاصيل (اختياري)', reportSent: 'وصلنا البلاغ، شكراً 🙏', suggestPlaceholder: 'وش تبي نضيف أو نغيّر؟',
@@ -137,7 +137,7 @@ import { getDiscordBootstrap } from './discord.js';
       profile: 'Profile', leaderboard: 'Leaderboard', suggestBtn: 'Send a suggestion', about: 'About', adminPanel: 'Admin',
       rank: 'Rank', games: 'Games', wins: 'Wins', winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
       curStreak: 'Win streak', bestStreak: 'Longest streak', followers: 'Followers', followingN: 'Following', memberSince: 'Member since',
-      follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
+      discordSignInBusy: 'Signing you in through Discord…', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
       matchResult: 'Match result', shareMatch: 'Copy match link', matchGone: 'That match is no longer around', place1: '1st', placeN: 'Place {n}', roundsN: '{n} rounds', openMatch: 'Open',
       report: 'Report', reportTitle: 'Report {n}', reportWhy: "What's wrong?", r_cheat: 'Cheating', r_name: 'Offensive name', r_chat: 'Abusive chat', r_other: 'Something else',
       reportDetails: 'Details (optional)', reportSent: 'Report received, thank you 🙏', suggestPlaceholder: 'What should we add or change?',
@@ -156,7 +156,10 @@ import { getDiscordBootstrap } from './discord.js';
 
   // ================= state =================
   const state = {
-    lang: store.get('uiLang', (navigator.language || 'ar').startsWith('ar') ? 'ar' : 'en'),
+    // English is the base language of the game; Arabic is the addition. New
+    // visitors start in English whatever their browser says, and the ع button
+    // in the top bar switches — the choice is then remembered.
+    lang: store.get('uiLang', 'en'),
     profile: store.get('profile', { name: '', avatar: Jelly.random() }),
     tokens: store.get('tokens', {}),
     xp: store.get('xp', 0),
@@ -169,6 +172,13 @@ import { getDiscordBootstrap } from './discord.js';
     draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '' },
     bet: 1, showQR: false, reactOpen: false,
     me: null, isAdmin: false, lobbies: null, achList: null,
+    // meKnown stays false until /api/auth/me answers. Rendering a sign-in
+    // button before that is a lie half the time, and it is what made the
+    // screen flip from signed-out to signed-in a moment after every load.
+    meKnown: false,
+    // Set only inside the Discord Activity, where cookies are unreliable and
+    // the session has to ride along as a bearer token instead.
+    bearer: null, inDiscord: new URLSearchParams(location.search).has('frame_id'),
     lastKey: '', phaseTotal: 1, timeouts: [], editor: null,
   };
   state.draft.name = state.profile.name;
@@ -183,7 +193,7 @@ import { getDiscordBootstrap } from './discord.js';
   const me = () => P(myId());
   const fmt = n => Number(n).toLocaleString(state.lang === 'ar' ? 'ar-EG' : 'en-US');
   const later = (ms, fn) => state.timeouts.push(setTimeout(fn, ms));
-  function applyDir() { document.documentElement.lang = state.lang; document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr'; document.title = state.lang === 'ar' ? 'مقلب | MAQLAB' : 'MAQLAB | مقلب'; }
+  function applyDir() { document.documentElement.lang = state.lang; document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr'; document.title = 'MAQLAB | مقلب'; }
 
   const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', spy: '🕵️' };
   const MODS = { normal: '✨', double: '💎', speed: '⏱️', jackpot: '🎁', golden: '👑' };
@@ -532,6 +542,14 @@ import { getDiscordBootstrap } from './discord.js';
   }
   function meCard() {
     if (!signedIn()) {
+      // Until the server answers we show the shape of the card, not a claim
+      // about who you are.
+      if (!state.meKnown) return `<div class="me-card skeleton"><div class="av"></div><div class="who-name"><i></i><i class="wide"></i></div></div>`;
+      // A top-level redirect to discord.com cannot happen inside the Activity
+      // iframe — Discord blocks it and the player just gets a white page. In
+      // there, signing in is the Activity's own job, so we say so instead of
+      // offering a button that goes nowhere.
+      if (state.inDiscord) return `<div class="center muted" style="font-size:14px">${t('discordSignInBusy')}</div>`;
       return `<div class="col" style="gap:10px">
         <div class="center muted" style="font-size:14px">${t('signInToPlay')}</div>
         <button class="btn lilac block" data-act="signin">💬 ${t('signIn')}</button>
@@ -613,7 +631,7 @@ import { getDiscordBootstrap } from './discord.js';
       <div class="wrap">
         <div class="hero">
           <div class="mascots">${J({ s: 2, c: 4, e: 1, m: 1, h: 10 })}${J({ s: 0, c: 0, e: 2, m: 3, h: 1 })}${J({ s: 3, c: 8, e: 4, m: 7, h: 2 })}</div>
-          <div class="logo">${state.lang === 'ar' ? 'مقلب' : 'MAQLAB'}<small>${state.lang === 'ar' ? 'MAQLAB' : 'مقلب'}</small></div>
+          <div class="logo">MAQLAB<small>مقلب</small></div>
           <div class="tagline">${t('tagline')}</div>
           <div class="mode-strip">${Object.keys(TYPES).map((k, i) => `<span class="chip" style="animation-delay:${i * 0.08}s">${TYPES[k]} ${t('type_' + k)}</span>`).join('')}</div>
         </div>
@@ -678,7 +696,7 @@ import { getDiscordBootstrap } from './discord.js';
         ${balloonCard()}
         <div class="section-title"><span>${t('settings')}</span>${host ? '' : '<span class="chip">🔒</span>'}</div>
         <div class="glass settings">
-          <div class="set-row"><div class="lbl">${t('qLang')}</div>${seg('lang', ['ar', 'en'], v => v === 'ar' ? 'العربية' : 'English')}</div>
+          <div class="set-row"><div class="lbl">${t('qLang')}</div>${seg('lang', ['en', 'ar'], v => v === 'ar' ? 'العربية' : 'English')}</div>
           <div class="set-row"><div class="lbl">${t('rounds')}</div>${seg('rounds', [3, 5, 8, 12], v => v)}</div>
           <div class="set-row"><div class="lbl">${t('types')}</div><div class="types">
             ${Object.keys(TYPES).map(k => `<button class="type-tog ${st.types[k] ? 'on' : ''}" data-act="type" data-k="${k}" ${dis}><span class="e">${TYPES[k]}</span>${t('type_' + k)}</button>`).join('')}
@@ -1409,7 +1427,9 @@ import { getDiscordBootstrap } from './discord.js';
   // ================= account & social =================
   async function api(path, opts = {}) {
     try {
-      const r = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+      const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+      if (state.bearer) headers.authorization = `Bearer ${state.bearer}`;
+      const r = await fetch(path, { ...opts, headers });
       const d = await r.json().catch(() => ({}));
       return r.ok ? d : { ...d, status: r.status };
     } catch { return { error: 'network' }; }
@@ -1418,6 +1438,7 @@ import { getDiscordBootstrap } from './discord.js';
 
   async function loadMe() {
     const r = await api('/api/auth/me');
+    state.meKnown = true;
     state.me = r.user || null;
     state.isAdmin = !!r.isAdmin;
     // Discord is the source of truth for who you are; keep the local copy in step
@@ -1460,8 +1481,16 @@ import { getDiscordBootstrap } from './discord.js';
   }
   async function loadLobbies() {
     const r = await api('/api/lobbies');
-    state.lobbies = r.lobbies || [];
-    if (state.route.name === 'home') { state.lastKey = ''; render(); }
+    const next = r.lobbies || [];
+    // This polls every 15 seconds. Re-rendering unconditionally — and worse,
+    // clearing lastKey so the whole screen was rebuilt from scratch with its
+    // entrance animations — is what made the home screen visibly redraw
+    // itself while nobody was touching it. Only a list that actually changed
+    // is worth a repaint, and it is a cheap one now.
+    const sig = l => l.map(x => `${x.code}:${x.players}:${x.phase || ''}`).join('|');
+    const changed = state.lobbies === null || sig(next) !== sig(state.lobbies);
+    state.lobbies = next;
+    if (changed && state.route.name === 'home') render();
   }
 
   // ---------- profile ----------
@@ -1754,7 +1783,10 @@ import { getDiscordBootstrap } from './discord.js';
   const actions = {
     menu: openMenu, how: howTo, edit: openEditor, achievements: showAchievements,
     home: () => navigate('/'),
-    signin: () => { location.href = '/api/auth/discord/start'; },
+    signin: () => {
+      if (state.inDiscord) { toast(t('discordSignInBusy'), 'err'); return; }
+      location.href = '/api/auth/discord/start';
+    },
     async signout() { await post('/api/auth/logout'); state.me = null; state.isAdmin = false; state.lastKey = ''; render(); },
     profile: el => openProfile(el.dataset.uid),
     leaderboard: openLeaderboard,
@@ -1876,12 +1908,28 @@ import { getDiscordBootstrap } from './discord.js';
   });
 
   // ================= boot =================
-  loadMe().then(() => { state.lastKey = ''; render(); });
+  // Inside the Activity the session rides as a bearer token: the iframe is on
+  // a discordsays.com proxy origin, where our cookie may never arrive.
+  function useBearer(token) {
+    state.bearer = token;
+    socket.auth = { token };
+    if (socket.connected) socket.disconnect();
+    socket.connect();
+  }
+
+  // Paint the shell straight away — the identity card renders as a skeleton
+  // until the server says who we are, so nothing has to be taken back.
+  onRoute();
   loadLobbies();
   setInterval(() => { if (state.route.name === 'home' && !document.hidden) loadLobbies(); }, 15000);
 
-  getDiscordBootstrap({ onLeave: () => { if (state.code) leaveRoom(); } }).then(info => {
-    if (!info) return onRoute();
+  getDiscordBootstrap({ onLeave: () => { if (state.code) leaveRoom(); } }).then(async info => {
+    // Order matters: inside Discord, asking who we are before the bootstrap
+    // hands us a session would always answer "nobody".
+    if (info && info.session) useBearer(info.session);
+    await loadMe();
+    state.lastKey = '';
+    if (!info) { render(); return; }
     // Launched as a Discord Activity: skip the home screen, use the
     // player's Discord name, and drop straight into the channel's room.
     state.profile.name = info.name;
@@ -1890,5 +1938,5 @@ import { getDiscordBootstrap } from './discord.js';
     history.replaceState(null, '', `/room/${info.roomCode}`);
     state.route = parseRoute();
     join(info.roomCode);
-  }).catch(() => onRoute());
+  }).catch(async () => { await loadMe(); state.lastKey = ''; render(); });
 })();

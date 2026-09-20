@@ -293,7 +293,7 @@ function finishRound(room) {
 function createRoom() {
   const room = {
     code: newCode(), hostId: null, phase: 'lobby',
-    settings: { lang: 'ar', rounds: 8, types: { bluff: true, number: true, blitz: true, likely: true, emoji: true, spy: true }, pace: 'normal', teams: false, public: true },
+    settings: { lang: 'en', rounds: 8, types: { bluff: true, number: true, blitz: true, likely: true, emoji: true, spy: true }, pace: 'normal', teams: false, public: true },
     players: new Map(), round: 0, gameNo: 0, current: null, deadline: null, timer: null,
     used: {}, plan: [], gains: {}, prevRank: {}, awards: [], bestLie: null, pairs: {}, rivals: {}, touched: Date.now(),
     balloon: { size: 0, target: 20 + rnd(20), pops: {} },
@@ -1010,8 +1010,8 @@ app.use(express.json());
 const INDEX_HTML = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
 const OG_BLOCK = /<!--og-->[\s\S]*?<!--\/og-->/;
 const attr = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const SITE_TITLE = 'مقلب | MAQLAB';
-const SITE_DESC = 'لعبة حفلات جماعية: اكذب بذكاء، اكشف الكذابين، وخمّن أسرع من ربعك.';
+const SITE_TITLE = 'MAQLAB | مقلب';
+const SITE_DESC = 'A party game for your whole crew: lie well, catch the liars, guess faster than your friends. · لعبة حفلات جماعية: اكذب بذكاء، اكشف الكذابين، وخمّن أسرع من ربعك.';
 
 function page(req, title, desc) {
   const base = `${req.protocol}://${req.get('host')}`;
@@ -1034,15 +1034,15 @@ app.get('/room/:code', (req, res) => {
   const n = room ? connected(room).length : 0;
   res.type('html').send(page(req,
     `🎈 ادخل غرفة ${code} · MAQLAB`,
-    n ? `${n} من ربعك ينتظرونك بالغرفة الحين — اضغط وادخل على طول.` : SITE_DESC));
+    n ? `${n} of your friends are in this room right now — tap to join. · ${n} من ربعك ينتظرونك بالغرفة الحين، اضغط وادخل على طول.` : SITE_DESC));
 });
 app.get('/match/:id', async (req, res) => {
   let title = SITE_TITLE, desc = SITE_DESC;
   if (db.on() && UUID.test(req.params.id)) {
     const rows = await db.getMatch(req.params.id).catch(() => []);
     const win = rows.find(r => r.won) || rows[0];
-    if (win) title = `🏆 ${win.name} — ${win.score} نقطة · MAQLAB`;
-    if (rows.length) desc = `نتيجة مباراة بين ${rows.length} لاعبين. تقدر تشوف الترتيب كامل.`;
+    if (win) title = `🏆 ${win.name} — ${win.score} pts · MAQLAB`;
+    if (rows.length) desc = `Final scores from a ${rows.length}-player match. · نتيجة مباراة بين ${rows.length} لاعبين، تقدر تشوف الترتيب كامل.`;
   }
   res.type('html').send(page(req, title, desc));
 });
@@ -1346,8 +1346,26 @@ app.post('/api/discord/token', async (req, res) => {
     });
     const data = await r.json();
     if (!r.ok || !data.access_token) return res.status(502).json({ error: 'exchange_failed' });
-    res.json({ access_token: data.access_token });
-  } catch {
+
+    // Inside Discord there is no place to run the normal OAuth redirect: the
+    // Activity iframe cannot navigate to discord.com, which is exactly the
+    // white page people were landing on. So the session is minted right here
+    // from the code the SDK already handed us. The identity comes from
+    // Discord's own API with that token, never from the client, and it is
+    // returned as a bearer token because third-party cookies are unreliable
+    // inside the iframe.
+    const who = await fetch('https://discord.com/api/users/@me', {
+      headers: { authorization: `Bearer ${data.access_token}` },
+    }).then(x => (x.ok ? x.json() : null)).catch(() => null);
+    if (!who || !who.id) return res.status(502).json({ error: 'exchange_failed' });
+
+    const name = cleanName(who.global_name || who.username || 'Player');
+    const signed = await signIn(res, { id: who.id, name });
+    if (signed.error) return res.status(403).json(signed);
+
+    res.json({ access_token: data.access_token, session: auth.mint({ id: who.id, name }), user: { id: who.id, name } });
+  } catch (e) {
+    console.error('discord token exchange failed:', e.message);
     res.status(502).json({ error: 'exchange_failed' });
   }
 });

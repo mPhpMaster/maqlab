@@ -1,4 +1,76 @@
-# مقلب | MAQLAB — لعبة حفلات جماعية (عربي / English)
+# MAQLAB | مقلب — a party game for your whole crew (English / عربي)
+
+"Lie well, catch the liars." Everyone plays from their own phone at the same time. Each round opens with a slot machine that picks the round type and the score multiplier.
+
+## Running it
+```
+npm install
+npm start          # http://localhost:3000
+```
+To play with people on the same network: open `http://<your IP>:3000` on their phones and enter the 5-letter room code, or scan the QR.
+
+### Running the server in the background (Windows / PowerShell)
+```
+.\start.ps1      # starts the server in the background, writes the PID to .server.pid
+.\stop.ps1       # stops it
+.\restart.ps1    # stop, then start
+```
+Logs go to `server.log` and `server.err.log` in the same folder.
+
+## Round types (6)
+| Round | Idea | Scoring |
+|---|---|---|
+| 🤥 **Bluff** | Everyone writes a lie, then picks the truth and bets ×1/×2/×3 | Right = 500×bet • wrong on a high bet = −150 per level • each player fooled by your lie = +300 |
+| 🎯 **Closest number** | A question whose answer is a number | Dead on (±1%) +1000 • closest +600 • second +300 • third +150 |
+| ⚡ **True or false** | 3 fast statements | Correct +200 + up to +200 for speed • fastest +100 |
+| 🔤 **Decode the emoji** | 3 emoji puzzles, 4 options each | Correct +300 + up to +300 for speed • fastest +100 |
+| 👥 **Who's most likely?** | Everyone votes for someone in the room (needs 3+ players) | With the majority +300 • the person chosen +150 |
+| 🕵️ **Spy** | One player is the spy and sees only the category, never the word. Everyone writes a clue, then votes on who the spy is (needs 4+ players) | Catching the spy +350 • spy escaping (under half the votes) +500 • spy guessing the word +300 |
+
+**Multipliers (the slot machine):** normal, points ×2 💎, speed ×1.5 ⏱️, mystery box 🎁, and the last round is always the **Golden Round ×3** 👑.
+
+**Powers (once per game):** 🔍 a scanner that removes two wrong options (voting and emoji rounds) • 💎 a doubler for a whole round, and everyone sees you use it.
+
+**Settings:** question language, rounds (3/5/8/12), which round types are in play, pace (chill / normal / fast).
+
+## The details
+- A ticking slot machine that slows as it lands, and calm background music generated in the browser (you can mute it)
+- Lies revealed one at a time, with "you got played by so-and-so 😂"
+- A personal score breakdown that bursts open, and a live leaderboard with ▲▼ arrows and a 👑 for the leader
+- An on-screen announcer: combo 🔥, unstoppable!, you're first 👑, legendary bluff 😈, perfect 3/3
+- A ✍️ indicator for who is typing, and pokes 👉 in the lobby
+- 7 end-of-game titles plus "best lie of the game"
+- Levels and XP, 24 permanent achievements 🏅, and hats that unlock as you level
+- Emoji that fly across everyone's screen, confetti, and phone haptics
+
+## Accounts and profiles
+Players sign in with Discord — there is no typed name, so nobody can sit down as someone else. Signing in gives you a profile with lifetime stats, achievements, a place on the leaderboard, and your last five matches. Any finished match has its own shareable page at `/match/<id>` that anyone can open, whether or not they were in the room.
+
+## 🎮 Running it as a Discord Activity
+The game runs inside Discord (launched from the rocket 🚀 button in a voice channel) — everyone in that channel lands in the same room automatically, and their names come from their Discord accounts.
+
+**Steps you have to do yourself from your own account (I can't do these for you):**
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications) → **New Application**.
+2. Under the **Activities** tab, enable it, and under **URL Mappings** add a root mapping: prefix `/` → target is your Render domain without `https://` (e.g. `maqlab.onrender.com`).
+3. Under **OAuth2**, copy the **Client ID**, then **Reset Secret** and copy the **Client Secret** (never put it anywhere public).
+4. In the Render dashboard: **Environment** → add both variables:
+   - `DISCORD_CLIENT_ID`
+   - `DISCORD_CLIENT_SECRET`
+5. Redeploy (Render restarts automatically once environment variables change).
+6. Under **Activities → Settings**, add the server you want to test in, and launch the game from a voice channel with the rocket button.
+
+**Note:** without those two variables the game runs fine as an ordinary website — the Activity feature degrades quietly instead of breaking anything.
+
+## Files
+- `server.js`: the game engine (rooms, round scheduling, scoring, powers, titles)
+- `content.js`: all the content in Arabic and English (bluff 120, numbers 100, true/false 120, most likely 85, emoji 85, spy 95)
+- `db.js` + `db/schema.sql`: profiles, match results, follows, reports, suggestions
+- `auth.js`: signed session tokens, Discord sign-in, admin checks
+- `public/`: the front end (`app.js`, `avatar.js` for the characters, `style.css`, `discord.js` for the Discord Activity integration)
+
+---
+
+# بالعربي
 
 «اكذب بذكاء، اكشف الكذابين». الشلة تلعب من جوالاتها في نفس الوقت. كل جولة تبدأ بآلة حظ تحدد نوع الجولة ومضاعِف النقاط.
 
@@ -7,7 +79,7 @@
 npm install
 npm start          # http://localhost:3000
 ```
-للعب مع ناس على نفس الشبكة: افتح `http://<IP جهازك>:3000` من الجوالات وادخل بالكود المكوّن من 4 حروف أو امسح الـQR.
+للعب مع ناس على نفس الشبكة: افتح `http://<IP جهازك>:3000` من الجوالات وادخل بالكود المكوّن من 5 حروف أو امسح الـQR.
 
 ### تشغيل السيرفر بالخلفية (Windows / PowerShell)
 ```
@@ -40,25 +112,11 @@ npm start          # http://localhost:3000
 - مذيع على الشاشة: كومبو 🔥، ما ينوقف!، صرت الأول 👑، مقلب أسطوري 😈، مثالي 3/3
 - مؤشر ✍️ لمين قاعد يكتب، ونغز الربع 👉 في اللوبي
 - 7 ألقاب آخر اللعبة + «أفضل كذبة في اللعبة»
-- مستويات وخبرة، و10 إنجازات دائمة 🏅، وقبعات تنفتح مع المستوى
+- مستويات وخبرة، و24 إنجاز دائم 🏅، وقبعات تنفتح مع المستوى
 - إيموجي يطيرون على شاشات الكل، كونفيتي، واهتزاز الجوال
 
+## الحسابات والبروفايلات
+الدخول عن طريق ديسكورد، وما فيه اسم يُكتب باليد — يعني ما أحد يقدر يدخل باسم غيره. تسجيل الدخول يعطيك بروفايل فيه إحصائياتك، وإنجازاتك، ومركزك في لوحة الترتيب، وآخر ٥ مباريات. كل مباراة خلصت لها صفحة خاصة على `‎/match/<id>` تقدر تشاركها مع أي أحد حتى لو ما كان معكم بالغرفة.
+
 ## 🎮 تشغيلها كـ Discord Activity
-اللعبة تشتغل جوّا ديسكورد (تفتح من زر الروكيت 🚀 في قناة صوتية) — كل الشلة اللي بنفس القناة تدخل نفس الغرفة تلقائياً، وأسماؤهم تنسحب من حساباتهم في ديسكورد بدون ما يكتبونها.
-
-**خطوات لازم تسويها أنت من حسابك (ما أقدر أسويها بدالك):**
-1. روح [Discord Developer Portal](https://discord.com/developers/applications) → **New Application**.
-2. من تبويب **Activities**، فعّلها، وتحت **URL Mappings** ضيف mapping جذري: prefix `/` → target دومين رندر بدون `https://` (مثلاً `maqlab.onrender.com`).
-3. من تبويب **OAuth2**، انسخ **Client ID**، وسوّي **Reset Secret** وانسخ **Client Secret** (لا تحطه بأي مكان عام).
-4. في لوحة Render: **Environment** → ضيف المتغيرين:
-   - `DISCORD_CLIENT_ID`
-   - `DISCORD_CLIENT_SECRET`
-5. أعد نشر الخدمة (Render يعيد التشغيل تلقائياً بعد إضافة متغيرات البيئة).
-6. من تبويب **Activities → Settings**، أضف السيرفر (Server) اللي تبي تختبر فيها، وشغّل اللعبة من قناة صوتية بزر الروكيت.
-
-**ملاحظة:** بدون هذين المتغيرين، اللعبة تشتغل عادي كموقع ويب عادي — ميزة الـActivity تتعطّل بهدوء بدون ما تكسر شي.
-
-## الملفات
-- `server.js`: محرك اللعبة (الغرف، تخطيط الجولات، النقاط، القدرات، الألقاب)
-- `content.js`: كل المحتوى بالعربي والإنجليزي (مقلب 63، أرقام 50، صح/خطأ 58، مين فينا 36، إيموجي 34، الجاسوس 39)
-- `public/`: الواجهة (`app.js`، `avatar.js` للشخصيات، `style.css`، `discord.js` لتكامل Discord Activity)
+اللعبة تشتغل جوّا ديسكورد (تفتح من زر الروكيت 🚀 في قناة صوتية) — كل الشلة اللي بنفس القناة تدخل نفس الغرفة تلقائياً، وأسماؤهم تنسحب من حساباتهم في ديسكورد بدون ما يكتبونها. الخطوات الكاملة موجودة في القسم الإنجليزي فوق.

@@ -25,16 +25,21 @@ export async function getDiscordBootstrap({ onLeave } = {}) {
       scope: ['identify'],
     });
 
-    const { access_token } = await fetch('/api/discord/token', {
+    // The server exchanges the code, checks who it belongs to with Discord,
+    // and hands back a session of ours. Without that session the player is a
+    // stranger to the game even though Discord knows exactly who they are.
+    const { access_token, session, user } = await fetch('/api/discord/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code }),
     }).then(r => r.json());
-    if (!access_token) return null;
+    if (!access_token || !session) return null;
 
     const auth = await discordSdk.commands.authenticate({ access_token });
-    // by code point, so an emoji in a Discord name is never cut in half
-    const raw = auth?.user?.global_name || auth?.user?.username || 'Player';
+    // The server already told us the authoritative name; the SDK call is what
+    // actually opens the Activity, and its user object is only a fallback.
+    // Trimmed by code point, so an emoji in a Discord name is never cut in half.
+    const raw = user?.name || auth?.user?.global_name || auth?.user?.username || 'Player';
     const name = [...raw.replace(/\s+/g, ' ').trim()].slice(0, 14).join('').trim() || 'Player';
 
     // Leaving the voice channel should leave the lobby too, otherwise the
@@ -42,7 +47,7 @@ export async function getDiscordBootstrap({ onLeave } = {}) {
     // Discord hands every client the full participant list, but we only ever
     // act on our OWN absence from it — a client that could evict other people
     // would be a griefing tool, and the host already has a kick button.
-    const meId = auth && auth.user && auth.user.id;
+    const meId = (user && user.id) || (auth && auth.user && auth.user.id);
     if (meId && onLeave) {
       try {
         await discordSdk.subscribe('ACTIVITY_INSTANCE_PARTICIPANTS_UPDATE', ({ participants }) => {
@@ -62,7 +67,7 @@ export async function getDiscordBootstrap({ onLeave } = {}) {
     }).then(r => r.json());
     if (!roomCode) return null;
 
-    return { name, roomCode };
+    return { name, roomCode, session };
   } catch (e) {
     console.error('Discord Activity bootstrap failed, falling back to normal web flow', e);
     return null;

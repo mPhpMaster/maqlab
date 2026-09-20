@@ -702,3 +702,11 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 .mrow .nm { flex: 1; font-size: 13px; font-weight: 700; }
 .mrow .dt { font-size: 11px; color: var(--muted); }
 .mrow .sc { font-weight: 800; font-size: 13px; min-width: 52px; text-align: end; }
+
+/* identity card before the server has said who you are */
+.me-card.skeleton { pointer-events: none; }
+.me-card.skeleton .av, .me-card.skeleton i { background: rgba(255,255,255,.08); border-radius: 10px; animation: sk 1.3s ease-in-out infinite; }
+.me-card.skeleton .av { width: 52px; height: 52px; border-radius: 50%; }
+.me-card.skeleton i { display: block; height: 9px; width: 54px; margin: 4px 0; }
+.me-card.skeleton i.wide { width: 96px; height: 13px; }
+@keyframes sk { 0%, 100% { opacity: .45 } 50% { opacity: .9 } }
