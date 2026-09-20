@@ -42,6 +42,7 @@ Logs go to `server.log` and `server.err.log` in the same folder.
 - 7 end-of-game titles plus "best lie of the game"
 - Levels and XP, 24 permanent achievements 🏅, and hats that unlock as you level
 - Emoji that fly across everyone's screen, confetti, and phone haptics
+- A revealed answer links straight to an image search, because half the fun of a strange answer is seeing the thing
 
 ## Accounts and profiles
 Players sign in with Discord — there is no typed name, so nobody can sit down as someone else. Signing in gives you a profile with lifetime stats, achievements, a place on the leaderboard, and your last five matches. Any finished match has its own shareable page at `/match/<id>` that anyone can open, whether or not they were in the room.
@@ -49,7 +50,7 @@ Players sign in with Discord — there is no typed name, so nobody can sit down 
 ## 🎮 Running it as a Discord Activity
 The game runs inside Discord (launched from the rocket 🚀 button in a voice channel) — everyone in that channel lands in the same room automatically, and their names come from their Discord accounts.
 
-**Steps you have to do yourself from your own account (I can't do these for you):**
+**Setup (all of it happens in your own Discord and Render accounts):**
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications) → **New Application**.
 2. Under the **Activities** tab, enable it, and under **URL Mappings** add a root mapping: prefix `/` → target is your Render domain without `https://` (e.g. `maqlab.onrender.com`).
 3. Under **OAuth2**, copy the **Client ID**, then **Reset Secret** and copy the **Client Secret** (never put it anywhere public).
@@ -61,9 +62,13 @@ The game runs inside Discord (launched from the rocket 🚀 button in a voice ch
 
 **Note:** without those two variables the game runs fine as an ordinary website — the Activity feature degrades quietly instead of breaking anything.
 
+**Two things the Activity iframe will not forgive**, both already handled here and both worth knowing before you change `public/discord.js`:
+- It can only talk to the mapped domain. The Discord SDK is therefore vendored into `public/vendor/` and imported by path; a CDN import is blocked and kills the bootstrap on its first line.
+- Discord's proxy serves stale assets for a long time regardless of cache headers. The server stamps `app.js` and `avatar.js` with a hash of their contents, and `app.js` passes that stamp on to its import of `discord.js`. If you add another client module, give it the same treatment or you will spend an afternoon debugging code that is not running.
+
 ## Files
 - `server.js`: the game engine (rooms, round scheduling, scoring, powers, titles)
-- `content.js`: all the content in Arabic and English (bluff 120, numbers 100, true/false 120, most likely 85, emoji 85, spy 95)
+- `content.js`: all the content in English and Arabic — 768 questions (bluff 157, numbers 125, true/false 152, most likely 117, emoji 106, spy 111). `npm run check` validates the banks for duplicates, schema and answers that give themselves away by length.
 - `db.js` + `db/schema.sql`: profiles, match results, follows, reports, suggestions
 - `auth.js`: signed session tokens, Discord sign-in, admin checks
 - `public/`: the front end (`app.js`, `avatar.js` for the characters, `style.css`, `discord.js` for the Discord Activity integration)
@@ -114,6 +119,7 @@ npm start          # http://localhost:3000
 - 7 ألقاب آخر اللعبة + «أفضل كذبة في اللعبة»
 - مستويات وخبرة، و24 إنجاز دائم 🏅، وقبعات تنفتح مع المستوى
 - إيموجي يطيرون على شاشات الكل، كونفيتي، واهتزاز الجوال
+- الجواب لما ينكشف فيه زر يوديك لبحث صور، لأن نص المتعة إنك تشوف الشي بعينك
 
 ## الحسابات والبروفايلات
 الدخول عن طريق ديسكورد، وما فيه اسم يُكتب باليد — يعني ما أحد يقدر يدخل باسم غيره. تسجيل الدخول يعطيك بروفايل فيه إحصائياتك، وإنجازاتك، ومركزك في لوحة الترتيب، وآخر ٥ مباريات. كل مباراة خلصت لها صفحة خاصة على `‎/match/<id>` تقدر تشاركها مع أي أحد حتى لو ما كان معكم بالغرفة.
