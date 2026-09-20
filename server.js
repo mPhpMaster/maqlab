@@ -1330,11 +1330,12 @@ app.get('/api/lobbies', (_, res) => {
 
 // ---- Discord Activity support ----
 // Public, non-secret config the client needs to boot the Discord SDK.
-app.get('/api/discord/config', (_, res) => res.json({ clientId: DISCORD_CLIENT_ID || null }));
+app.get('/api/discord/config', (_, res) => { console.log('activity: config requested'); res.json({ clientId: DISCORD_CLIENT_ID || null }); });
 
 // Exchanges a Discord OAuth `code` (from the client's authorize() call) for an
 // access token, using the client secret which must never reach the browser.
 app.post('/api/discord/token', async (req, res) => {
+  console.log('activity: token exchange requested');
   if (!DISCORD_CLIENT_ID || !DISCORD_CLIENT_SECRET) return res.status(500).json({ error: 'not_configured' });
   const code = String(req.body?.code || '');
   if (!code) return res.status(400).json({ error: 'missing_code' });
@@ -1363,6 +1364,7 @@ app.post('/api/discord/token', async (req, res) => {
     const signed = await signIn(res, { id: who.id, name });
     if (signed.error) return res.status(403).json(signed);
 
+    console.log('activity: signed in', who.id);
     res.json({ access_token: data.access_token, session: auth.mint({ id: who.id, name }), user: { id: who.id, name } });
   } catch (e) {
     console.error('discord token exchange failed:', e.message);
@@ -1373,6 +1375,7 @@ app.post('/api/discord/token', async (req, res) => {
 // One room per Discord Activity instance (= one per voice channel session),
 // so everyone who launches the Activity from the same channel lands together.
 app.post('/api/discord/room', (req, res) => {
+  console.log('activity: room requested');
   const instanceId = String(req.body?.instanceId || '').slice(0, 80);
   if (!instanceId) return res.status(400).json({ error: 'missing_instance' });
   const existing = discordInstanceRooms.get(instanceId);
