@@ -9,37 +9,49 @@
 // players staring at "signing you in". The bundle is self-contained.
 const SDK_URL = '/vendor/embedded-app-sdk.js';
 
-export async function getDiscordBootstrap({ onLeave } = {}) {
+// A step that never settles is worse than one that fails: the player just
+// watches a message forever and nothing reaches the server logs. Every stage
+// is named and capped, so a hang becomes a reportable error.
+const STAGE_TIMEOUT_MS = 20000;
+const stage = (name, p, report) => {
+  report && report(name);
+  return Promise.race([
+    p,
+    new Promise((_, rej) => setTimeout(() => rej(new Error(`timed out at: ${name}`)), STAGE_TIMEOUT_MS)),
+  ]);
+};
+
+export async function getDiscordBootstrap({ onLeave, onStage } = {}) {
   const params = new URLSearchParams(location.search);
   if (!params.has('frame_id')) return null;
 
   try {
-    const { clientId } = await fetch('/api/discord/config').then(r => r.json());
+    const { clientId } = await stage('config', fetch('/api/discord/config').then(r => r.json()), onStage);
     if (!clientId) return null;
 
-    const { DiscordSDK } = await import(/* webpackIgnore: true */ SDK_URL);
+    const { DiscordSDK } = await stage('sdk', import(/* webpackIgnore: true */ SDK_URL), onStage);
     const discordSdk = new DiscordSDK(clientId);
-    await discordSdk.ready();
+    await stage('ready', discordSdk.ready(), onStage);
 
-    const { code } = await discordSdk.commands.authorize({
+    const { code } = await stage('authorize', discordSdk.commands.authorize({
       client_id: clientId,
       response_type: 'code',
       state: '',
       prompt: 'none',
       scope: ['identify'],
-    });
+    }), onStage);
 
     // The server exchanges the code, checks who it belongs to with Discord,
     // and hands back a session of ours. Without that session the player is a
     // stranger to the game even though Discord knows exactly who they are.
-    const { access_token, session, user } = await fetch('/api/discord/token', {
+    const { access_token, session, user } = await stage('token', fetch('/api/discord/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code }),
-    }).then(r => r.json());
+    }).then(r => r.json()), onStage);
     if (!access_token || !session) return null;
 
-    const auth = await discordSdk.commands.authenticate({ access_token });
+    const auth = await stage('authenticate', discordSdk.commands.authenticate({ access_token }), onStage);
     // The server already told us the authoritative name; the SDK call is what
     // actually opens the Activity, and its user object is only a fallback.
     // Trimmed by code point, so an emoji in a Discord name is never cut in half.
@@ -64,11 +76,11 @@ export async function getDiscordBootstrap({ onLeave } = {}) {
       }
     }
 
-    const { code: roomCode } = await fetch('/api/discord/room', {
+    const { code: roomCode } = await stage('room', fetch('/api/discord/room', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ instanceId: discordSdk.instanceId }),
-    }).then(r => r.json());
+    }).then(r => r.json()), onStage);
     if (!roomCode) return null;
 
     return { name, roomCode, session };

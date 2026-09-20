@@ -178,7 +178,7 @@ import { getDiscordBootstrap } from './discord.js';
     meKnown: false,
     // Set only inside the Discord Activity, where cookies are unreliable and
     // the session has to ride along as a bearer token instead.
-    bearer: null, inDiscord: new URLSearchParams(location.search).has('frame_id'),
+    bearer: null, inDiscord: new URLSearchParams(location.search).has('frame_id'), discordStage: '',
     lastKey: '', phaseTotal: 1, timeouts: [], editor: null,
   };
   state.draft.name = state.profile.name;
@@ -549,7 +549,7 @@ import { getDiscordBootstrap } from './discord.js';
       // iframe — Discord blocks it and the player just gets a white page. In
       // there, signing in is the Activity's own job, so we say so instead of
       // offering a button that goes nowhere.
-      if (state.inDiscord) return `<div class="center muted" style="font-size:14px">${t('discordSignInBusy')}</div>`;
+      if (state.inDiscord) return `<div class="center muted" style="font-size:14px">${t('discordSignInBusy')}${state.discordStage ? ` <b>${esc(state.discordStage)}</b>` : ''}</div>`;
       return `<div class="col" style="gap:10px">
         <div class="center muted" style="font-size:14px">${t('signInToPlay')}</div>
         <button class="btn lilac block" data-act="signin">💬 ${t('signIn')}</button>
@@ -1923,7 +1923,10 @@ import { getDiscordBootstrap } from './discord.js';
   loadLobbies();
   setInterval(() => { if (state.route.name === 'home' && !document.hidden) loadLobbies(); }, 15000);
 
-  getDiscordBootstrap({ onLeave: () => { if (state.code) leaveRoom(); } }).then(async info => {
+  getDiscordBootstrap({
+    onLeave: () => { if (state.code) leaveRoom(); },
+    onStage: name => { state.discordStage = name; if (!signedIn()) { state.lastKey = ''; render(); } },
+  }).then(async info => {
     // Order matters: inside Discord, asking who we are before the bootstrap
     // hands us a session would always answer "nobody".
     if (info && info.session) useBearer(info.session);
