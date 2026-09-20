@@ -1,0 +1,15 @@
+/* Shared shell for the Terms and Privacy pages. */
+body { overflow: auto; user-select: text; -webkit-user-select: text; }
+.legal { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; position: relative; z-index: 1; }
+.legal .back { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px; margin-bottom: 20px; }
+.legal .back:hover { color: var(--lemon); }
+.legal h1 { font-size: clamp(26px, 6vw, 36px); margin: 0 0 4px; }
+.legal .updated { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 28px; }
+.legal section { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 14px; }
+.legal h2 { font-size: 18px; margin: 0 0 10px; }
+.legal p, .legal li { color: #ded8fb; line-height: 1.9; font-weight: 500; margin: 0 0 10px; }
+.legal ul { margin: 0 0 4px; padding-inline-start: 22px; }
+.legal a { color: var(--lemon); }
+.legal .lang-split { border-top: 1px dashed var(--line); margin: 34px 0 22px; }
+.legal [dir="ltr"] { text-align: left; }
+.legal [dir="rtl"] { text-align: right; }

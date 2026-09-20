@@ -970,6 +970,10 @@ app.get('/room/:code', (req, res) => {
 });
 app.get('/profile', (req, res) => res.type('html').send(page(req, SITE_TITLE, SITE_DESC)));
 
+// Discord's app verification requires both of these to be reachable links.
+app.get('/terms', (_, res) => res.sendFile(path.join(__dirname, 'public', 'terms.html')));
+app.get('/privacy', (_, res) => res.sendFile(path.join(__dirname, 'public', 'privacy.html')));
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/room/:code', (req, res) => {
   const r = rooms.get(String(req.params.code).toUpperCase());

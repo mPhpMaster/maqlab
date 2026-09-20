@@ -81,7 +81,7 @@ import { getDiscordBootstrap } from './discord.js';
       confirmReset: 'تصفير كل تقدم {n}؟ ما يمكن التراجع.', nothingHere: 'ما فيه شي هنا 👌', searchPlayers: 'ابحث باسم لاعب',
       youAreBanned: 'حسابك محظور: {r}', achLocked: 'مقفل',
       aboutBody: ['مقلب لعبة حفلات جماعية عربية/إنجليزية، تنلعب من الجوال مع الشلة في نفس الوقت.', '٦ أنواع جولات، آلة حظ تحدد المضاعف، وقدرات تستخدمها مرة وحدة باللعبة.', 'كل شي فيها أصلي: الأسئلة، الشخصيات، والأصوات تتولّد بالمتصفح بدون أي ملفات.'],
-      aboutMade: 'صُنعت بـ ❤️', version: 'الإصدار',
+      aboutMade: 'صُنعت بـ ❤️', version: 'الإصدار', terms: 'شروط الاستخدام', privacy: 'سياسة الخصوصية',
     },
     en: {
       appName: 'MAQLAB', tagline: 'Bluff smart. Catch the liars. 😏', yourName: 'Your name', create: 'Create room ✨', join: 'Join', or: 'or',
@@ -148,7 +148,7 @@ import { getDiscordBootstrap } from './discord.js';
       confirmReset: "Reset all of {n}'s progress? This can't be undone.", nothingHere: 'Nothing here 👌', searchPlayers: 'Search by player name',
       youAreBanned: 'Your account is banned: {r}', achLocked: 'Locked',
       aboutBody: ['MAQLAB is a bilingual Arabic/English party game, played together on your phones.', '6 round types, a slot machine that sets the multiplier, and one-use power-ups.', 'Everything in it is original: the questions, the characters, and sound synthesized in the browser with no audio files.'],
-      aboutMade: 'Made with ❤️', version: 'Version',
+      aboutMade: 'Made with ❤️', version: 'Version', terms: 'Terms of Service', privacy: 'Privacy Policy',
     },
   };
 
@@ -1654,6 +1654,7 @@ import { getDiscordBootstrap } from './discord.js';
       ${STR[state.lang].aboutBody.map(p => `<p>${esc(p)}</p>`).join('')}
       <div class="mode-strip" style="margin:14px 0">${Object.keys(TYPES).map(k => `<span class="chip">${TYPES[k]} ${t('type_' + k)}</span>`).join('')}</div>
       <div class="center muted" style="font-size:12px">${t('aboutMade')} · ${t('version')} 2.0</div>
+      <div class="center" style="margin-top:8px;font-size:12px"><a href="/terms" target="_blank" style="color:var(--muted)">${t('terms')}</a> · <a href="/privacy" target="_blank" style="color:var(--muted)">${t('privacy')}</a></div>
       <button class="btn block ghost" data-close style="margin-top:14px">${t('close')}</button>`);
   }
 
