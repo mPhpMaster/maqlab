@@ -39,6 +39,18 @@ const MODS = [
   { id: 'jackpot', w: 15, mult: 1 },
 ];
 
+// How many people a mode needs to make sense. Voting on "who among us" with
+// two players is not a vote, and a spy round needs a spy plus a few civilians.
+const MIN_PLAYERS = { likely: 3, spy: 4 };
+// The plan is drawn once at kickoff, but people leave mid-game. Before a round
+// starts, swap out a mode the room has shrunk below.
+function supportedType(room, wanted) {
+  const n = connected(room).length;
+  if (n >= (MIN_PLAYERS[wanted] || 1)) return wanted;
+  const alt = TYPES.filter(t => room.settings.types[t] && n >= (MIN_PLAYERS[t] || 1));
+  return alt.length ? alt[rnd(alt.length)] : 'bluff';
+}
+
 const rooms = new Map();
 
 // Failed joins per IP. Codes are ~8M now, but this makes sweeping them pointless
@@ -295,9 +307,9 @@ function planTypes(room) {
   let enabled = TYPES.filter(t => room.settings.types[t]);
   const crowd = connected(room).length;
   // "who's most likely" needs a crowd
-  if (crowd < 3 && enabled.length > 1) enabled = enabled.filter(t => t !== 'likely');
+  if (crowd < MIN_PLAYERS.likely && enabled.length > 1) enabled = enabled.filter(t => t !== 'likely');
   // spy needs a spy + a few civilians to be worth playing
-  if (crowd < 4 && enabled.length > 1) enabled = enabled.filter(t => t !== 'spy');
+  if (crowd < MIN_PLAYERS.spy && enabled.length > 1) enabled = enabled.filter(t => t !== 'spy');
   const n = room.settings.rounds, plan = [];
   for (let i = 0; i < n; i++) {
     if (i === 0 && enabled.includes('bluff')) { plan.push('bluff'); continue; }
@@ -354,7 +366,7 @@ function nextRound(room) {
   const mod = chooseMod(room);
   room.gains = {};
   room.prevRank = rankMap(room);
-  room.current = { type: room.plan[room.round - 1], mod: mod.id, mult: mod.mult, doubled: {}, peeked: {} };
+  room.current = { type: supportedType(room, room.plan[room.round - 1]), mod: mod.id, mult: mod.mult, doubled: {}, peeked: {} };
   room.phase = 'spin';
   setTimer(room, pace(room, 'spin'), () => beginRound(room));
   broadcast(room);
@@ -1226,6 +1238,26 @@ function kickEverywhere(userId) {
 
 // ---- public lobbies ----
 // Straight off the in-memory rooms; no database needed.
+// Cheap to poll and enough to tell whether a bad report is the server, the
+// database, or just one player's connection.
+app.get('/health', (_, res) => {
+  let players = 0, active = 0;
+  for (const r of rooms.values()) {
+    const n = connected(r).length;
+    players += n;
+    if (n) active += 1;
+  }
+  res.json({
+    ok: true,
+    uptimeSeconds: Math.round(process.uptime()),
+    rooms: rooms.size,
+    activeRooms: active,
+    players,
+    database: db.on() ? 'connected' : 'off',
+    discord: DISCORD_CLIENT_ID ? 'configured' : 'off',
+  });
+});
+
 app.get('/api/lobbies', (_, res) => {
   const list = [];
   for (const r of rooms.values()) {
