@@ -1027,6 +1027,13 @@ function page(req, title, desc) {
   ].join('\n  '));
 }
 
+// Every route below hands back HTML built at request time, so it carries the
+// same revalidate rule the static files got.
+app.use(['/', '/room/:code', '/match/:id', '/profile'], (_, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache');
+  next();
+});
+
 app.get('/', (req, res) => res.type('html').send(page(req, SITE_TITLE, SITE_DESC)));
 app.get('/room/:code', (req, res) => {
   const code = String(req.params.code).toUpperCase();
@@ -1052,7 +1059,17 @@ app.get('/profile', (req, res) => res.type('html').send(page(req, SITE_TITLE, SI
 app.get('/terms', (_, res) => res.sendFile(path.join(__dirname, 'public', 'terms.html')));
 app.get('/privacy', (_, res) => res.sendFile(path.join(__dirname, 'public', 'privacy.html')));
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Without an explicit policy, express.static sends no Cache-Control at all
+// and intermediaries are free to guess — Discord's activity proxy guessed
+// generously and kept serving a stale client long after a fix had shipped,
+// which cost real debugging time. The page and its modules must revalidate
+// every load; the vendored SDK is pinned by filename and never changes.
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders(res, filePath) {
+    if (filePath.includes(`${path.sep}vendor${path.sep}`)) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    else if (/\.(html|js|css)$/.test(filePath)) res.setHeader('Cache-Control', 'no-cache');
+  },
+}));
 app.get('/api/room/:code', (req, res) => {
   const r = rooms.get(String(req.params.code).toUpperCase());
   if (!r) return res.status(404).json({ exists: false });
