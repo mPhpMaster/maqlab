@@ -3,7 +3,11 @@
 // Normal web visitors never pay for any of this — getDiscordBootstrap()
 // resolves to null immediately for them.
 
-const SDK_URL = 'https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@2.5.0/+esm';
+// Served from our own origin on purpose. Inside the Activity iframe Discord
+// only allows requests to the mapped domain, so a direct import from a CDN is
+// blocked and the whole bootstrap dies before it starts — which is what left
+// players staring at "signing you in". The bundle is self-contained.
+const SDK_URL = '/vendor/embedded-app-sdk.js';
 
 export async function getDiscordBootstrap({ onLeave } = {}) {
   const params = new URLSearchParams(location.search);
@@ -69,7 +73,9 @@ export async function getDiscordBootstrap({ onLeave } = {}) {
 
     return { name, roomCode, session };
   } catch (e) {
-    console.error('Discord Activity bootstrap failed, falling back to normal web flow', e);
-    return null;
+    // Inside the iframe there is no web flow to fall back to, so say what
+    // broke instead of leaving the player on a screen that never resolves.
+    console.error('Discord Activity bootstrap failed', e);
+    return { failed: (e && e.message) || 'unknown error' };
   }
 }
