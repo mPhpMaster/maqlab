@@ -12,8 +12,19 @@ async function init() {
   // Hosted Postgres (Supabase/Neon) presents a publicly-trusted cert, so verify
   // it properly; a local dev server speaks plaintext.
   const local = /@(localhost|127\.0\.0\.1)/.test(URL);
-  pool = new Pool({ connectionString: URL, ssl: !local, max: 8 });
-  await pool.query(fs.readFileSync(path.join(__dirname, 'db', 'schema.sql'), 'utf8'));
+  const p = new Pool({ connectionString: URL, ssl: !local, max: 8 });
+  // An idle client dropped by the server (Neon scales to zero, networks blink)
+  // emits on the pool. With no listener that is an uncaught exception, and the
+  // whole game goes down over a database nobody was using.
+  p.on('error', e => console.error('database pool error:', e.message));
+  try {
+    await p.query(fs.readFileSync(path.join(__dirname, 'db', 'schema.sql'), 'utf8'));
+  } catch (e) {
+    // Leave pool null so on() reports the truth: callers must not try to use it.
+    await p.end().catch(() => {});
+    throw e;
+  }
+  pool = p;
   return true;
 }
 

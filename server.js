@@ -1247,6 +1247,16 @@ app.post('/api/discord/room', (req, res) => {
 });
 
 
+// A failing database must never take the game down with it: people who are
+// only playing as guests never touch it. Express 4 does not catch rejections
+// from async handlers, so both nets are needed.
+app.use((err, req, res, _next) => {
+  console.error('request failed:', req.method, req.originalUrl, '-', err.message);
+  if (!res.headersSent) res.status(503).json({ error: 'unavailable' });
+});
+process.on('unhandledRejection', e => console.error('unhandled rejection:', e && e.message ? e.message : e));
+process.on('uncaughtException', e => console.error('uncaught exception:', e && e.stack ? e.stack : e));
+
 db.init()
   .then(ok => console.log(ok ? 'database connected' : 'no DATABASE_URL — profiles, leaderboard and moderation are off'))
   .catch(e => console.error('database unavailable, running without it:', e.message));
