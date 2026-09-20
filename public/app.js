@@ -44,7 +44,7 @@ import { getDiscordBootstrap } from './discord.js';
       leave: 'غادر الغرفة', endGame: 'أنهِ اللعبة الحين', sound: 'الأصوات', music: 'الموسيقى', on: 'شغّال', off: 'مطفي', uiLang: 'English', menu: 'القائمة',
       kicked: 'تم إخراجك من الغرفة', confirmKick: 'تبي تطلّع {n} من الغرفة؟', yes: 'إيه', cancel: 'إلغاء', reconnecting: 'انقطع الاتصال… نحاول نرجع', loading: 'جاري الدخول…', close: 'تمام', pokedYou: '{n} نغزك 👉',
       power_peek: 'كشّاف', power_double: 'دبل', powerOn: 'مفعّل ✓', peekDone: 'شلنا خيارين غلط 🔍', doubleDone: 'نقاطك بهالجولة ×2 💎', doubledBy: '💎 {n} فعّل الدبل!',
-      err_truth: 'هذي الإجابة الصحيحة! اكتب كذبة 😏', err_own: 'ما تقدر تختار كذبتك 😅', err_selfvote: 'ما تقدر تصوت لنفسك 😅', err_noroom: 'الغرفة غير موجودة', err_full: 'الغرفة ممتلئة', err_nan: 'اكتب رقم صحيح', err_empty: 'اكتب شيء أول', err_late: 'انتهى الوقت ⏰', err_host: 'للمضيف فقط', err_dup: 'استخدمتها خلاص', err_nopower: 'خلصت هالقدرة', err_nopeek: 'الكشّاف يشتغل وقت الاختيار بس 🔍', err_bad: 'خيار غير صالح',
+      err_truth: 'هذي الإجابة الصحيحة! اكتب كذبة 😏', err_own: 'ما تقدر تختار كذبتك 😅', err_selfvote: 'ما تقدر تصوت لنفسك 😅', err_noroom: 'الغرفة غير موجودة', err_full: 'الغرفة ممتلئة', err_nan: 'اكتب رقم صحيح', err_empty: 'اكتب شيء أول', err_late: 'انتهى الوقت ⏰', err_host: 'للمضيف فقط', err_dup: 'استخدمتها خلاص', err_nopower: 'خلصت هالقدرة', err_nopeek: 'الكشّاف يشتغل وقت الاختيار بس 🔍', err_bad: 'خيار غير صالح', err_signin: 'سجّل دخولك بديسكورد أول',
       g_correct: 'إجابة صحيحة', g_fooled: 'خدعت لاعبين', g_betLoss: 'خسارة الرهان', g_streak: 'سلسلة 🔥', g_bullseye: 'في الصميم 🎯', g_closest: 'الأقرب', g_second: 'المركز الثاني', g_third: 'المركز الثالث', g_blitz: 'إجابات صحيحة', g_emoji: 'إجابات صحيحة', g_speed: 'مكافأة السرعة', g_fastest: 'الأسرع ⚡', g_jackpot: 'صندوق الحظ 🎁', g_majority: 'مع الأغلبية 👥', g_famous: 'اختاروك 🌟', g_double: 'دبل 💎', g_spyCatch: 'لقّط الجاسوس', g_spyEvade: 'هرب من اللقطة', g_spyGuess: 'خمّن الكلمة',
       a_liar: 'سيد المقالب', a_liar_d: 'خدع {n} مرة', a_detective: 'المحقق', a_detective_d: '{n} إجابات صحيحة', a_sniper: 'القناص', a_sniper_d: '{n} تخمينات دقيقة', a_lightning: 'البرق', a_lightning_d: 'الأسرع {n} مرات', a_gambler: 'المغامر', a_gambler_d: 'راهن بقوة {n} مرات', a_fire: 'ولّعت', a_fire_d: 'سلسلة {n} 🔥', a_star: 'نجم الشلة', a_star_d: 'اختاروه {n} مرات',
       ann_first: 'صرت الأول! 👑', ann_combo: 'كومبو ×{n} 🔥', ann_unstoppable: 'ما ينوقف!! 🔥🔥', ann_legend: 'مقلب أسطوري! 😈', ann_perfect: 'مثالي! 3 من 3 ✨', ann_golden: 'الجولة الذهبية! 👑',
@@ -65,7 +65,7 @@ import { getDiscordBootstrap } from './discord.js';
       laughHint: 'اضحك على أحلى كذبة 😂 وصاحبها ياخذ +200', g_funniest: 'أضحك كذبة 😂',
       rivals: '⚔️ خصومك', nemesis: 'عدوك اللدود', nemesisD: 'قلبك {n} مرات 😤', victim: 'ضحيتك المفضلة', victimD: 'قلبته {n} مرات 😈',
       phrases: ['ما راح تعرفها 😏', 'أنا الفايز 🏆', 'يا ساتر 😂', 'ركّز يا بطل!', 'كذّاب! 🤥', 'يلا بسرعة ⏰', 'حظ أوفر 😅', 'الله عليك 👏', 'مستحيل! 😱', 'صدقني هذي الصح 😇', 'خلاص تعبت 😴', 'انتقامي قادم 😈'],
-      signIn: 'دخول بديسكورد', signOut: 'تسجيل خروج', guestNote: 'تلعب كضيف — تقدمك ما ينحفظ', signedInAs: 'مسجّل باسم',
+      signIn: 'دخول بديسكورد', signInToPlay: 'سجّل دخولك بديسكورد عشان تلعب — اسمك وصورتك يجونك منه', signOut: 'تسجيل خروج', guestNote: 'تلعب كضيف — تقدمك ما ينحفظ', signedInAs: 'مسجّل باسم',
       profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
       rank: 'الترتيب', games: 'ألعاب', wins: 'فوز', winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
       curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: 'متابِعين', followingN: 'يتابع', memberSince: 'عضو منذ',
@@ -111,7 +111,7 @@ import { getDiscordBootstrap } from './discord.js';
       leave: 'Leave room', endGame: 'End game now', sound: 'Sound effects', music: 'Music', on: 'On', off: 'Off', uiLang: 'العربية', menu: 'Menu',
       kicked: 'You were removed from the room', confirmKick: 'Remove {n} from the room?', yes: 'Yes', cancel: 'Cancel', reconnecting: 'Connection lost… reconnecting', loading: 'Joining…', close: 'Got it', pokedYou: '{n} poked you 👉',
       power_peek: 'Peek', power_double: 'Double', powerOn: 'Active ✓', peekDone: 'Removed two wrong options 🔍', doubleDone: 'Your points this round ×2 💎', doubledBy: '💎 {n} used Double!',
-      err_truth: "That's the real answer! Write a lie 😏", err_own: "You can't pick your own lie 😅", err_selfvote: "You can't vote for yourself 😅", err_noroom: "Room doesn't exist", err_full: 'Room is full', err_nan: 'Enter a valid number', err_empty: 'Type something first', err_late: "Time's up ⏰", err_host: 'Host only', err_dup: 'Already used', err_nopower: 'No uses left', err_nopeek: 'Peek only works while choosing 🔍', err_bad: 'Invalid choice',
+      err_truth: "That's the real answer! Write a lie 😏", err_own: "You can't pick your own lie 😅", err_selfvote: "You can't vote for yourself 😅", err_noroom: "Room doesn't exist", err_full: 'Room is full', err_nan: 'Enter a valid number', err_empty: 'Type something first', err_late: "Time's up ⏰", err_host: 'Host only', err_dup: 'Already used', err_nopower: 'No uses left', err_nopeek: 'Peek only works while choosing 🔍', err_bad: 'Invalid choice', err_signin: 'Sign in with Discord first',
       g_correct: 'Correct answer', g_fooled: 'Fooled players', g_betLoss: 'Lost bet', g_streak: 'Streak 🔥', g_bullseye: 'Bullseye 🎯', g_closest: 'Closest', g_second: '2nd closest', g_third: '3rd closest', g_blitz: 'Correct answers', g_emoji: 'Correct answers', g_speed: 'Speed bonus', g_fastest: 'Fastest ⚡', g_jackpot: 'Jackpot 🎁', g_majority: 'With the crowd 👥', g_famous: 'Crowd pick 🌟', g_double: 'Double 💎', g_spyCatch: 'Caught the spy', g_spyEvade: 'Evaded capture', g_spyGuess: 'Guessed the word',
       a_liar: 'Master Liar', a_liar_d: 'Fooled {n} times', a_detective: 'Detective', a_detective_d: '{n} correct answers', a_sniper: 'Sniper', a_sniper_d: '{n} spot-on guesses', a_lightning: 'Lightning', a_lightning_d: 'Fastest {n} times', a_gambler: 'High Roller', a_gambler_d: 'Bet big {n} times', a_fire: 'On Fire', a_fire_d: '{n} streak 🔥', a_star: 'Crowd Favorite', a_star_d: 'Picked {n} times',
       ann_first: "You're #1! 👑", ann_combo: 'Combo ×{n} 🔥', ann_unstoppable: 'UNSTOPPABLE!! 🔥🔥', ann_legend: 'Legendary bluff! 😈', ann_perfect: 'Perfect! 3 of 3 ✨', ann_golden: 'GOLDEN ROUND! 👑',
@@ -132,7 +132,7 @@ import { getDiscordBootstrap } from './discord.js';
       laughHint: 'Laugh at the funniest lie 😂 — its author gets +200', g_funniest: 'Funniest lie 😂',
       rivals: '⚔️ Your rivals', nemesis: 'Your nemesis', nemesisD: 'Fooled you {n} times 😤', victim: 'Favourite victim', victimD: 'You fooled them {n} times 😈',
       phrases: ["You'll never get it 😏", "I'm winning 🏆", 'LOL 😂', 'Focus!', 'Liar! 🤥', 'Hurry up ⏰', 'Better luck next time 😅', 'Nice one 👏', 'No way! 😱', "Trust me, that's it 😇", "I'm tired 😴", 'Revenge is coming 😈'],
-      signIn: 'Sign in with Discord', signOut: 'Sign out', guestNote: "Playing as a guest — progress isn't saved", signedInAs: 'Signed in as',
+      signIn: 'Sign in with Discord', signInToPlay: 'Sign in with Discord to play — your name comes from there', signOut: 'Sign out', guestNote: "Playing as a guest — progress isn't saved", signedInAs: 'Signed in as',
       profile: 'Profile', leaderboard: 'Leaderboard', suggestBtn: 'Send a suggestion', about: 'About', adminPanel: 'Admin',
       rank: 'Rank', games: 'Games', wins: 'Wins', winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
       curStreak: 'Win streak', bestStreak: 'Longest streak', followers: 'Followers', followingN: 'Following', memberSince: 'Member since',
@@ -524,9 +524,15 @@ import { getDiscordBootstrap } from './discord.js';
     return `<div class="level-pill"><span class="lv">${L.level}</span><span>${t('level')}</span><span class="bar"><i style="width:${(L.into / L.need) * 100}%"></i></span></div>`;
   }
   function meCard() {
+    if (!signedIn()) {
+      return `<div class="col" style="gap:10px">
+        <div class="center muted" style="font-size:14px">${t('signInToPlay')}</div>
+        <button class="btn lilac block" data-act="signin">💬 ${t('signIn')}</button>
+      </div>`;
+    }
     return `<div class="me-card">
       <button class="av" data-act="edit" aria-label="${t('editAvatar')}" style="border:none">${J(state.profile.avatar)}<span class="edit">✏️</span></button>
-      <input id="name" class="input" maxlength="14" placeholder="${t('yourName')}" value="${esc(state.draft.name)}" autocomplete="off">
+      <div class="who-name"><small>${t('signedInAs')}</small><b>${esc(state.me.name)}</b></div>
     </div>`;
   }
   function timerRing() {
@@ -601,12 +607,12 @@ import { getDiscordBootstrap } from './discord.js';
         </div>
         <div class="glass col" style="padding:16px;margin-top:10px">
           ${meCard()}
-          <button class="btn block" data-act="create">${t('create')}</button>
+          ${signedIn() ? `<button class="btn block" data-act="create">${t('create')}</button>
           <div class="divider">${t('or')}</div>
           <div class="join-row">
             <input id="code" class="input code" maxlength="5" placeholder="ABCDE" value="${esc(state.draft.code)}" autocomplete="off" autocapitalize="characters" spellcheck="false">
             <button class="btn sky" data-act="join-code">${t('join')}</button>
-          </div>
+          </div>` : ''}
         </div>
         ${accountBar()}
         ${lobbyList()}
@@ -1402,6 +1408,8 @@ import { getDiscordBootstrap } from './discord.js';
     const r = await api('/api/auth/me');
     state.me = r.user || null;
     state.isAdmin = !!r.isAdmin;
+    // Discord is the source of truth for who you are; keep the local copy in step
+    if (state.me) { state.profile.name = state.me.name; store.set('profile', state.profile); }
     if (r.banned) toast(t('youAreBanned', { r: r.banned }), 'err');
   }
 
@@ -1414,11 +1422,7 @@ import { getDiscordBootstrap } from './discord.js';
   const apiErr = d => toast(d.error === 'slow_down' ? t('slowDown') : t('err_bad'), 'err');
 
   function accountBar() {
-    if (!signedIn()) {
-      return `<div class="account guest">
-        <button class="btn sm lilac" data-act="signin">💬 ${t('signIn')}</button>
-        <small>${t('guestNote')}</small></div>`;
-    }
+    if (!signedIn()) return '';
     return `<div class="account">
       <button class="chip" data-act="profile" data-uid="${esc(state.me.id)}">👤 ${esc(state.me.name)}</button>
       ${state.isAdmin ? `<button class="chip" data-act="admin">🛡️</button>` : ''}
@@ -1660,9 +1664,9 @@ import { getDiscordBootstrap } from './discord.js';
 
   // ================= actions =================
   function needName() {
-    const name = state.draft.name.trim();
-    if (!name) { toast(t('needName'), 'err'); document.getElementById('name')?.focus(); return false; }
-    state.profile.name = name; store.set('profile', state.profile);
+    if (!signedIn()) { toast(t('signInFirst'), 'err'); return false; }
+    state.profile.name = state.me.name;
+    store.set('profile', state.profile);
     return true;
   }
   async function shareLink(native) {
@@ -1786,8 +1790,7 @@ import { getDiscordBootstrap } from './discord.js';
   });
   $app.addEventListener('input', e => {
     const id = e.target.id;
-    if (id === 'name') state.draft.name = e.target.value;
-    else if (id === 'code') { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, ''); state.draft.code = e.target.value; }
+    if (id === 'code') { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, ''); state.draft.code = e.target.value; }
     else if (id === 'lie') { state.draft.lie = e.target.value; sendTyping(); }
     else if (id === 'guess') { state.draft.guess = e.target.value; sendTyping(); }
     else if (id === 'spyclue') { state.draft.spyClue = e.target.value; sendTyping(); }
@@ -1796,7 +1799,6 @@ import { getDiscordBootstrap } from './discord.js';
   $app.addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
     if (e.target.id === 'code') actions['join-code']();
-    else if (e.target.id === 'name') (state.route.name === 'room' ? actions.enter : actions.create)();
   });
 
   // ================= boot =================

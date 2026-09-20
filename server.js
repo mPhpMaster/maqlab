@@ -814,11 +814,15 @@ io.on('connection', socket => {
     if (joinBlocked(ip)) return reply(cb, { error: 'noroom' });
     const r = rooms.get(String(code || '').toUpperCase());
     if (!r) { noteJoinFail(ip); return reply(cb, { error: 'noroom' }); }
-    if (session && db.on()) {
-      const banned = await db.isBanned(session.id).catch(() => null);
-      if (banned) return reply(cb, { error: 'banned' });
+    // Players are their Discord account. The client no longer supplies a name,
+    // so nobody can sit down as someone else.
+    if (!session) return reply(cb, { error: 'signin' });
+    let profile = null;
+    if (db.on()) {
+      profile = await db.getProfile(session.id).catch(() => null);
+      if (profile && profile.banned_at) return reply(cb, { error: 'banned' });
     }
-    name = cleanName(name);
+    name = cleanName(profile ? profile.name : session.name);
     avatar = cleanAvatar(avatar);
     let p = token && r.players.get(token);
     if (!p) {
