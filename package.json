@@ -12,7 +12,8 @@
     "dev": "node --watch --env-file-if-exists=.env server.js",
     "check": "node scripts/validate-content.js --strict",
     "check:new": "node scripts/validate-content.js --new --strict",
-    "prestart": "node scripts/validate-content.js"
+    "prestart": "node scripts/validate-content.js",
+    "test": "node --test \"tests/**/*.test.js\""
   },
   "dependencies": {
     "express": "^4.21.2",

@@ -1716,7 +1716,7 @@ import { getDiscordBootstrap } from './discord.js';
     share: () => shareLink(true),
     qr() { state.showQR = !state.showQR; render(); },
     set(el) { const k = el.dataset.k; let v = el.dataset.v; if (k === 'rounds') v = +v; sfx.tap(); emit('settings', { [k]: v }); },
-    type(el) { const types = { ...state.room.settings.types, [el.dataset.k]: !state.room.settings.types[el.dataset.k] }; sfx.tap(); emit('settings', { types }); },
+    type(el) { sfx.tap(); emit('settings', { toggleType: el.dataset.k }); },
     kick(el, e) { e.stopPropagation(); const p = P(el.dataset.id); if (p) confirmBox(t('confirmKick', { n: p.name }), () => emit('kick', p.id)); },
     poke(el, e) { if (e.target.closest('[data-act="kick"]')) return actions.kick(e.target.closest('[data-act="kick"]'), e); socket.emit('poke', el.dataset.id); buzz(15); },
     start() { sfx.send(); buzz(30); emit('start'); },

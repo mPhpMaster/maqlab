@@ -798,6 +798,13 @@ io.on('connection', socket => {
     if (['chill', 'normal', 'fast'].includes(patch.pace)) s.pace = patch.pace;
     if (typeof patch.teams === 'boolean') { s.teams = patch.teams; if (s.teams) balanceTeams(room); }
     if (typeof patch.public === 'boolean') s.public = patch.public;
+    // Toggling flips against the server's own copy. The client used to send the
+    // whole map computed from its local state, so two quick taps raced: the
+    // second was built from state the first had already changed, and undid it.
+    if (typeof patch.toggleType === 'string' && TYPES.includes(patch.toggleType)) {
+      const next = { ...s.types, [patch.toggleType]: !s.types[patch.toggleType] };
+      if (Object.values(next).some(Boolean)) s.types = next;
+    }
     if (patch.types && typeof patch.types === 'object') {
       const t = Object.fromEntries(TYPES.map(k => [k, !!patch.types[k]]));
       if (Object.values(t).some(Boolean)) s.types = t;
