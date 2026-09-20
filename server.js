@@ -15,7 +15,9 @@ const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || '';
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+// 64KB is far above any legitimate payload here (a lie is capped at 50
+// characters) and well below what it takes to hurt the process.
+const io = new Server(server, { maxHttpBufferSize: 64 * 1024 });
 
 const MAX_PLAYERS = 12;
 const ROOM_TTL_MS = 30 * 60 * 1000;
@@ -38,16 +40,45 @@ const MODS = [
 ];
 
 const rooms = new Map();
+
+// Failed joins per IP. Codes are ~8M now, but this makes sweeping them pointless
+// rather than merely slow, and costs a legitimate player nothing.
+const joinFails = new Map();
+const JOIN_WINDOW_MS = 60 * 1000;
+const JOIN_MAX_FAILS = 20;
+function joinBlocked(ip) {
+  const rec = joinFails.get(ip);
+  if (!rec) return false;
+  if (Date.now() - rec.since > JOIN_WINDOW_MS) { joinFails.delete(ip); return false; }
+  return rec.n >= JOIN_MAX_FAILS;
+}
+function noteJoinFail(ip) {
+  const rec = joinFails.get(ip);
+  if (!rec || Date.now() - rec.since > JOIN_WINDOW_MS) joinFails.set(ip, { n: 1, since: Date.now() });
+  else rec.n += 1;
+}
 const discordInstanceRooms = new Map(); // Discord Activity instanceId -> room code, so a whole voice channel lands in one room
 
 // ---------------- helpers ----------------
 const rid = (n = 16) => crypto.randomBytes(24).toString('base64url').slice(0, n);
 const rnd = n => Math.floor(Math.random() * n);
 const shuffle = arr => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+// Room codes are the only thing protecting a private room, so they come from
+// the CSPRNG rather than Math.random, whose stream is predictable from a few
+// observed outputs. Five characters from an unambiguous alphabet gives ~8M
+// codes instead of 332k, which is no longer worth enumerating.
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+const CODE_LEN = 5;
 function newCode() {
   let c;
-  do { c = Array.from({ length: 4 }, () => CODE_CHARS[rnd(CODE_CHARS.length)]).join(''); } while (rooms.has(c));
+  do {
+    // rejection sampling keeps every character equally likely
+    const bytes = crypto.randomBytes(CODE_LEN * 2);
+    c = '';
+    for (let i = 0; c.length < CODE_LEN && i < bytes.length; i++) {
+      if (bytes[i] < 256 - (256 % CODE_CHARS.length)) c += CODE_CHARS[bytes[i] % CODE_CHARS.length];
+    }
+  } while (c.length < CODE_LEN || rooms.has(c));
   return c;
 }
 
@@ -767,8 +798,10 @@ io.on('connection', socket => {
   socket.on('create', (_, cb) => reply(cb, { code: createRoom().code }));
 
   socket.on('join', async ({ code, token, name, avatar } = {}, cb) => {
+    const ip = socket.handshake.address;
+    if (joinBlocked(ip)) return reply(cb, { error: 'noroom' });
     const r = rooms.get(String(code || '').toUpperCase());
-    if (!r) return reply(cb, { error: 'noroom' });
+    if (!r) { noteJoinFail(ip); return reply(cb, { error: 'noroom' }); }
     if (session && db.on()) {
       const banned = await db.isBanned(session.id).catch(() => null);
       if (banned) return reply(cb, { error: 'banned' });

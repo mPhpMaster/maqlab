@@ -18,7 +18,7 @@ import { getDiscordBootstrap } from './discord.js';
   const STR = {
     ar: {
       appName: 'مقلب', tagline: 'اكذب بذكاء، اكشف الكذابين 😏', yourName: 'اسمك', create: 'أنشئ غرفة ✨', join: 'ادخل', or: 'أو',
-      how: 'كيف تلعب؟', editAvatar: 'عدّل شخصيتك', save: 'حفظ', random: 'عشوائي 🎲', needName: 'اكتب اسمك أول 😊', needCode: 'اكتب كود الغرفة (4 حروف)',
+      how: 'كيف تلعب؟', editAvatar: 'عدّل شخصيتك', save: 'حفظ', random: 'عشوائي 🎲', needName: 'اكتب اسمك أول 😊', needCode: 'اكتب كود الغرفة',
       tab_s: 'الشكل', tab_c: 'اللون', tab_e: 'العيون', tab_m: 'الفم', tab_h: 'القبعة', lockedAt: 'تنفتح في المستوى {n} 🔒', hatUnlocked: 'فتحت قبعة جديدة! 🎩',
       roomCode: 'كود الغرفة', copyLink: 'انسخ الرابط', share: 'شارك', copied: 'تم النسخ ✅', players: 'اللاعبين', invite: 'ادعُ', pokeHint: 'اضغط على أي لاعب عشان تنغزه 👉',
       settings: 'الإعدادات', qLang: 'لغة الأسئلة', rounds: 'عدد الجولات', types: 'أنواع الجولات', pace: 'السرعة', chill: 'رايق 😌', normal: 'عادي', fast: 'سريع ⚡',
@@ -85,7 +85,7 @@ import { getDiscordBootstrap } from './discord.js';
     },
     en: {
       appName: 'MAQLAB', tagline: 'Bluff smart. Catch the liars. 😏', yourName: 'Your name', create: 'Create room ✨', join: 'Join', or: 'or',
-      how: 'How to play', editAvatar: 'Customize', save: 'Save', random: 'Random 🎲', needName: 'Enter your name first 😊', needCode: 'Enter the 4-letter room code',
+      how: 'How to play', editAvatar: 'Customize', save: 'Save', random: 'Random 🎲', needName: 'Enter your name first 😊', needCode: 'Enter the room code',
       tab_s: 'Shape', tab_c: 'Color', tab_e: 'Eyes', tab_m: 'Mouth', tab_h: 'Hat', lockedAt: 'Unlocks at level {n} 🔒', hatUnlocked: 'New hat unlocked! 🎩',
       roomCode: 'ROOM CODE', copyLink: 'Copy link', share: 'Share', copied: 'Copied ✅', players: 'Players', invite: 'Invite', pokeHint: 'Tap a player to poke them 👉',
       settings: 'Settings', qLang: 'Question language', rounds: 'Rounds', types: 'Round types', pace: 'Pace', chill: 'Chill 😌', normal: 'Normal', fast: 'Fast ⚡',
@@ -452,7 +452,7 @@ import { getDiscordBootstrap } from './discord.js';
 
   // ================= routing =================
   function parseRoute() {
-    const m = location.pathname.match(/^\/room\/([A-Za-z]{4})/);
+    const m = location.pathname.match(/^\/room\/([A-Za-z]{4,5})/);
     return m ? { name: 'room', code: m[1].toUpperCase() } : { name: 'home' };
   }
   function navigate(path) { history.pushState(null, '', path); onRoute(); }
@@ -604,7 +604,7 @@ import { getDiscordBootstrap } from './discord.js';
           <button class="btn block" data-act="create">${t('create')}</button>
           <div class="divider">${t('or')}</div>
           <div class="join-row">
-            <input id="code" class="input code" maxlength="4" placeholder="ABCD" value="${esc(state.draft.code)}" autocomplete="off" autocapitalize="characters" spellcheck="false">
+            <input id="code" class="input code" maxlength="5" placeholder="ABCDE" value="${esc(state.draft.code)}" autocomplete="off" autocapitalize="characters" spellcheck="false">
             <button class="btn sky" data-act="join-code">${t('join')}</button>
           </div>
         </div>
@@ -1708,7 +1708,7 @@ import { getDiscordBootstrap } from './discord.js';
     'join-code'() {
       if (!needName()) return;
       const code = state.draft.code.trim().toUpperCase();
-      if (!/^[A-Z]{4}$/.test(code)) { toast(t('needCode'), 'err'); return; }
+      if (!/^[A-Z]{4,5}$/.test(code)) { toast(t('needCode'), 'err'); return; }
       sfx.send(); history.pushState(null, '', `/room/${code}`); state.route = parseRoute(); join(code);
     },
     enter() { if (!needName()) return; sfx.send(); join(state.route.code); },
