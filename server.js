@@ -1009,13 +1009,26 @@ app.use(express.json());
 // request time. The page keeps a placeholder block we swap out per route.
 const INDEX_HTML = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
 const OG_BLOCK = /<!--og-->[\s\S]*?<!--\/og-->/;
+
+// Discord's activity proxy serves stale modules for a long time whatever the
+// cache headers say, so the URL itself has to change when the code does. The
+// stamp is a hash of the client modules: it moves on a real change and
+// stays put across restarts that changed nothing.
+const ASSET_V = crypto.createHash('sha1')
+  .update(['app.js', 'discord.js', 'avatar.js'].map(f => {
+    try { return fs.readFileSync(path.join(__dirname, 'public', f)); } catch { return ''; }
+  }).join('|'))
+  .digest('hex').slice(0, 10);
 const attr = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const SITE_TITLE = 'MAQLAB | مقلب';
 const SITE_DESC = 'A party game for your whole crew: lie well, catch the liars, guess faster than your friends. · لعبة حفلات جماعية: اكذب بذكاء، اكشف الكذابين، وخمّن أسرع من ربعك.';
 
 function page(req, title, desc) {
   const base = `${req.protocol}://${req.get('host')}`;
-  return INDEX_HTML.replace(OG_BLOCK, [
+  return INDEX_HTML
+    .replace('src="/app.js"', `src="/app.js?v=${ASSET_V}"`)
+    .replace('src="/avatar.js"', `src="/avatar.js?v=${ASSET_V}"`)
+    .replace(OG_BLOCK, [
     '<meta property="og:type" content="website">',
     '<meta property="og:site_name" content="MAQLAB">',
     `<meta property="og:title" content="${attr(title)}">`,

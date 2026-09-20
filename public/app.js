@@ -1,4 +1,8 @@
-import { getDiscordBootstrap } from './discord.js';
+// Imported by URL rather than by name so the ?v= stamp on this module rides
+// along to the next one. Discord's activity proxy caches hard enough that
+// headers alone do not dislodge a stale client, and a half-updated pair of
+// modules is worse than either.
+const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.meta.url).search);
 
 (() => {
   'use strict';
