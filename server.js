@@ -1395,7 +1395,7 @@ app.post('/api/discord/token', async (req, res) => {
     if (signed.error) return res.status(403).json(signed);
 
     console.log('activity: signed in', who.id);
-    res.json({ access_token: data.access_token, session: auth.mint({ id: who.id, name }), user: { id: who.id, name } });
+    res.json({ access_token: data.access_token, session: auth.mint({ id: who.id, name }), user: { id: who.id, name }, isAdmin: auth.isAdmin(who.id) });
   } catch (e) {
     console.error('discord token exchange failed:', e.message);
     res.status(502).json({ error: 'exchange_failed' });

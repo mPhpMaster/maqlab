@@ -12,6 +12,10 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   const $modal = document.getElementById('modal-root');
   const $floaters = document.getElementById('floaters');
 
+  // Discord launches the game inside an iframe and says so in the URL. Several
+  // decisions below hang off this, including the very first screen we paint.
+  const IN_DISCORD = new URLSearchParams(location.search).has('frame_id');
+
   // ================= storage =================
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
@@ -21,7 +25,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   // ================= i18n =================
   const STR = {
     ar: {
-      appName: 'مقلب', tagline: 'اكذب بذكاء، اكشف الكذابين 😏', yourName: 'اسمك', create: 'أنشئ غرفة ✨', join: 'ادخل', or: 'أو',
+      appName: 'MAQLAB', tagline: 'اكذب بذكاء، اكشف الكذابين 😏', yourName: 'اسمك', create: 'أنشئ غرفة ✨', join: 'ادخل', or: 'أو',
       how: 'كيف تلعب؟', editAvatar: 'عدّل شخصيتك', save: 'حفظ', random: 'عشوائي 🎲', needName: 'اكتب اسمك أول 😊', needCode: 'اكتب كود الغرفة',
       tab_s: 'الشكل', tab_c: 'اللون', tab_e: 'العيون', tab_m: 'الفم', tab_h: 'القبعة', lockedAt: 'تنفتح في المستوى {n} 🔒', hatUnlocked: 'فتحت قبعة جديدة! 🎩',
       roomCode: 'كود الغرفة', copyLink: 'انسخ الرابط', share: 'شارك', copied: 'تم النسخ ✅', players: 'اللاعبين', invite: 'ادعُ', pokeHint: 'اضغط على أي لاعب عشان تنغزه 👉',
@@ -182,7 +186,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     meKnown: false,
     // Set only inside the Discord Activity, where cookies are unreliable and
     // the session has to ride along as a bearer token instead.
-    bearer: null, inDiscord: new URLSearchParams(location.search).has('frame_id'), discordStage: '',
+    bearer: null, inDiscord: IN_DISCORD, discordDone: false, discordStage: '',
     lastKey: '', phaseTotal: 1, timeouts: [], editor: null,
   };
   state.draft.name = state.profile.name;
@@ -353,7 +357,10 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   }
 
   // ================= socket =================
-  const socket = io({ transports: ['websocket', 'polling'] });
+  // Inside Discord the handshake needs a bearer token that does not exist yet,
+  // so the socket waits rather than connecting once anonymously and then
+  // reconnecting — that second handshake was pure latency on the way in.
+  const socket = io({ transports: ['websocket', 'polling'], autoConnect: !IN_DISCORD });
   const emit = (ev, data) => new Promise(res => socket.emit(ev, data, r => { if (r && r.error) toast(t('err_' + r.error), 'err'); res(r || {}); }));
   socket.on('connect', () => { if (state.code && state.route.name === 'room') join(state.code, true); });
   socket.on('disconnect', () => { if (state.code) toast(t('reconnecting'), 'err'); });
@@ -495,6 +502,11 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     const r = state.route, s = state.room;
     if (r.name === 'room' && s && state.code === r.code) return `room:${s.phase}:${s.gameNo}:${s.round}:${s.current && s.current.idx != null ? s.current.idx : ''}`;
     if (r.name === 'room') return state.joining || (state.tokens[r.code] && state.profile.name) ? 'loading' : 'enter';
+    // An Activity is always on its way into the channel's room, so the home
+    // screen is a place the player never goes. Showing it while the handshake
+    // runs is a flicker of the wrong game. If the handshake fails we fall
+    // through to home, which at least has something to press.
+    if (state.inDiscord && !state.discordDone) return 'loading';
     return 'home';
   }
 
@@ -527,7 +539,11 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
 
   function view(key) {
     if (key === 'home') return homeView();
-    if (key === 'loading') return `<div class="screen"><div class="center-msg"><div><div class="spinner"></div><b>${t('loading')}</b></div></div></div>`;
+    if (key === 'loading') return `<div class="screen"><div class="center-msg"><div>
+      ${state.inDiscord ? `<div class="logo sm" style="margin-bottom:18px">MAQLAB<small>مقلب</small></div>` : ''}
+      <div class="spinner"></div><b>${t('loading')}</b>
+      ${state.inDiscord && state.discordStage ? `<div class="muted" style="font-size:11px;margin-top:8px">${esc(state.discordStage)}</div>` : ''}
+    </div></div></div>`;
     if (key === 'enter') return enterView();
     const views = {
       lobby: lobbyView, spin: spinView, write: writeView, vote: voteView, bluffReveal: bluffRevealView, guess: guessView, numReveal: numRevealView,
@@ -1924,27 +1940,35 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   // Paint the shell straight away — the identity card renders as a skeleton
   // until the server says who we are, so nothing has to be taken back.
   onRoute();
-  loadLobbies();
-  setInterval(() => { if (state.route.name === 'home' && !document.hidden) loadLobbies(); }, 15000);
+  // The open-rooms list belongs to the home screen, which an Activity never
+  // shows, so in Discord it is a request nobody was ever going to read.
+  if (!IN_DISCORD) {
+    loadLobbies();
+    setInterval(() => { if (state.route.name === 'home' && !document.hidden) loadLobbies(); }, 15000);
+  }
 
   getDiscordBootstrap({
     onLeave: () => { if (state.code) leaveRoom(); },
     onStage: name => { state.discordStage = name; if (!signedIn()) { state.lastKey = ''; render(); } },
   }).then(async info => {
-    // Order matters: inside Discord, asking who we are before the bootstrap
-    // hands us a session would always answer "nobody".
-    if (info && info.session) useBearer(info.session);
-    await loadMe();
+    state.discordDone = true;
     state.lastKey = '';
-    if (info && info.failed) { render(); toast(t('discordFailed', { e: info.failed }), 'err'); return; }
-    if (!info) { render(); return; }
-    // Launched as a Discord Activity: skip the home screen, use the
-    // player's Discord name, and drop straight into the channel's room.
+    // Not in Discord: this is an ordinary web visit, so ask who we are.
+    if (!info) { await loadMe(); render(); return; }
+    if (info.failed) { await loadMe(); render(); toast(t('discordFailed', { e: info.failed }), 'err'); return; }
+
+    // The bootstrap already carries the answer /api/auth/me would give, and
+    // it was verified against Discord on the server. Asking again here would
+    // be one more round trip between the player and their lobby.
+    useBearer(info.session);
+    state.me = { id: info.user.id, name: info.name };
+    state.meKnown = true;
+    state.isAdmin = !!info.isAdmin;
     state.profile.name = info.name;
     state.draft.name = info.name;
     store.set('profile', state.profile);
     history.replaceState(null, '', `/room/${info.roomCode}`);
     state.route = parseRoute();
     join(info.roomCode);
-  }).catch(async () => { await loadMe(); state.lastKey = ''; render(); });
+  }).catch(async () => { state.discordDone = true; await loadMe(); state.lastKey = ''; render(); });
 })();

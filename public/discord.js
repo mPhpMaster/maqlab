@@ -26,12 +26,25 @@ export async function getDiscordBootstrap({ onLeave, onStage } = {}) {
   if (!params.has('frame_id')) return null;
 
   try {
-    const { clientId } = await stage('config', fetch('/api/discord/config').then(r => r.json()), onStage);
+    // Our config and the SDK bundle have nothing to say to each other, so
+    // they load side by side instead of one after the other.
+    const [{ clientId }, { DiscordSDK }] = await stage('start', Promise.all([
+      fetch('/api/discord/config').then(r => r.json()),
+      import(/* webpackIgnore: true */ SDK_URL),
+    ]), onStage);
     if (!clientId) return null;
 
-    const { DiscordSDK } = await stage('sdk', import(/* webpackIgnore: true */ SDK_URL), onStage);
     const discordSdk = new DiscordSDK(clientId);
     await stage('ready', discordSdk.ready(), onStage);
+
+    // The room is keyed by the activity instance and nothing else, so it has
+    // no reason to queue behind signing in. Started now, collected at the end:
+    // by then it has almost always already arrived.
+    const roomP = fetch('/api/discord/room', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ instanceId: discordSdk.instanceId }),
+    }).then(r => r.json());
 
     const { code } = await stage('authorize', discordSdk.commands.authorize({
       client_id: clientId,
@@ -44,18 +57,16 @@ export async function getDiscordBootstrap({ onLeave, onStage } = {}) {
     // The server exchanges the code, checks who it belongs to with Discord,
     // and hands back a session of ours. Without that session the player is a
     // stranger to the game even though Discord knows exactly who they are.
-    const { access_token, session, user } = await stage('token', fetch('/api/discord/token', {
+    const { access_token, session, user, isAdmin } = await stage('token', fetch('/api/discord/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code }),
     }).then(r => r.json()), onStage);
     if (!access_token || !session) return null;
 
-    const auth = await stage('authenticate', discordSdk.commands.authenticate({ access_token }), onStage);
-    // The server already told us the authoritative name; the SDK call is what
-    // actually opens the Activity, and its user object is only a fallback.
-    // Trimmed by code point, so an emoji in a Discord name is never cut in half.
-    const raw = user?.name || auth?.user?.global_name || auth?.user?.username || 'Player';
+    // The server already told us the authoritative name, trimmed by code point
+    // so an emoji in a Discord name is never cut in half.
+    const raw = (user && user.name) || 'Player';
     const name = [...raw.replace(/\s+/g, ' ').trim()].slice(0, 14).join('').trim() || 'Player';
 
     // Leaving the voice channel should leave the lobby too, otherwise the
@@ -63,27 +74,23 @@ export async function getDiscordBootstrap({ onLeave, onStage } = {}) {
     // Discord hands every client the full participant list, but we only ever
     // act on our OWN absence from it — a client that could evict other people
     // would be a griefing tool, and the host already has a kick button.
-    const meId = (user && user.id) || (auth && auth.user && auth.user.id);
-    if (meId && onLeave) {
-      try {
-        await discordSdk.subscribe('ACTIVITY_INSTANCE_PARTICIPANTS_UPDATE', ({ participants }) => {
-          if (Array.isArray(participants) && !participants.some(u => u && u.id === meId)) onLeave();
-        });
-      } catch (e) {
+    //
+    // None of this is needed to get into the room, so it settles in the
+    // background rather than holding the player on a loading screen.
+    if (user && user.id && onLeave) {
+      discordSdk.commands.authenticate({ access_token })
+        .then(() => discordSdk.subscribe('ACTIVITY_INSTANCE_PARTICIPANTS_UPDATE', ({ participants }) => {
+          if (Array.isArray(participants) && !participants.some(u => u && u.id === user.id)) onLeave();
+        }))
         // Older Discord clients do not emit this; the socket disconnect that
         // follows when the window closes still cleans the player up.
-        console.warn('participants updates unavailable', e && e.message);
-      }
+        .catch(e => console.warn('participant updates unavailable', e && e.message));
     }
 
-    const { code: roomCode } = await stage('room', fetch('/api/discord/room', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ instanceId: discordSdk.instanceId }),
-    }).then(r => r.json()), onStage);
+    const { code: roomCode } = await stage('room', roomP, onStage);
     if (!roomCode) return null;
 
-    return { name, roomCode, session };
+    return { name, roomCode, session, user, isAdmin };
   } catch (e) {
     // Inside the iframe there is no web flow to fall back to, so say what
     // broke instead of leaving the player on a screen that never resolves.
