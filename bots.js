@@ -25,13 +25,15 @@ const THINK = {
   likelyVote: [3000, 8000],
   blitz: [1800, 5000],
   emoji: [2200, 6000],
+  odd: [3000, 8000],
+  order: [8000, 20000],
   spyClue: [6000, 14000],
   spyVote: [4000, 10000],
 };
 
 // How often a bot is right. Deliberately short of perfect: a bot that always
 // knows is not an opponent, it is a wall.
-const ACCURACY = { blitz: 0.62, emoji: 0.55 };
+const ACCURACY = { blitz: 0.62, emoji: 0.55, order: 0.3 };
 
 // Clues vague enough to be honest about any word in the category — which is
 // exactly what a careful human writes when they do not want to give it away.
@@ -108,11 +110,31 @@ function spyClue({ category }) {
   return { ar, en };
 }
 
+// Sometimes exactly right, more often nearly right: one or two neighbouring
+// swaps is what half-knowing an order actually looks like, and it is worth
+// partial credit under the same scoring a human gets.
+function orderGuess({ correctIds }) {
+  if (!Array.isArray(correctIds) || correctIds.length < 2) return null;
+  const seq = correctIds.slice();
+  if (Math.random() < ACCURACY.order) return seq;
+  // Distinct positions: two swaps at the same spot cancel out and hand back a
+  // perfect answer, which quietly made the bot far better than the accuracy
+  // above claims — measured at 38% perfect when it should have been 30%.
+  const spots = [];
+  for (let i = 0; i < seq.length - 1; i++) spots.push(i);
+  const swaps = Math.random() < 0.65 ? 1 : 2;
+  for (let n = 0; n < swaps && spots.length; n++) {
+    const i = spots.splice(Math.floor(Math.random() * spots.length), 1)[0];
+    [seq[i], seq[i + 1]] = [seq[i + 1], seq[i]];
+  }
+  return seq;
+}
+
 // The spy has only ever been told the category, so its guess is a word from
 // that category and nothing better. Exactly the position a human spy is in.
 const spyGuess = ({ candidates }) => (candidates && candidates.length ? pick(candidates) : null);
 
 module.exports = {
   NAMES, freeName, thinkFor,
-  lie, bluffVote, numberGuess, blitzAnswer, emojiAnswer, votePlayer, spyClue, spyGuess,
+  lie, bluffVote, numberGuess, blitzAnswer, emojiAnswer, votePlayer, orderGuess, spyClue, spyGuess,
 };

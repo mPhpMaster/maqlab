@@ -3,6 +3,7 @@
 // number: numeric answers; closest guess wins.
 // blitz:  true/false statements for speed rounds.
 // odd:    four things, one of which does not belong.
+// order:  four things to arrange, largest first.
 
 const bluff = [
   { q: { ar: 'قبل أن يصبح لعبة أطفال، ما الاستخدام الأصلي لمعجون اللعب "Play-Doh"؟', en: 'Before it became a toy, what was Play-Doh originally sold as?' }, a: { ar: 'منظف ورق الجدران', en: 'Wallpaper cleaner' }, alt: ['منظف جدران', 'منظف للجدران', 'wall cleaner', 'wallpaper cleaning'] },
@@ -735,6 +736,42 @@ const odd = [
   O('حاسوب', 'Computer', 'الباقي أثاث', 'The rest are furniture', ['طاولة', 'Table'], ['سرير', 'Bed'], ['خزانة', 'Wardrobe']),
 ];
 
+// order: four things to put in order, largest value first. The values are the
+// answer, so they never leave the server until the round is over.
+const R = (ar, en, ...items) => ({ q: { ar, en }, items: items.map(([a, e, v]) => ({ ar: a, en: e, v })) });
+const order = [
+  R('رتّبها من الأكبر للأصغر مساحة', 'Order these from largest to smallest by area', ['روسيا', 'Russia', 17098242], ['الصين', 'China', 9596961], ['مصر', 'Egypt', 1002450], ['فرنسا', 'France', 643801]),
+  R('رتّبها من الأبعد للأقرب عن الشمس', 'Order these from furthest to closest to the Sun', ['نبتون', 'Neptune', 4495], ['زحل', 'Saturn', 1434], ['المريخ', 'Mars', 228], ['عطارد', 'Mercury', 58]),
+  R('رتّبها من الأطول للأقصر', 'Order these from tallest to shortest', ['الزرافة', 'Giraffe', 550], ['الفيل', 'Elephant', 330], ['الحصان', 'Horse', 160], ['الكلب', 'Dog', 60]),
+  R('رتّبها من الأثقل للأخف', 'Order these from heaviest to lightest', ['الحوت الأزرق', 'Blue whale', 150000], ['الفيل الأفريقي', 'African elephant', 6000], ['الحصان', 'Horse', 500], ['الإنسان', 'A human', 70]),
+  R('رتّبها من الأقدم للأحدث', 'Order these from oldest to newest', ['الأهرامات', 'The pyramids', 4600], ['الكولوسيوم', 'The Colosseum', 1950], ['برج إيفل', 'The Eiffel Tower', 135], ['برج خليفة', 'The Burj Khalifa', 15]),
+  R('رتّبها من الأسرع للأبطأ', 'Order these from fastest to slowest', ['الفهد', 'Cheetah', 110], ['الحصان', 'Horse', 70], ['الإنسان', 'A human', 37], ['الفيل', 'Elephant', 25]),
+  R('رتّبها من الأكثر سكاناً للأقل', 'Order these from most to least populated', ['الهند', 'India', 1430], ['الولايات المتحدة', 'The USA', 340], ['مصر', 'Egypt', 113], ['السعودية', 'Saudi Arabia', 37]),
+  R('رتّبها من الأطول للأقصر نهراً', 'Order these rivers from longest to shortest', ['النيل', 'The Nile', 6650], ['الأمازون', 'The Amazon', 6400], ['الدانوب', 'The Danube', 2850], ['السين', 'The Seine', 777]),
+  R('رتّبها من الأعمق للأضحل', 'Order these from deepest to shallowest', ['المحيط الهادئ', 'The Pacific', 10935], ['المحيط الأطلسي', 'The Atlantic', 8376], ['البحر الأبيض', 'The Mediterranean', 5267], ['البحر الأحمر', 'The Red Sea', 3040]),
+  R('رتّبها من الأعلى للأدنى حرارة', 'Order these from hottest to coldest', ['سطح الشمس', 'The surface of the Sun', 5500], ['الحمم البركانية', 'Lava', 1100], ['الماء المغلي', 'Boiling water', 100], ['الثلج', 'Ice', 0]),
+  R('رتّبها من الأكبر للأصغر حجماً', 'Order these from largest to smallest', ['الشمس', 'The Sun', 1392000], ['المشتري', 'Jupiter', 139820], ['الأرض', 'Earth', 12742], ['القمر', 'The Moon', 3475]),
+  R('رتّبها من الأكثر للأقل استخداماً كلغة', 'Order these languages from most to fewest speakers', ['الإنجليزية', 'English', 1500], ['الصينية', 'Mandarin', 1100], ['العربية', 'Arabic', 420], ['اليابانية', 'Japanese', 125]),
+  R('رتّب المواد من الأكثف للأخف', 'Order these materials from densest to lightest', ['الذهب', 'Gold', 19], ['الحديد', 'Iron', 8], ['الألمنيوم', 'Aluminium', 3], ['الماء', 'Water', 1]),
+  R('رتّبها من الأطول عمراً للأقصر', 'Order these from longest to shortest lifespan', ['السلحفاة', 'Tortoise', 150], ['الفيل', 'Elephant', 70], ['الحصان', 'Horse', 28], ['الكلب', 'Dog', 13]),
+  R('رتّب الجبال من الأعلى للأقل', 'Order these mountains from tallest to shortest', ['إيفرست', 'Everest', 8849], ['كليمنجارو', 'Kilimanjaro', 5895], ['جبل فوجي', 'Mount Fuji', 3776], ['بن نيفيس', 'Ben Nevis', 1345]),
+  R('رتّبها من الأثقل للأخف كوكباً', 'Order these planets from heaviest to lightest', ['المشتري', 'Jupiter', 3180], ['نبتون', 'Neptune', 170], ['الأرض', 'Earth', 10], ['المريخ', 'Mars', 1]),
+  R('رتّبها من الأكثر للأقل سعرات', 'Order these from most to fewest calories', ['الزيت', 'Oil', 884], ['الجبن', 'Cheese', 400], ['الأرز', 'Rice', 130], ['الخيار', 'Cucumber', 15]),
+  R('رتّبها من الأقدم للأحدث اختراعاً', 'Order these from oldest to newest invention', ['العجلة', 'The wheel', 5500], ['الطباعة', 'The printing press', 580], ['الهاتف', 'The telephone', 150], ['الإنترنت', 'The internet', 55]),
+  R('رتّبها من الأطول للأقصر مدة', 'Order these from longest to shortest', ['سنة', 'A year', 525600], ['أسبوع', 'A week', 10080], ['يوم', 'A day', 1440], ['ساعة', 'An hour', 60]),
+  R('رتّبها من الأكثر للأقل أرجلاً', 'Order these from most to fewest legs', ['العنكبوت', 'A spider', 8], ['النملة', 'An ant', 6], ['القط', 'A cat', 4], ['الطائر', 'A bird', 2]),
+  R('رتّبها من الأدفأ للأبرد', 'Order these from warmest to coldest', ['القطب الجنوبي', 'Antarctica', -50], ['سيبيريا', 'Siberia', -20], ['لندن', 'London', 11], ['الرياض', 'Riyadh', 26]),
+  R('رتّبها من الأغلى للأرخص', 'Order these from most to least expensive by weight', ['الذهب', 'Gold', 70000], ['الفضة', 'Silver', 900], ['النحاس', 'Copper', 9], ['الحديد', 'Iron', 1]),
+  R('رتّبها من الأكبر للأصغر قارة', 'Order these continents from largest to smallest', ['آسيا', 'Asia', 44], ['أفريقيا', 'Africa', 30], ['أمريكا الشمالية', 'North America', 24], ['أوروبا', 'Europe', 10]),
+  R('رتّبها من الأكثر للأقل عظاماً', 'Order these from most to fewest bones', ['الرضيع', 'A newborn', 300], ['البالغ', 'An adult', 206], ['اليد الواحدة', 'One hand', 27], ['الوجه', 'The face', 14]),
+  R('رتّبها من الأثقل للأخف رياضة', 'Order these balls from heaviest to lightest', ['كرة البولينج', 'A bowling ball', 6000], ['كرة القدم', 'A football', 430], ['كرة التنس', 'A tennis ball', 58], ['كرة الطاولة', 'A ping-pong ball', 3]),
+  R('رتّبها بحسب سرعة انتقالها، الأسرع أولاً', 'Order these by how fast they travel, fastest first', ['الضوء', 'Light', 300000], ['الصوت', 'Sound', 343], ['الطائرة', 'A plane', 250], ['السيارة', 'A car', 30]),
+  R('رتّبها من الأكثر للأقل مطراً', 'Order these from wettest to driest', ['الغابة الاستوائية', 'A rainforest', 3000], ['لندن', 'London', 600], ['القاهرة', 'Cairo', 25], ['الصحراء الكبرى', 'The Sahara', 3]),
+  R('رتّبها من الأكبر للأصغر مدينة', 'Order these cities from most to least populated', ['طوكيو', 'Tokyo', 37], ['القاهرة', 'Cairo', 22], ['لندن', 'London', 9], ['الرياض', 'Riyadh', 7]),
+  R('رتّبها من الأطول للأقصر حملاً', 'Order these from longest to shortest pregnancy', ['الفيل', 'An elephant', 640], ['الإنسان', 'A human', 280], ['الكلب', 'A dog', 63], ['الأرنب', 'A rabbit', 31]),
+  R('رتّبها من الأكثر للأقل أذرعاً', 'Order these from most to fewest arms', ['الأخطبوط', 'An octopus', 8], ['النجم البحري', 'A starfish', 5], ['الإنسان', 'A human', 2], ['الحصان', 'A horse', 0]),
+];
+
 const spy = [
   { cat: { ar: 'مكان', en: 'Place' }, w: { ar: 'المطار', en: 'The airport' } },
   { cat: { ar: 'مكان', en: 'Place' }, w: { ar: 'المستشفى', en: 'The hospital' } },
@@ -849,4 +886,4 @@ const spy = [
   { cat: { ar: 'حيوان', en: 'Animal' }, w: { ar: 'النحلة', en: 'Bee' } },
 ];
 
-module.exports = { bluff, number, blitz, likely, emoji, odd, spy };
+module.exports = { bluff, number, blitz, likely, emoji, odd, order, spy };

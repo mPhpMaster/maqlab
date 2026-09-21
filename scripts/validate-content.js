@@ -84,6 +84,17 @@ const SHAPES = {
       if (norm(x.why[lang]).includes(norm(x.odd[lang]))) err('odd', i, `why (${lang}) gives away the answer`);
     }
   },
+  order: (x, i) => {
+    bilingual(x.q, 'order', i, 'q');
+    if (!Array.isArray(x.items) || x.items.length !== 4) return err('order', i, 'needs exactly 4 items');
+    x.items.forEach((it, j) => {
+      bilingual(it, 'order', i, `items[${j}]`);
+      if (typeof it.v !== 'number' || !Number.isFinite(it.v)) err('order', i, `items[${j}].v must be a finite number`);
+    });
+    // Two items with the same value have no correct order between them, so
+    // the round would mark a right answer wrong.
+    if (new Set(x.items.map(it => it.v)).size !== x.items.length) err('order', i, 'two items share a value, so there is no single correct order');
+  },
   spy: (x, i) => { bilingual(x.cat, 'spy', i, 'cat'); bilingual(x.w, 'spy', i, 'w'); },
 };
 
@@ -95,6 +106,7 @@ const KEYS = {
   likely: x => [norm(x.ar), norm(x.en)],
   emoji: x => [x.e, norm(x.a && x.a.ar)],
   odd: x => [norm(x.odd && x.odd.ar), norm(x.odd && x.odd.en)],
+  order: x => [norm(x.q && x.q.ar), norm(x.q && x.q.en)],
   spy: x => [norm(x.w && x.w.ar), norm(x.w && x.w.en)],
 };
 

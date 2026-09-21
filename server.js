@@ -26,14 +26,14 @@ const GHOST_MS = 25 * 1000; // grace for a lobby refresh before the seat is free
 const ROOM_TTL_MS = 30 * 60 * 1000;
 const ITEMS_PER_QUICK_ROUND = 3; // blitz & emoji rounds have 3 quick items
 const REACTIONS = ['😂', '🔥', '😱', '👏', '🤡', '💀', '😈', '❤️'];
-const TYPES = ['bluff', 'number', 'blitz', 'likely', 'emoji', 'odd', 'spy'];
-const ACTIVE = ['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'spyClue', 'spyVote'];
+const TYPES = ['bluff', 'number', 'blitz', 'likely', 'emoji', 'odd', 'order', 'spy'];
+const ACTIVE = ['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'order', 'spyClue', 'spyVote'];
 const PHRASES = 12; // number of preset taunts the client knows
 
 const T = {
-  chill: { spin: 6, write: 70, vote: 35, guess: 35, blitz: 10, blitzResult: 3.5, numReveal: 9, scores: 12, likelyVote: 30, likelyReveal: 9, emoji: 15, emojiResult: 3.5, odd: 18, oddResult: 4.5, spyClue: 50, spyVote: 30, spyReveal: 10 },
-  normal: { spin: 6, write: 45, vote: 25, guess: 25, blitz: 8, blitzResult: 3, numReveal: 8, scores: 10, likelyVote: 20, likelyReveal: 8, emoji: 10, emojiResult: 3, odd: 13, oddResult: 4, spyClue: 35, spyVote: 20, spyReveal: 9 },
-  fast: { spin: 5.5, write: 30, vote: 15, guess: 15, blitz: 5, blitzResult: 2.5, numReveal: 7, scores: 8, likelyVote: 14, likelyReveal: 7, emoji: 7, emojiResult: 2.5, odd: 9, oddResult: 3, spyClue: 22, spyVote: 13, spyReveal: 7 },
+  chill: { spin: 6, write: 70, vote: 35, guess: 35, blitz: 10, blitzResult: 3.5, numReveal: 9, scores: 12, likelyVote: 30, likelyReveal: 9, emoji: 15, emojiResult: 3.5, odd: 18, oddResult: 4.5, order: 50, orderResult: 11, spyClue: 50, spyVote: 30, spyReveal: 10 },
+  normal: { spin: 6, write: 45, vote: 25, guess: 25, blitz: 8, blitzResult: 3, numReveal: 8, scores: 10, likelyVote: 20, likelyReveal: 8, emoji: 10, emojiResult: 3, odd: 13, oddResult: 4, order: 38, orderResult: 10, spyClue: 35, spyVote: 20, spyReveal: 9 },
+  fast: { spin: 5.5, write: 30, vote: 15, guess: 15, blitz: 5, blitzResult: 2.5, numReveal: 7, scores: 8, likelyVote: 14, likelyReveal: 7, emoji: 7, emojiResult: 2.5, odd: 9, oddResult: 3, order: 24, orderResult: 8, spyClue: 22, spyVote: 13, spyReveal: 7 },
 };
 const MODS = [
   { id: 'normal', w: 50, mult: 1 },
@@ -209,6 +209,19 @@ function snapshot(room, pid) {
     s.current.myAnswer = ans[pid] ? ans[pid].id : null;
     if (ph === 'emojiResult') Object.assign(s.current, { correctId: it.correctId, results: ans, fastest: c.fastest[c.idx] || null });
   }
+  if (c.type === 'order' && ['order', 'orderResult'].includes(ph)) {
+    s.current.question = c.q[L];
+    s.current.items = c.items.map(it => ({ id: it.id, text: it[L] }));
+    s.current.submitted = Object.keys(c.orders);
+    s.current.myOrder = c.orders[pid] || null;
+    // Values and the true order go out only once the round is over: together
+    // they are the whole answer.
+    if (ph === 'orderResult') {
+      const by = Object.fromEntries(c.items.map(it => [it.id, it]));
+      s.current.truth = c.truth.map(id => ({ id, text: by[id][L], v: by[id].v }));
+      s.current.results = Object.fromEntries(Object.entries(c.orders).map(([pid2, seq]) => [pid2, { seq, pairs: correctPairs(seq, c.truth) }]));
+    }
+  }
   if (c.type === 'odd' && ['odd', 'oddResult'].includes(ph)) {
     const it = c.items[c.idx];
     const hidden = peeked('o' + c.idx);
@@ -330,6 +343,10 @@ function botAction(room, b) {
     const id = bots.emojiAnswer({ options: it.opts, correctId: it.correctId });
     return id && (() => submitQuick(room, b, id));
   }
+  if (ph === 'order' && !c.orders[b.id]) {
+    const seq = bots.orderGuess({ correctIds: c.truth });
+    return seq && (() => submitOrder(room, b, seq));
+  }
   if (ph === 'spyClue' && !c.clues[b.id]) {
     // The clue comes from the category alone whether or not this bot is the
     // spy, so a bot that happens to know the word cannot leak it by being
@@ -414,7 +431,7 @@ function finishRound(room) {
 function createRoom() {
   const room = {
     code: newCode(), hostId: null, phase: 'lobby',
-    settings: { lang: 'en', rounds: 8, types: { bluff: true, number: true, blitz: true, likely: true, emoji: true, odd: true, spy: true }, pace: 'normal', teams: false, public: true },
+    settings: { lang: 'en', rounds: 8, types: { bluff: true, number: true, blitz: true, likely: true, emoji: true, odd: true, order: true, spy: true }, pace: 'normal', teams: false, public: true },
     players: new Map(), round: 0, gameNo: 0, current: null, deadline: null, timer: null,
     used: {}, plan: [], gains: {}, prevRank: {}, awards: [], bestLie: null, pairs: {}, rivals: {}, touched: Date.now(),
     balloon: { size: 0, target: 20 + rnd(20), pops: {} },
@@ -534,6 +551,15 @@ function beginRound(room) {
     Object.assign(c, { word: entry.w, cat: entry.cat, spyId, clues: {}, votes: {}, guess: null });
     room.phase = 'spyClue';
     setTimer(room, pace(room, 'spyClue'), () => startSpyVote(room));
+  } else if (c.type === 'order') {
+    // Four things to put in order, largest first. The values are never sent
+    // while the round is live — they are the answer.
+    const entry = pickFrom(room, 'order')[0];
+    const items = shuffle(entry.items.map(it => ({ ...it, id: rid(6) })));
+    const truth = items.slice().sort((a, b) => b.v - a.v).map(it => it.id);
+    Object.assign(c, { q: entry.q, items, truth, orders: {} });
+    room.phase = 'order';
+    setTimer(room, pace(room, 'order'), () => revealOrder(room));
   } else if (c.type === 'odd') {
     // Four things, one of which does not belong. The group is never named —
     // working out what the other three have in common is the round.
@@ -826,6 +852,51 @@ function resolveQuickItem(room) {
   broadcast(room);
 }
 
+// ----- line them up -----
+// Scored by neighbouring pairs rather than exact positions: getting the top
+// two right is worth something even if the bottom two are swapped, which is
+// how people actually half-know an order.
+const PAIR_POINTS = 250;
+const PERFECT_BONUS = 250;
+
+function correctPairs(seq, truth) {
+  const rank = Object.fromEntries(truth.map((id, i) => [id, i]));
+  let n = 0;
+  for (let i = 0; i + 1 < seq.length; i++) if (rank[seq[i]] < rank[seq[i + 1]]) n += 1;
+  return n;
+}
+
+function submitOrder(room, p, ids) {
+  const c = room.current;
+  if (!c || room.phase !== 'order') return { error: 'late' };
+  if (c.orders[p.id]) return { error: 'dup' };
+  if (!Array.isArray(ids) || ids.length !== c.items.length) return { error: 'bad' };
+  // Must be a permutation of exactly this round's items, or the pair count
+  // below would be scoring something that was never on screen.
+  const want = new Set(c.items.map(i => i.id));
+  const got = new Set(ids.map(String));
+  if (got.size !== want.size || [...got].some(id => !want.has(id))) return { error: 'bad' };
+  c.orders[p.id] = ids.map(String);
+  if (connected(room).every(x => c.orders[x.id])) revealOrder(room); else broadcast(room);
+  return { ok: true };
+}
+
+function revealOrder(room) {
+  if (room.phase !== 'order') return;
+  const c = room.current;
+  for (const p of connected(room)) {
+    const seq = c.orders[p.id];
+    if (!seq) continue;
+    const n = correctPairs(seq, c.truth);
+    if (n) gain(room, p.id, 'orderPairs', n * PAIR_POINTS);
+    if (n === c.truth.length - 1) { gain(room, p.id, 'orderPerfect', PERFECT_BONUS); p.stats.correct += 1; }
+    streakResult(room, p.id, n === c.truth.length - 1);
+  }
+  room.phase = 'orderResult';
+  setTimer(room, pace(room, 'orderResult'), () => { finishRound(room); showScores(room); });
+  broadcast(room);
+}
+
 // ----- power-ups -----
 function usePower(room, p, kind) {
   const c = room.current;
@@ -872,7 +943,7 @@ function payLaughs(room) {
 // hand-written version silently froze any round type somebody forgot to add
 // to it — the game simply stopped, with no error anywhere.
 const isRevealPhase = ph =>
-  ['bluffReveal', 'numReveal', 'likelyReveal', 'spyReveal'].includes(ph) ||
+  ['bluffReveal', 'numReveal', 'likelyReveal', 'spyReveal', 'orderResult'].includes(ph) ||
   Object.values(QUICK).some(q => q.result === ph);
 
 function showScores(room) {
@@ -960,6 +1031,7 @@ function checkProgress(room) {
   else if (room.phase === 'guess' && ps.every(p => c.guesses[p.id] != null)) revealNumber(room);
   else if (room.phase === 'likelyVote' && ps.every(p => c.lvotes[p.id])) revealLikely(room);
   else if ((room.phase === 'blitz' || room.phase === 'emoji') && ps.every(p => c.answers[c.idx][p.id])) resolveQuickItem(room);
+  else if (room.phase === 'order' && ps.every(p => c.orders[p.id])) revealOrder(room);
   else if (room.phase === 'spyClue' && ps.every(p => c.clues[p.id])) startSpyVote(room);
   else if (room.phase === 'spyVote' && ps.every(p => c.votes[p.id])) revealSpy(room);
 }
@@ -1064,6 +1136,7 @@ io.on('connection', socket => {
   socket.on('blitz', (v, cb) => room && reply(cb, submitQuick(room, player, v)));
   socket.on('emoji', (id, cb) => room && reply(cb, submitQuick(room, player, id)));
   socket.on('odd', (id, cb) => room && reply(cb, submitQuick(room, player, id)));
+  socket.on('order', (ids, cb) => room && reply(cb, submitOrder(room, player, ids)));
   socket.on('likely', (target, cb) => room && reply(cb, submitLikely(room, player, target)));
   socket.on('power', (kind, cb) => room && reply(cb, usePower(room, player, kind)));
   socket.on('spyClue', (text, cb) => room && reply(cb, submitSpyClue(room, player, text)));

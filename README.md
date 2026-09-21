@@ -17,7 +17,7 @@ To play with people on the same network: open `http://<your IP>:3000` on their p
 ```
 Logs go to `server.log` and `server.err.log` in the same folder.
 
-## Round types (6)
+## Round types (8)
 | Round | Idea | Scoring |
 |---|---|---|
 | 🤥 **Bluff** | Everyone writes a lie, then picks the truth and bets ×1/×2/×3 | Right = 500×bet • wrong on a high bet = −150 per level • each player fooled by your lie = +300 |
@@ -25,6 +25,8 @@ Logs go to `server.log` and `server.err.log` in the same folder.
 | ⚡ **True or false** | 3 fast statements | Correct +200 + up to +200 for speed • fastest +100 |
 | 🔤 **Decode the emoji** | 3 emoji puzzles, 4 options each | Correct +300 + up to +300 for speed • fastest +100 |
 | 👥 **Who's most likely?** | Everyone votes for someone in the room (needs 3+ players) | With the majority +300 • the person chosen +150 |
+| 🧩 **Odd One Out** | 4 things, one of which does not belong — the group is never named | Correct +300 + up to +300 for speed • fastest +100 |
+| 📊 **Line Them Up** | Put 4 things in order, largest first | +250 for every neighbouring pair in the right order • +250 more for a perfect order |
 | 🕵️ **Spy** | One player is the spy and sees only the category, never the word. Everyone writes a clue, then votes on who the spy is (needs 4+ players) | Catching the spy +350 • spy escaping (under half the votes) +500 • spy guessing the word +300 |
 
 **Multipliers (the slot machine):** normal, points ×2 💎, speed ×1.5 ⏱️, mystery box 🎁, and the last round is always the **Golden Round ×3** 👑.
@@ -43,6 +45,11 @@ Logs go to `server.log` and `server.err.log` in the same folder.
 - Levels and XP, 24 permanent achievements 🏅, and hats that unlock as you level
 - Emoji that fly across everyone's screen, confetti, and phone haptics
 - A revealed answer links straight to an image search, because half the fun of a strange answer is seeing the thing
+
+## Playing on your own
+Two round types need company: "who's most likely" needs three people before it is a question, and the spy needs four to have anyone to hide among. Start a game alone and enough bots sit down to make every enabled type playable; at any table size the host can add or drop one by hand.
+
+A bot is an ordinary player with no socket. It reaches the game only through the same submit functions a human uses, so it cannot skip a check a human cannot skip and never sees more than its own view would show — a bot spy guesses from the category alone, exactly like a human one.
 
 ## Accounts and profiles
 Players sign in with Discord — there is no typed name, so nobody can sit down as someone else. Signing in gives you a profile with lifetime stats, achievements, a place on the leaderboard, and your last five matches. Any finished match has its own shareable page at `/match/<id>` that anyone can open, whether or not they were in the room.
@@ -68,9 +75,10 @@ The game runs inside Discord (launched from the rocket 🚀 button in a voice ch
 
 ## Files
 - `server.js`: the game engine (rooms, round scheduling, scoring, powers, titles)
-- `content.js`: all the content in English and Arabic — 768 questions (bluff 157, numbers 125, true/false 152, most likely 117, emoji 106, spy 111). `npm run check` validates the banks for duplicates, schema and answers that give themselves away by length.
+- `content.js`: all the content in English and Arabic — 843 questions (bluff 157, numbers 125, true/false 152, most likely 117, emoji 106, odd one out 45, line them up 30, spy 111). `npm run check` validates the banks for duplicates, schema, and answers that give themselves away by length.
 - `db.js` + `db/schema.sql`: profiles, match results, follows, reports, suggestions
 - `auth.js`: signed session tokens, Discord sign-in, admin checks
+- `bots.js`: what a bot does in each round (the server decides when)
 - `public/`: the front end (`app.js`, `avatar.js` for the characters, `style.css`, `discord.js` for the Discord Activity integration)
 
 ---
@@ -94,7 +102,7 @@ npm start          # http://localhost:3000
 ```
 اللوقز تروح لـ`server.log` و`server.err.log` في نفس المجلد.
 
-## أنواع الجولات (6)
+## أنواع الجولات (8)
 | الجولة | الفكرة | النقاط |
 |---|---|---|
 | 🤥 **المقلب** | الكل يكتب كذبة، بعدين يختار الصح ويراهن ×1/×2/×3 | صح = 500×الرهان • غلط برهان عالي = −150 لكل مستوى • كل واحد ينخدع بكذبتك = +300 |
@@ -102,6 +110,8 @@ npm start          # http://localhost:3000
 | ⚡ **صح ولا خطأ** | 3 عبارات سريعة | صح +200 + سرعة حتى +200 • الأسرع +100 |
 | 🔤 **فكّ الإيموجي** | 3 ألغاز إيموجي، 4 خيارات | صح +300 + سرعة حتى +300 • الأسرع +100 |
 | 👥 **مين فينا؟** | الكل يصوّت على واحد من الشلة (يحتاج 3 لاعبين أو أكثر) | مع الأغلبية +300 • اللي اختاروه +150 |
+| 🧩 **الدخيل** | ٤ أشياء، وحدة ما لها دخل — والفئة ما تُذكر أبداً | صح +300 + سرعة حتى +300 • الأسرع +100 |
+| 📊 **رتّبها** | رتّب ٤ أشياء من الأكبر للأصغر | +250 لكل جارَين في الترتيب الصح • +250 زيادة للترتيب المثالي |
 | 🕵️ **الجاسوس** | واحد بينهم جاسوس يشوف الفئة بس (بدون الكلمة)، الكل يكتب تلميح، وبعدين يصوّتون مين الجاسوس (يحتاج 4 لاعبين أو أكثر) | لقّطوا الجاسوس +350 • الجاسوس إذا هرب (أقل من نص الأصوات) +500 • الجاسوس إذا خمّن الكلمة الصح +300 |
 
 **المضاعفات (آلة الحظ):** عادي، نقاط ×2 💎، سرعة ×1.5 ⏱️، صندوق الحظ 🎁، وآخر جولة دايماً **الجولة الذهبية ×3** 👑.
@@ -120,6 +130,11 @@ npm start          # http://localhost:3000
 - مستويات وخبرة، و24 إنجاز دائم 🏅، وقبعات تنفتح مع المستوى
 - إيموجي يطيرون على شاشات الكل، كونفيتي، واهتزاز الجوال
 - الجواب لما ينكشف فيه زر يوديك لبحث صور، لأن نص المتعة إنك تشوف الشي بعينك
+
+## اللعب لحالك
+نوعان يحتاجان ناساً: «مين فينا» يحتاج ثلاثة قبل ما يصير سؤالاً أصلاً، والجاسوس يحتاج أربعة عشان يكون فيه بين مين يختبي. ابدأ لعبة وأنت لحالك وينزل معك بوتات تكفي عشان كل نوع مفعّل يصير قابلاً للعب، وفي أي عدد يقدر المضيف يضيف أو يشيل بوت بيده.
+
+البوت لاعب عادي بلا سوكِت. ما يوصل للعبة إلا من نفس الدوال اللي يمر منها الإنسان، فما يقدر يتجاوز تحققاً ولا يشوف أكثر من نصيبه — والبوت لما يصير جاسوساً يخمّن من الفئة فقط، تماماً مثل الإنسان.
 
 ## الحسابات والبروفايلات
 الدخول عن طريق ديسكورد، وما فيه اسم يُكتب باليد — يعني ما أحد يقدر يدخل باسم غيره. تسجيل الدخول يعطيك بروفايل فيه إحصائياتك، وإنجازاتك، ومركزك في لوحة الترتيب، وآخر ٥ مباريات. كل مباراة خلصت لها صفحة خاصة على `‎/match/<id>` تقدر تشاركها مع أي أحد حتى لو ما كان معكم بالغرفة.

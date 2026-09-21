@@ -719,3 +719,20 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 /* odd one out */
 .type-tag.odd { background: rgba(120,200,160,.18); color: #7fe0b0; }
 .why { margin-top: 8px; font-size: 13px; color: var(--muted); font-weight: 700; }
+
+/* line them up */
+.type-tag.order { background: rgba(255,190,90,.18); color: #ffc46b; }
+.order-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.ord { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 14px; border-radius: 14px;
+  background: rgba(255,255,255,.06); border: 1px solid var(--line); color: var(--text);
+  font-size: 15px; font-weight: 700; text-align: start; animation: fadeUp .3s ease-out backwards; }
+.ord .pos { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255,255,255,.08); font-size: 13px; font-weight: 900; color: var(--muted); }
+.ord .nm { flex: 1; }
+.ord .val { font-size: 12px; font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ord .yours { font-size: 11px; font-weight: 700; color: var(--muted); opacity: .8; }
+.ord.picked { background: rgba(255,190,90,.16); border-color: #ffc46b; }
+.ord.picked .pos { background: #ffc46b; color: #2b1e05; }
+.ord.reveal.right { background: rgba(79,224,176,.16); border-color: var(--mint); }
+.ord.reveal.near { background: rgba(255,190,90,.12); border-color: rgba(255,190,90,.5); }
+.no-anim .ord { animation: none; }

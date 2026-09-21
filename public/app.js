@@ -77,7 +77,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
       rank: 'الترتيب', games: 'ألعاب', wins: 'فوز', winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
       curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: 'متابِعين', followingN: 'يتابع', memberSince: 'عضو منذ',
-      whichOdd: 'مين الدخيل بينهم؟', addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
+      whichOdd: 'مين الدخيل بينهم؟', type_order: 'رتّبها', desc_order: 'رتّب ٤ أشياء… كل جارَين بالترتيب الصح لك نقاط', clear: 'امسح', lockIn: 'ثبّت الترتيب ✅', pickAll: 'باقي {n}', youSaid: 'حطيتها {n}', perfectOrder: 'ترتيب مثالي! 🎯', pairsRight: '{n} من ٣ صح', g_orderPairs: 'ترتيب صحيح', g_orderPerfect: 'ترتيب مثالي 🎯', addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
       matchResult: 'نتيجة المباراة', shareMatch: 'انسخ رابط المباراة', matchGone: 'المباراة هذي ما عادت موجودة', place1: 'الأول', placeN: 'المركز {n}', roundsN: '{n} جولات', openMatch: 'افتح',
       report: 'بلاغ', reportTitle: 'بلاغ عن {n}', reportWhy: 'وش المشكلة؟', r_cheat: 'غش', r_name: 'اسم مسيء', r_chat: 'إساءة بالدردشة', r_other: 'غير ذلك',
       reportDetails: 'تفاصيل (اختياري)', reportSent: 'وصلنا البلاغ، شكراً 🙏', suggestPlaceholder: 'وش تبي نضيف أو نغيّر؟',
@@ -145,7 +145,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       profile: 'Profile', leaderboard: 'Leaderboard', suggestBtn: 'Send a suggestion', about: 'About', adminPanel: 'Admin',
       rank: 'Rank', games: 'Games', wins: 'Wins', winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
       curStreak: 'Win streak', bestStreak: 'Longest streak', followers: 'Followers', followingN: 'Following', memberSince: 'Member since',
-      whichOdd: "Which one doesn't belong?", addBot: 'Add bot', soloHint: 'On your own? Add a bot, or just start — we will sit some down for you 🤖', discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
+      whichOdd: "Which one doesn't belong?", type_order: 'Line Them Up', desc_order: 'Put 4 things in order — every neighbouring pair you get right scores', clear: 'Clear', lockIn: 'Lock it in ✅', pickAll: '{n} to go', youSaid: 'you said {n}', perfectOrder: 'Perfect order! 🎯', pairsRight: '{n} of 3 right', g_orderPairs: 'Right order', g_orderPerfect: 'Perfect order 🎯', addBot: 'Add bot', soloHint: 'On your own? Add a bot, or just start — we will sit some down for you 🤖', discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
       matchResult: 'Match result', shareMatch: 'Copy match link', matchGone: 'That match is no longer around', place1: '1st', placeN: 'Place {n}', roundsN: '{n} rounds', openMatch: 'Open',
       report: 'Report', reportTitle: 'Report {n}', reportWhy: "What's wrong?", r_cheat: 'Cheating', r_name: 'Offensive name', r_chat: 'Abusive chat', r_other: 'Something else',
       reportDetails: 'Details (optional)', reportSent: 'Report received, thank you 🙏', suggestPlaceholder: 'What should we add or change?',
@@ -177,7 +177,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     ach: store.get('ach', { unlocked: [], games: 0, wins: 0, fooled: 0, fastest: 0 }),
     route: { name: 'home' },
     room: null, code: null, joining: false,
-    draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '' },
+    draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '', order: [] },
     bet: 1, showQR: false, reactOpen: false,
     me: null, isAdmin: false, lobbies: null, achList: null,
     // meKnown stays false until /api/auth/me answers. Rendering a sign-in
@@ -203,7 +203,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   const later = (ms, fn) => state.timeouts.push(setTimeout(fn, ms));
   function applyDir() { document.documentElement.lang = state.lang; document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr'; document.title = 'MAQLAB | مقلب'; }
 
-  const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', spy: '🕵️' };
+  const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', order: '📊', spy: '🕵️' };
   const MODS = { normal: '✨', double: '💎', speed: '⏱️', jackpot: '🎁', golden: '👑' };
   const AWARD_E = { liar: '🤥', detective: '🕵️', sniper: '🎯', lightning: '⚡', gambler: '🎲', fire: '🔥', star: '🌟' };
   const ACH = [['first_game', '🎮'], ['first_win', '🏆'], ['liar5', '🤥'], ['bull', '🎯'], ['streak4', '🔥'], ['allin', '🎲'], ['famous', '🌟'], ['speedy', '⚡'], ['games10', '🏅'], ['wins5', '👑']];
@@ -497,7 +497,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   }
 
   // ================= render =================
-  const STATIC = new Set(['spin', 'bluffReveal', 'numReveal', 'blitzResult', 'emojiResult', 'oddResult', 'likelyReveal', 'spyReveal', 'scores', 'final']);
+  const STATIC = new Set(['spin', 'bluffReveal', 'numReveal', 'blitzResult', 'emojiResult', 'oddResult', 'orderResult', 'likelyReveal', 'spyReveal', 'scores', 'final']);
   function screenKey() {
     const r = state.route, s = state.room;
     if (r.name === 'room' && s && state.code === r.code) return `room:${s.phase}:${s.gameNo}:${s.round}:${s.current && s.current.idx != null ? s.current.idx : ''}`;
@@ -546,7 +546,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     if (key === 'enter') return enterView();
     const views = {
       lobby: lobbyView, spin: spinView, write: writeView, vote: voteView, bluffReveal: bluffRevealView, guess: guessView, numReveal: numRevealView,
-      blitz: blitzView, blitzResult: blitzResultView, likelyVote: likelyVoteView, likelyReveal: likelyRevealView, emoji: emojiView, emojiResult: emojiResultView, odd: oddView, oddResult: oddResultView,
+      blitz: blitzView, blitzResult: blitzResultView, likelyVote: likelyVoteView, likelyReveal: likelyRevealView, emoji: emojiView, emojiResult: emojiResultView, odd: oddView, oddResult: oddResultView, order: orderView, orderResult: orderResultView,
       spyClue: spyClueView, spyVote: spyVoteView, spyReveal: spyRevealView,
       scores: scoresView, final: finalView,
     };
@@ -581,7 +581,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   }
   function timerRing() {
     const s = state.room;
-    if (!s.deadline || !['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'spyClue', 'spyVote'].includes(s.phase)) return '<div style="width:48px"></div>';
+    if (!s.deadline || !['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'order', 'spyClue', 'spyVote'].includes(s.phase)) return '<div style="width:48px"></div>';
     return `<div class="timer" data-deadline="${s.deadline}"><svg viewBox="0 0 48 48"><circle class="track" cx="24" cy="24" r="20"/><circle class="prog" cx="24" cy="24" r="20" stroke-dasharray="125.66" stroke-dashoffset="0"/></svg><span>0</span></div>`;
   }
   function gameTop() {
@@ -1027,6 +1027,56 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ${quickDots(c, true)}
       <div class="q-card glass emoji-card"><span class="type-tag emoji">${TYPES.emoji} ${t('type_emoji')}</span><div class="big-emoji">${esc(c.emoji)}</div></div>
       ${quickResult(c, `<div class="verdict t">${esc(right ? right.text : '')}</div>${imgSearch(right ? right.text : '')}`)}
+    </div></div></div></div>`;
+  }
+
+  // ---------- line them up ----------
+  // Tapping, not dragging. Dragging four cards into order on a phone, against
+  // a clock, with a thumb, is a worse game than the one being played — so you
+  // tap them in order and tap again to take one back.
+  function orderView() {
+    const c = state.room.current;
+    const picked = state.draft.order.filter(id => c.items.some(it => it.id === id));
+    const done = c.myOrder != null;
+    const seq = done ? c.myOrder : picked;
+    const byId = Object.fromEntries(c.items.map(it => [it.id, it]));
+    const rank = id => seq.indexOf(id);
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      ${qCard('order', c.question)}
+      <div class="timebar"><i data-bar="${state.room.deadline}"></i></div>
+      <div class="order-list">${c.items.map((it, i) => {
+        const at = rank(it.id);
+        return `<button class="ord ${at >= 0 ? 'picked' : ''}" style="animation-delay:${i * 60}ms" data-act="ordpick" data-id="${esc(it.id)}" ${done ? 'disabled' : ''}>
+          <span class="pos">${at >= 0 ? at + 1 : ''}</span><span class="nm">${esc(it.text)}</span>
+        </button>`;
+      }).join('')}</div>
+      ${done
+        ? `<div class="center muted" style="margin-top:14px"><span class="dots">${t('waitOthers')}</span></div>`
+        : `<div class="row" style="margin-top:14px">
+            <button class="btn sm ghost" data-act="ordclear" ${seq.length ? '' : 'disabled'}>${t('clear')}</button>
+            <button class="btn mint grow" data-act="ordsend" ${seq.length === c.items.length ? '' : 'disabled'}>${seq.length === c.items.length ? t('lockIn') : t('pickAll', { n: c.items.length - seq.length })}</button>
+          </div>`}
+      ${whoRow(c.submitted)}
+    </div></div></div></div>`;
+  }
+
+  function orderResultView() {
+    const c = state.room.current, mid = myId();
+    const mine = (c.results && c.results[mid]) || null;
+    const place = id => (mine ? mine.seq.indexOf(id) : -1);
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      ${qCard('order', c.question)}
+      <div class="order-list">${c.truth.map((it, i) => {
+        const at = place(it.id);
+        // Green when you had it in exactly this slot, amber when you had it
+        // somewhere else — at a glance you can see what you nearly had.
+        const cls = at < 0 ? '' : at === i ? 'right' : 'near';
+        return `<div class="ord reveal ${cls}" style="animation-delay:${i * 90}ms">
+          <span class="pos">${i + 1}</span><span class="nm">${esc(it.text)}</span>
+          <span class="val">${fmt(it.v)}</span>${at >= 0 && at !== i ? `<span class="yours">${t('youSaid', { n: at + 1 })}</span>` : ''}
+        </div>`;
+      }).join('')}</div>
+      ${mine ? `<div class="center" style="margin-top:14px;font-weight:800">${mine.pairs === c.truth.length - 1 ? t('perfectOrder') : t('pairsRight', { n: mine.pairs })}</div>` : ''}
     </div></div></div></div>`;
   }
 
@@ -1904,6 +1954,18 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     async tf(el) { sfx.send(); buzz(20); await emit('blitz', el.dataset.v === '1'); },
     async emoji(el) { sfx.send(); buzz(20); await emit('emoji', el.dataset.id); },
     async odd(el) { sfx.send(); buzz(20); await emit('odd', el.dataset.id); },
+    ordpick(el) {
+      const id = el.dataset.id, cur = state.draft.order;
+      // Tapping something already placed takes it out and closes the gap.
+      state.draft.order = cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id];
+      sfx.tap(); buzz(10); state.lastKey = ''; render();
+    },
+    ordclear() { state.draft.order = []; sfx.tap(); state.lastKey = ''; render(); },
+    async ordsend() {
+      const r = await emit('order', state.draft.order);
+      if (r && r.error) { toast(t('err_' + r.error), 'err'); return; }
+      sfx.send(); buzz(20); state.draft.order = [];
+    },
     async likely(el) { sfx.send(); buzz(20); await emit('likely', el.dataset.id); },
     async spyvote(el) { sfx.send(); buzz(20); await emit('spyVote', el.dataset.id); },
     async power(el) {
