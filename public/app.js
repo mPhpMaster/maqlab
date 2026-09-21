@@ -542,7 +542,6 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     if (key === 'loading') return `<div class="screen"><div class="center-msg"><div>
       ${state.inDiscord ? `<div class="logo sm" style="margin-bottom:18px">MAQLAB<small>مقلب</small></div>` : ''}
       <div class="spinner"></div><b>${t('loading')}</b>
-      ${state.inDiscord && state.discordStage ? `<div class="muted" style="font-size:11px;margin-top:8px">${esc(state.discordStage)}</div>` : ''}
     </div></div></div>`;
     if (key === 'enter') return enterView();
     const views = {
@@ -1949,7 +1948,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
 
   getDiscordBootstrap({
     onLeave: () => { if (state.code) leaveRoom(); },
-    onStage: name => { state.discordStage = name; if (!signedIn()) { state.lastKey = ''; render(); } },
+    onStage: name => { state.discordStage = name; },
   }).then(async info => {
     state.discordDone = true;
     state.lastKey = '';
