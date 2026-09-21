@@ -710,3 +710,8 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 .me-card.skeleton i { display: block; height: 9px; width: 54px; margin: 4px 0; }
 .me-card.skeleton i.wide { width: 96px; height: 13px; }
 @keyframes sk { 0%, 100% { opacity: .45 } 50% { opacity: .9 } }
+
+/* a bot is a player, but everyone should be able to tell at a glance */
+.pcard.is-bot { border-style: dashed; opacity: .92; }
+.pcard .bot-tag { position: absolute; top: -8px; inset-inline-start: -6px; font-size: 14px; filter: saturate(.8); }
+.pcard.empty[data-act="addbot"] { font-size: 22px; }

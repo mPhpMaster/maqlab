@@ -77,7 +77,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
       rank: 'الترتيب', games: 'ألعاب', wins: 'فوز', winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
       curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: 'متابِعين', followingN: 'يتابع', memberSince: 'عضو منذ',
-      discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
+      addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
       matchResult: 'نتيجة المباراة', shareMatch: 'انسخ رابط المباراة', matchGone: 'المباراة هذي ما عادت موجودة', place1: 'الأول', placeN: 'المركز {n}', roundsN: '{n} جولات', openMatch: 'افتح',
       report: 'بلاغ', reportTitle: 'بلاغ عن {n}', reportWhy: 'وش المشكلة؟', r_cheat: 'غش', r_name: 'اسم مسيء', r_chat: 'إساءة بالدردشة', r_other: 'غير ذلك',
       reportDetails: 'تفاصيل (اختياري)', reportSent: 'وصلنا البلاغ، شكراً 🙏', suggestPlaceholder: 'وش تبي نضيف أو نغيّر؟',
@@ -145,7 +145,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       profile: 'Profile', leaderboard: 'Leaderboard', suggestBtn: 'Send a suggestion', about: 'About', adminPanel: 'Admin',
       rank: 'Rank', games: 'Games', wins: 'Wins', winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
       curStreak: 'Win streak', bestStreak: 'Longest streak', followers: 'Followers', followingN: 'Following', memberSince: 'Member since',
-      discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
+      addBot: 'Add bot', soloHint: 'On your own? Add a bot, or just start — we will sit some down for you 🤖', discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
       matchResult: 'Match result', shareMatch: 'Copy match link', matchGone: 'That match is no longer around', place1: '1st', placeN: 'Place {n}', roundsN: '{n} rounds', openMatch: 'Open',
       report: 'Report', reportTitle: 'Report {n}', reportWhy: "What's wrong?", r_cheat: 'Cheating', r_name: 'Offensive name', r_chat: 'Abusive chat', r_other: 'Something else',
       reportDetails: 'Details (optional)', reportSent: 'Report received, thank you 🙏', suggestPlaceholder: 'What should we add or change?',
@@ -692,10 +692,16 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     const dis = host ? '' : 'disabled';
     const seg = (key, vals, lab) => `<div class="seg">${vals.map(v => `<button class="${st[key] === v ? 'on' : ''}" data-act="set" data-k="${key}" data-v="${v}" ${dis}>${lab(v)}</button>`).join('')}</div>`;
     const players = online.map(p => `
-      <div class="pcard ${p.id === mid ? 'me' : ''} ${p.team ? 'team-' + p.team : ''}" data-pid="${esc(p.id)}" ${p.id !== mid ? `data-act="poke" data-id="${esc(p.id)}"` : ''}>
-        ${p.id === s.hostId ? '<span class="crown">👑</span>' : ''}${host && p.id !== mid ? `<span class="kick-x" data-act="kick" data-id="${esc(p.id)}">✕</span><span class="crown-give" data-act="makehost" data-id="${esc(p.id)}" title="${t('makeHost')}">👑</span>` : ''}${p.ready ? '<span class="rdy">✅</span>' : ''}${J(p.avatar)}<span class="nm" ${p.userId ? `data-act="profile" data-uid="${esc(p.userId)}"` : ''}>${esc(p.name)}</span>
+      <div class="pcard ${p.id === mid ? 'me' : ''} ${p.bot ? 'is-bot' : ''} ${p.team ? 'team-' + p.team : ''}" data-pid="${esc(p.id)}" ${p.id !== mid && !p.bot ? `data-act="poke" data-id="${esc(p.id)}"` : ''}>
+        ${p.id === s.hostId ? '<span class="crown">👑</span>' : ''}${p.bot ? '<span class="bot-tag">🤖</span>' : ''}${host && p.id !== mid ? (p.bot
+          ? `<span class="kick-x" data-act="unbot" data-id="${esc(p.id)}">✕</span>`
+          : `<span class="kick-x" data-act="kick" data-id="${esc(p.id)}">✕</span><span class="crown-give" data-act="makehost" data-id="${esc(p.id)}" title="${t('makeHost')}">👑</span>`) : ''}${p.ready && !p.bot ? '<span class="rdy">✅</span>' : ''}${J(p.avatar)}<span class="nm" ${p.userId ? `data-act="profile" data-uid="${esc(p.userId)}"` : ''}>${esc(p.name)}</span>
       </div>`).join('');
     const invite = online.length < 12 ? `<div class="pcard empty" data-act="copy">＋<span style="font-size:12px;font-weight:700">${t('invite')}</span></div>` : '';
+    // Alone, two of the six round types cannot run at all. Starting solo fills
+    // the table automatically, but the button is here for anyone who wants
+    // another player without waiting for one.
+    const addBot = host && online.length < 12 ? `<div class="pcard empty" data-act="addbot">🤖<span style="font-size:12px;font-weight:700">${t('addBot')}</span></div>` : '';
     return `<div class="screen">
       <div class="topbar">${menuBtn}<div class="mid"><div class="logo sm">${t('appName')}</div></div><div style="width:44px"></div></div>
       <div class="scroll" data-scroll="lobby"><div class="wrap" style="padding-bottom:20px">
@@ -710,8 +716,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
           ${state.showQR ? `<div class="qr-box"><img alt="QR" src="/api/qr?text=${encodeURIComponent(location.origin + '/room/' + s.code)}"></div>` : ''}
         </div>
         <div class="section-title"><span>${t('players')}</span><span class="chip">${online.length}/12</span></div>
-        ${st.teams ? teamColumns(online, mid) : `<div class="players">${players}${invite}</div>`}
-        ${online.length > 1 ? `<div class="center muted" style="font-size:12px;margin-top:8px">${t('pokeHint')}</div>` : ''}
+        ${st.teams ? teamColumns(online, mid) : `<div class="players">${players}${invite}${addBot}</div>`}
+        ${online.filter(p => !p.bot).length > 1 ? `<div class="center muted" style="font-size:12px;margin-top:8px">${t('pokeHint')}</div>` : ''}
+        ${online.length === 1 && host ? `<div class="center muted" style="font-size:12px;margin-top:8px">${t('soloHint')}</div>` : ''}
         ${balloonCard()}
         <div class="section-title"><span>${t('settings')}</span>${host ? '' : '<span class="chip">🔒</span>'}</div>
         <div class="glass settings">
@@ -1812,6 +1819,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     suggest: openSuggest,
     about: openAbout,
     admin: () => openAdmin(),
+    async addbot() { sfx.tap(); const r = await emit('addBot'); if (r && r.error) toast(t('err_full'), 'err'); },
+    async unbot(el) { sfx.tap(); await emit('removeBot', el.dataset.id); },
     'rooms-refresh'() { sfx.tap(); loadLobbies(); },
     'join-lobby'(el) {
       if (!needName()) return;

@@ -9,6 +9,8 @@ const content = require('./content');
 const db = require('./db');
 const auth = require('./auth');
 const achievements = require('./achievements');
+const { matchAnswerCase } = require('./text');
+const bots = require('./bots');
 
 const PORT = process.env.PORT || 3000;
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
@@ -123,7 +125,31 @@ const freshPowers = () => ({ peek: 1, double: 1 });
 
 // ---------------- snapshots ----------------
 function publicPlayer(p) {
-  return { id: p.id, name: p.name, avatar: p.avatar, score: p.score, connected: p.connected, streak: p.streak, powers: p.powers, team: p.team, ready: p.ready, userId: p.userId || null };
+  return { id: p.id, name: p.name, avatar: p.avatar, score: p.score, connected: p.connected, streak: p.streak, powers: p.powers, team: p.team, ready: p.ready, userId: p.userId || null, bot: !!p.bot };
+}
+
+const MAX_BOTS = 5;
+const humans = room => [...room.players.values()].filter(p => !p.bot);
+const randomAvatar = () => ({ s: rnd(6), c: rnd(14), e: rnd(10), m: rnd(10), h: rnd(12) });
+
+function addBot(room) {
+  if (room.players.size >= MAX_PLAYERS) return null;
+  if ([...room.players.values()].filter(p => p.bot).length >= MAX_BOTS) return null;
+  const p = {
+    id: rid(), name: bots.freeName([...room.players.values()].map(x => x.name)),
+    avatar: randomAvatar(), score: 0, streak: 0, stats: freshStats(), powers: freshPowers(),
+    connected: true, socketId: null, team: null, ready: true, userId: null, bot: true,
+  };
+  if (room.settings.teams) p.team = smallerTeam(room);
+  room.players.set(p.id, p);
+  return p;
+}
+
+// Bots exist to make a round playable, so they go when the round types that
+// needed them are no longer in play — and they must never be the last ones
+// standing, or the room would keep itself alive with nobody in it.
+function dropBots(room) {
+  for (const [id, p] of room.players) if (p.bot) room.players.delete(id);
 }
 
 function snapshot(room, pid) {
@@ -234,9 +260,92 @@ function balanceTeams(room) {
   if (ps.length > 1 && !b.length) a[0].team = 'B';
 }
 
+// Bots act once per step, through the same submit functions a human calls.
+// The step key stops a re-broadcast from queueing a second answer, and every
+// timer re-checks it on the way out so a bot that was still "thinking" when
+// the round moved on simply does nothing.
+function scheduleBots(room) {
+  const c = room.current;
+  const key = `${room.gameNo}:${room.round}:${room.phase}:${c && c.idx != null ? c.idx : ''}`;
+  if (room.botKey === key) return;
+  room.botKey = key;
+  const mine = [...room.players.values()].filter(p => p.bot);
+  // With nobody human left there is no game to play and no one to play it
+  // for. Bots must never be the reason a room stays warm.
+  if (!mine.length || !c || !humans(room).some(p => p.connected)) return;
+
+  for (const b of mine) {
+    const act = botAction(room, b);
+    if (!act) continue;
+    setTimeout(() => {
+      // The world may have moved several times while this was pending.
+      if (room.botKey !== key || !room.players.get(b.id)) return;
+      try { act(); } catch (e) { console.error('bot action failed:', e.message); }
+    }, bots.thinkFor(room.phase));
+  }
+}
+
+// Returns a thunk that performs this bot's move for the current phase, or
+// null when the phase asks nothing of it.
+function botAction(room, b) {
+  const c = room.current, L = room.settings.lang, ph = room.phase;
+
+  if (ph === 'write' && !c.lies[b.id]) {
+    // Lies are borrowed from real answers to other questions, so they read
+    // exactly like the truth — because somewhere else they are the truth.
+    const decoys = shuffle(content.bluff.map(e => e.a[L])).slice(0, 8);
+    const text = bots.lie({ decoys, truth: c.q.a[L] });
+    return text && (() => submitLie(room, b, text));
+  }
+  if (ph === 'vote' && !c.votes[b.id]) {
+    const v = bots.bluffVote({ options: c.options, myId: b.id });
+    return v && (() => submitVote(room, b, v.id, v.bet));
+  }
+  if (ph === 'guess' && c.guesses[b.id] == null) {
+    const g = bots.numberGuess({ answer: c.q.a });
+    return g != null && (() => submitGuess(room, b, g));
+  }
+  if (ph === 'likelyVote' && !c.lvotes[b.id]) {
+    const t = bots.votePlayer({ players: connected(room), myId: b.id });
+    return t && (() => submitLikely(room, b, t));
+  }
+  if (ph === 'blitz' && !c.answers[c.idx][b.id]) {
+    const v = bots.blitzAnswer({ truth: c.items[c.idx].t });
+    return () => submitQuick(room, b, v);
+  }
+  if (ph === 'emoji' && !c.answers[c.idx][b.id]) {
+    const it = c.items[c.idx];
+    const id = bots.emojiAnswer({ options: it.opts, correctId: it.correctId });
+    return id && (() => submitQuick(room, b, id));
+  }
+  if (ph === 'spyClue' && !c.clues[b.id]) {
+    // The clue comes from the category alone whether or not this bot is the
+    // spy, so a bot that happens to know the word cannot leak it by being
+    // suspiciously specific.
+    return () => submitSpyClue(room, b, bots.spyClue({ category: c.cat.en })[L]);
+  }
+  if (ph === 'spyVote' && !c.votes[b.id]) {
+    const t = bots.votePlayer({ players: connected(room), myId: b.id });
+    if (!t) return null;
+    return () => {
+      // The spy votes like everyone else — the round does not move until
+      // every player has — and guesses on top of that, from the category
+      // alone, which is all a human spy has to go on either.
+      if (c.spyId === b.id) {
+        const candidates = content.spy.filter(e => e.cat.en === c.cat.en).map(e => e.w[L]);
+        const guess = bots.spyGuess({ candidates });
+        if (guess) submitSpyGuess(room, b, guess);
+      }
+      submitSpyVote(room, b, t);
+    };
+  }
+  return null;
+}
+
 function broadcast(room) {
   room.touched = Date.now();
   for (const p of room.players.values()) if (p.socketId) io.to(p.socketId).emit('room', snapshot(room, p.id));
+  scheduleBots(room);
 }
 
 function clearTimer(room) { if (room.timer) clearTimeout(room.timer); room.timer = null; }
@@ -345,6 +454,20 @@ function pickFrom(room, type, count = 1) {
   return chosen.map(i => bank[i]);
 }
 
+// Alone, four of the six round types work and two do not: "who's most
+// likely" needs three people to be a question at all, and the spy needs four
+// to have anyone to hide among. Rather than quietly dropping those rounds
+// from a solo game, sit some bots down at the table.
+//
+// Only for a player who is genuinely on their own. With anyone else in the
+// room the host decides, with the button.
+function fillForSolo(room) {
+  if (humans(room).filter(p => p.connected).length !== 1) return;
+  const enabled = TYPES.filter(t => room.settings.types[t]);
+  const needed = Math.min(MAX_PLAYERS, Math.max(1, ...enabled.map(t => MIN_PLAYERS[t] || 1)));
+  while (connected(room).length < needed && addBot(room));
+}
+
 function startGame(room) {
   Object.assign(room, { round: 0, gameNo: room.gameNo + 1, gains: {}, awards: [], bestLie: null, used: {} });
   for (const p of room.players.values()) { p.score = 0; p.streak = 0; p.stats = freshStats(); p.powers = freshPowers(); }
@@ -417,6 +540,7 @@ function submitLie(room, p, text) {
   text = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 50);
   if (!text) return { error: 'empty' };
   if (isTruth(text, room.current.q)) return { error: 'truth' };
+  text = matchAnswerCase(text, room.settings.lang);
   room.current.lies[p.id] = text;
   if (connected(room).every(x => room.current.lies[x.id])) startVote(room); else broadcast(room);
   return { ok: true };
@@ -839,7 +963,7 @@ io.on('connection', socket => {
     if (room && player && room !== r) leave(false);
     room = r; player = p;
     p.connected = true; p.socketId = socket.id;
-    if (!r.hostId || !r.players.get(r.hostId)?.connected) r.hostId = p.id;
+    if (!r.hostId || !r.players.get(r.hostId)?.connected || r.players.get(r.hostId)?.bot) r.hostId = p.id;
     socket.join(r.code);
     io.to(r.code).emit('joined', { id: p.id, name: p.name });
     reply(cb, { ok: true, token: p.id, code: r.code });
@@ -871,7 +995,25 @@ io.on('connection', socket => {
 
   socket.on('start', (_, cb) => {
     if (!host() || room.phase !== 'lobby') return reply(cb, { error: 'host' });
+    fillForSolo(room);
     startGame(room);
+    reply(cb, { ok: true });
+  });
+
+  socket.on('addBot', (_, cb) => {
+    if (!host() || room.phase !== 'lobby') return reply(cb, { error: 'host' });
+    const b = addBot(room);
+    if (!b) return reply(cb, { error: 'full' });
+    broadcast(room);
+    reply(cb, { ok: true });
+  });
+
+  socket.on('removeBot', (pid, cb) => {
+    if (!host() || room.phase !== 'lobby') return reply(cb, { error: 'host' });
+    const b = room.players.get(String(pid || ''));
+    if (!b || !b.bot) return reply(cb, { error: 'bad' });
+    room.players.delete(b.id);
+    broadcast(room);
     reply(cb, { ok: true });
   });
 
@@ -972,7 +1114,7 @@ io.on('connection', socket => {
       const cur = r.players.get(pid);
       if (!cur || cur.connected || r.phase !== 'lobby') return;
       r.players.delete(pid);
-      if (r.hostId === pid) { const n = connected(r)[0]; if (n) r.hostId = n.id; }
+      if (r.hostId === pid) { const n = humans(r).find(x => x.connected); if (n) r.hostId = n.id; }
       if (rooms.has(r.code)) broadcast(r);
     }, GHOST_MS);
   }
@@ -984,7 +1126,7 @@ io.on('connection', socket => {
     socket.leave(r.code);
     if (!soft && r.phase === 'lobby') r.players.delete(p.id);
     else if (soft && r.phase === 'lobby') sweepGhost(r, p.id);
-    if (r.hostId === p.id) { const n = connected(r)[0]; if (n) r.hostId = n.id; }
+    if (r.hostId === p.id) { const n = humans(r).find(x => x.connected); if (n) r.hostId = n.id; }
     checkProgress(r); broadcast(r);
     room = null; player = null;
   }
@@ -993,7 +1135,13 @@ io.on('connection', socket => {
 setInterval(() => {
   const now = Date.now();
   for (const [code, r] of rooms) {
-    if (!connected(r).length && now - r.touched > (r.players.size ? ROOM_TTL_MS : 5 * 60 * 1000)) { clearTimer(r); rooms.delete(code); }
+    const people = humans(r);
+    if (!people.some(p => p.connected)) {
+      // Bots do not keep a room alive, and they do not outlive the last
+      // person in it either.
+      if (r.players.size !== people.length) dropBots(r);
+      if (now - r.touched > (people.length ? ROOM_TTL_MS : 5 * 60 * 1000)) { clearTimer(r); rooms.delete(code); }
+    }
   }
   for (const [instanceId, code] of discordInstanceRooms) {
     if (!rooms.has(code)) discordInstanceRooms.delete(instanceId);
@@ -1345,8 +1493,10 @@ app.get('/health', (_, res) => {
 app.get('/api/lobbies', (_, res) => {
   const list = [];
   for (const r of rooms.values()) {
-    const online = connected(r);
-    if (!r.settings.public || !online.length || online.length >= MAX_PLAYERS) continue;
+    // Bots are padding, not company: a room advertised as having three
+    // players should have three people in it.
+    const online = humans(r).filter(p => p.connected);
+    if (!r.settings.public || !online.length || r.players.size >= MAX_PLAYERS) continue;
     const host = r.players.get(r.hostId);
     list.push({
       code: r.code, players: online.length, phase: r.phase, round: r.round,
