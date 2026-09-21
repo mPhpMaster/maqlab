@@ -2,6 +2,7 @@
 // bluff:  obscure-but-true facts; players invent fake answers.
 // number: numeric answers; closest guess wins.
 // blitz:  true/false statements for speed rounds.
+// odd:    four things, one of which does not belong.
 
 const bluff = [
   { q: { ar: 'قبل أن يصبح لعبة أطفال، ما الاستخدام الأصلي لمعجون اللعب "Play-Doh"؟', en: 'Before it became a toy, what was Play-Doh originally sold as?' }, a: { ar: 'منظف ورق الجدران', en: 'Wallpaper cleaner' }, alt: ['منظف جدران', 'منظف للجدران', 'wall cleaner', 'wallpaper cleaning'] },
@@ -679,6 +680,61 @@ const emoji = [
 ];
 
 // Spy round — everyone but the spy gets the secret word; the spy only sees the category.
+// odd: four things, one of which does not belong. The group is never named —
+// working out what the other three share is the round. `why` is only ever
+// shown after the answer, because it is the answer.
+const O = (ar, en, wAr, wEn, ...rest) => ({
+  odd: { ar, en }, why: { ar: wAr, en: wEn },
+  rest: rest.map(([a, e]) => ({ ar: a, en: e })),
+});
+const odd = [
+  O('جزر', 'Carrot', 'الباقي فواكه', 'The rest are fruit', ['تفاح', 'Apple'], ['موز', 'Banana'], ['عنب', 'Grapes']),
+  O('حوت', 'Whale', 'الباقي أسماك', 'The rest are fish', ['سلمون', 'Salmon'], ['تونة', 'Tuna'], ['سردين', 'Sardine']),
+  O('خفاش', 'Bat', 'الباقي طيور', 'The rest are birds', ['نسر', 'Eagle'], ['بطريق', 'Penguin'], ['بومة', 'Owl']),
+  O('زمرد', 'Emerald', 'الباقي معادن', 'The rest are metals', ['حديد', 'Iron'], ['نحاس', 'Copper'], ['فضة', 'Silver']),
+  O('الشمس', 'Sun', 'الباقي كواكب', 'The rest are planets', ['المريخ', 'Mars'], ['زحل', 'Saturn'], ['نبتون', 'Neptune']),
+  O('تنس', 'Tennis', 'الباقي بالأقدام', 'The rest use your feet', ['كرة قدم', 'Football'], ['ركض', 'Running'], ['ركل', 'Kickboxing']),
+  O('بصل', 'Onion', 'الباقي حلو', 'The rest are sweet', ['عسل', 'Honey'], ['تمر', 'Dates'], ['شوكولاتة', 'Chocolate']),
+  O('عنكبوت', 'Spider', 'الباقي حشرات', 'The rest are insects', ['نملة', 'Ant'], ['نحلة', 'Bee'], ['ذبابة', 'Fly']),
+  O('ماء', 'Water', 'الباقي فيه كافيين', 'The rest have caffeine', ['قهوة', 'Coffee'], ['شاي', 'Tea'], ['كولا', 'Cola']),
+  O('طوب', 'Brick', 'الباقي يطفو', 'The rest float', ['خشب', 'Wood'], ['فلين', 'Cork'], ['ثلج', 'Ice']),
+  O('طبيب', 'Doctor', 'الباقي يبنون', 'The rest build things', ['نجار', 'Carpenter'], ['حداد', 'Blacksmith'], ['بنّاء', 'Bricklayer']),
+  O('يوليو', 'July', 'الباقي شتاء', 'The rest are winter months', ['ديسمبر', 'December'], ['يناير', 'January'], ['فبراير', 'February']),
+  O('طماطم', 'Tomato', 'الباقي خضار جذرية', 'The rest grow underground', ['بطاطس', 'Potato'], ['جزر', 'Carrot'], ['فجل', 'Radish']),
+  O('قطار', 'Train', 'الباقي يطير', 'The rest fly', ['طائرة', 'Plane'], ['مروحية', 'Helicopter'], ['منطاد', 'Balloon']),
+  O('الفرنسية', 'French', 'الباقي يُكتب من اليمين', 'The rest are written right to left', ['العربية', 'Arabic'], ['العبرية', 'Hebrew'], ['الفارسية', 'Persian']),
+  O('أخضر', 'Green', 'الباقي ألوان أساسية', 'The rest are primary colours', ['أحمر', 'Red'], ['أزرق', 'Blue'], ['أصفر', 'Yellow']),
+  O('بطيخ', 'Watermelon', 'الباقي حمضيات', 'The rest are citrus', ['برتقال', 'Orange'], ['ليمون', 'Lemon'], ['جريب فروت', 'Grapefruit']),
+  O('قلم', 'Pen', 'الباقي يقيس', 'The rest measure things', ['مسطرة', 'Ruler'], ['ميزان', 'Scales'], ['ترمومتر', 'Thermometer']),
+  O('عسل', 'Honey', 'الباقي من الحليب', 'The rest come from milk', ['جبن', 'Cheese'], ['زبدة', 'Butter'], ['لبن', 'Yoghurt']),
+  O('البرازيل', 'Brazil', 'الباقي في آسيا', 'The rest are in Asia', ['اليابان', 'Japan'], ['الهند', 'India'], ['تايلاند', 'Thailand']),
+  O('غيتار', 'Guitar', 'الباقي ينفخ', 'The rest you blow into', ['ناي', 'Flute'], ['بوق', 'Trumpet'], ['مزمار', 'Clarinet']),
+  O('ثلج', 'Snow', 'الباقي يسخّن', 'The rest give heat', ['شمس', 'The Sun'], ['نار', 'Fire'], ['فرن', 'Oven']),
+  O('صحراء', 'Desert', 'الباقي فيها ماء', 'The rest are full of water', ['بحيرة', 'Lake'], ['نهر', 'River'], ['محيط', 'Ocean']),
+  O('سلحفاة', 'Tortoise', 'الباقي سريع', 'The rest are fast', ['فهد', 'Cheetah'], ['صقر', 'Falcon'], ['أرنب', 'Hare']),
+  O('كرسي', 'Chair', 'الباقي يضيء', 'The rest give light', ['مصباح', 'Lamp'], ['شمعة', 'Candle'], ['كشاف', 'Torch']),
+  O('رمل', 'Sand', 'الباقي يذوب', 'The rest melt', ['شمع', 'Wax'], ['زبدة', 'Butter'], ['ثلج', 'Ice']),
+  O('باذنجان', 'Aubergine', 'الباقي مكسرات', 'The rest are nuts', ['لوز', 'Almond'], ['جوز', 'Walnut'], ['فستق', 'Pistachio']),
+  O('السبت', 'Saturday', 'الباقي أيام عمل', 'The rest are working days', ['الاثنين', 'Monday'], ['الثلاثاء', 'Tuesday'], ['الأربعاء', 'Wednesday']),
+  O('أسد', 'Lion', 'الباقي يعيش بالماء', 'The rest live in water', ['دلفين', 'Dolphin'], ['أخطبوط', 'Octopus'], ['سلطعون', 'Crab']),
+  O('ملح', 'Salt', 'الباقي توابل حارة', 'The rest are hot spices', ['فلفل', 'Pepper'], ['زنجبيل', 'Ginger'], ['شطة', 'Chilli']),
+  O('إبرة', 'Needle', 'الباقي يقطع', 'The rest cut', ['سكين', 'Knife'], ['مقص', 'Scissors'], ['منشار', 'Saw']),
+  O('النيل', 'The Nile', 'الباقي جبال', 'The rest are mountains', ['إيفرست', 'Everest'], ['كليمنجارو', 'Kilimanjaro'], ['الألب', 'The Alps']),
+  O('خيار', 'Cucumber', 'الباقي أحمر', 'The rest are red', ['فراولة', 'Strawberry'], ['طماطم', 'Tomato'], ['كرز', 'Cherry']),
+  O('ساعة', 'Clock', 'الباقي يُلبس', 'The rest are worn', ['قبعة', 'Hat'], ['حذاء', 'Shoe'], ['وشاح', 'Scarf']),
+  O('كتاب', 'Book', 'الباقي يعزف', 'The rest make music', ['بيانو', 'Piano'], ['كمان', 'Violin'], ['طبل', 'Drum']),
+  O('بقرة', 'Cow', 'الباقي يبيض', 'The rest lay eggs', ['دجاجة', 'Hen'], ['بطة', 'Duck'], ['نعامة', 'Ostrich']),
+  O('الرياض', 'Riyadh', 'الباقي على البحر', 'The rest are on the coast', ['جدة', 'Jeddah'], ['الإسكندرية', 'Alexandria'], ['بيروت', 'Beirut']),
+  O('زجاج', 'Glass', 'الباقي ينثني', 'The rest bend', ['مطاط', 'Rubber'], ['قماش', 'Cloth'], ['ورق', 'Paper']),
+  O('فلفل', 'Pepper', 'الباقي حبوب', 'The rest are grains', ['أرز', 'Rice'], ['قمح', 'Wheat'], ['شعير', 'Barley']),
+  O('غواصة', 'Submarine', 'الباقي له عجلات', 'The rest have wheels', ['سيارة', 'Car'], ['دراجة', 'Bicycle'], ['شاحنة', 'Lorry']),
+  O('نحلة', 'Bee', 'الباقي له فرو', 'The rest have fur', ['قط', 'Cat'], ['أرنب', 'Rabbit'], ['دب', 'Bear']),
+  O('مطر', 'Rain', 'الباقي يُشرب ساخن', 'The rest are drunk hot', ['شاي', 'Tea'], ['قهوة', 'Coffee'], ['شوربة', 'Soup']),
+  O('صابون', 'Soap', 'الباقي يؤكل', 'The rest are edible', ['خبز', 'Bread'], ['جبن', 'Cheese'], ['بيض', 'Egg']),
+  O('أزرق', 'Blue', 'الباقي في علم فلسطين', 'The rest are on the flag of Palestine', ['أحمر', 'Red'], ['أخضر', 'Green'], ['أسود', 'Black']),
+  O('حاسوب', 'Computer', 'الباقي أثاث', 'The rest are furniture', ['طاولة', 'Table'], ['سرير', 'Bed'], ['خزانة', 'Wardrobe']),
+];
+
 const spy = [
   { cat: { ar: 'مكان', en: 'Place' }, w: { ar: 'المطار', en: 'The airport' } },
   { cat: { ar: 'مكان', en: 'Place' }, w: { ar: 'المستشفى', en: 'The hospital' } },
@@ -793,4 +849,4 @@ const spy = [
   { cat: { ar: 'حيوان', en: 'Animal' }, w: { ar: 'النحلة', en: 'Bee' } },
 ];
 
-module.exports = { bluff, number, blitz, likely, emoji, spy };
+module.exports = { bluff, number, blitz, likely, emoji, odd, spy };

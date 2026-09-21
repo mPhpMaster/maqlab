@@ -26,14 +26,14 @@ const GHOST_MS = 25 * 1000; // grace for a lobby refresh before the seat is free
 const ROOM_TTL_MS = 30 * 60 * 1000;
 const ITEMS_PER_QUICK_ROUND = 3; // blitz & emoji rounds have 3 quick items
 const REACTIONS = ['😂', '🔥', '😱', '👏', '🤡', '💀', '😈', '❤️'];
-const TYPES = ['bluff', 'number', 'blitz', 'likely', 'emoji', 'spy'];
-const ACTIVE = ['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'spyClue', 'spyVote'];
+const TYPES = ['bluff', 'number', 'blitz', 'likely', 'emoji', 'odd', 'spy'];
+const ACTIVE = ['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'spyClue', 'spyVote'];
 const PHRASES = 12; // number of preset taunts the client knows
 
 const T = {
-  chill: { spin: 6, write: 70, vote: 35, guess: 35, blitz: 10, blitzResult: 3.5, numReveal: 9, scores: 12, likelyVote: 30, likelyReveal: 9, emoji: 15, emojiResult: 3.5, spyClue: 50, spyVote: 30, spyReveal: 10 },
-  normal: { spin: 6, write: 45, vote: 25, guess: 25, blitz: 8, blitzResult: 3, numReveal: 8, scores: 10, likelyVote: 20, likelyReveal: 8, emoji: 10, emojiResult: 3, spyClue: 35, spyVote: 20, spyReveal: 9 },
-  fast: { spin: 5.5, write: 30, vote: 15, guess: 15, blitz: 5, blitzResult: 2.5, numReveal: 7, scores: 8, likelyVote: 14, likelyReveal: 7, emoji: 7, emojiResult: 2.5, spyClue: 22, spyVote: 13, spyReveal: 7 },
+  chill: { spin: 6, write: 70, vote: 35, guess: 35, blitz: 10, blitzResult: 3.5, numReveal: 9, scores: 12, likelyVote: 30, likelyReveal: 9, emoji: 15, emojiResult: 3.5, odd: 18, oddResult: 4.5, spyClue: 50, spyVote: 30, spyReveal: 10 },
+  normal: { spin: 6, write: 45, vote: 25, guess: 25, blitz: 8, blitzResult: 3, numReveal: 8, scores: 10, likelyVote: 20, likelyReveal: 8, emoji: 10, emojiResult: 3, odd: 13, oddResult: 4, spyClue: 35, spyVote: 20, spyReveal: 9 },
+  fast: { spin: 5.5, write: 30, vote: 15, guess: 15, blitz: 5, blitzResult: 2.5, numReveal: 7, scores: 8, likelyVote: 14, likelyReveal: 7, emoji: 7, emojiResult: 2.5, odd: 9, oddResult: 3, spyClue: 22, spyVote: 13, spyReveal: 7 },
 };
 const MODS = [
   { id: 'normal', w: 50, mult: 1 },
@@ -209,6 +209,18 @@ function snapshot(room, pid) {
     s.current.myAnswer = ans[pid] ? ans[pid].id : null;
     if (ph === 'emojiResult') Object.assign(s.current, { correctId: it.correctId, results: ans, fastest: c.fastest[c.idx] || null });
   }
+  if (c.type === 'odd' && ['odd', 'oddResult'].includes(ph)) {
+    const it = c.items[c.idx];
+    const hidden = peeked('o' + c.idx);
+    Object.assign(s.current, { idx: c.idx, total: c.items.length });
+    s.current.options = it.opts.map(o => ({ id: o.id, text: o.text[L], hidden: hidden.includes(o.id) }));
+    const ans = c.answers[c.idx];
+    s.current.answered = Object.keys(ans);
+    s.current.myAnswer = ans[pid] ? ans[pid].id : null;
+    // The reason is only ever sent once the answer is out, or it would be
+    // the answer.
+    if (ph === 'oddResult') Object.assign(s.current, { correctId: it.correctId, why: it.why[L], results: ans, fastest: c.fastest[c.idx] || null });
+  }
   if (c.type === 'likely' && ['likelyVote', 'likelyReveal'].includes(ph)) {
     s.current.prompt = c.prompt[L];
     s.current.voted = Object.keys(c.lvotes);
@@ -313,7 +325,7 @@ function botAction(room, b) {
     const v = bots.blitzAnswer({ truth: c.items[c.idx].t });
     return () => submitQuick(room, b, v);
   }
-  if (ph === 'emoji' && !c.answers[c.idx][b.id]) {
+  if ((ph === 'emoji' || ph === 'odd') && !c.answers[c.idx][b.id]) {
     const it = c.items[c.idx];
     const id = bots.emojiAnswer({ options: it.opts, correctId: it.correctId });
     return id && (() => submitQuick(room, b, id));
@@ -402,7 +414,7 @@ function finishRound(room) {
 function createRoom() {
   const room = {
     code: newCode(), hostId: null, phase: 'lobby',
-    settings: { lang: 'en', rounds: 8, types: { bluff: true, number: true, blitz: true, likely: true, emoji: true, spy: true }, pace: 'normal', teams: false, public: true },
+    settings: { lang: 'en', rounds: 8, types: { bluff: true, number: true, blitz: true, likely: true, emoji: true, odd: true, spy: true }, pace: 'normal', teams: false, public: true },
     players: new Map(), round: 0, gameNo: 0, current: null, deadline: null, timer: null,
     used: {}, plan: [], gains: {}, prevRank: {}, awards: [], bestLie: null, pairs: {}, rivals: {}, touched: Date.now(),
     balloon: { size: 0, target: 20 + rnd(20), pops: {} },
@@ -522,6 +534,16 @@ function beginRound(room) {
     Object.assign(c, { word: entry.w, cat: entry.cat, spyId, clues: {}, votes: {}, guess: null });
     room.phase = 'spyClue';
     setTimer(room, pace(room, 'spyClue'), () => startSpyVote(room));
+  } else if (c.type === 'odd') {
+    // Four things, one of which does not belong. The group is never named —
+    // working out what the other three have in common is the round.
+    const items = pickFrom(room, 'odd', ITEMS_PER_QUICK_ROUND).map(it => {
+      const opts = shuffle([{ text: it.odd, ok: true }, ...it.rest.map(r => ({ text: r }))]).map(o => ({ ...o, id: rid(6) }));
+      return { why: it.why, opts, correctId: opts.find(o => o.ok).id };
+    });
+    Object.assign(c, { items, idx: 0, fastest: [], correctCount: {} });
+    c.answers = c.items.map(() => ({}));
+    return startQuickItem(room);
   } else {
     const items = pickFrom(room, 'emoji', ITEMS_PER_QUICK_ROUND).map(it => {
       const opts = shuffle([{ text: it.a, ok: true }, ...it.d.map(d => ({ text: d }))]).map(o => ({ ...o, id: rid(6) }));
@@ -738,10 +760,21 @@ function revealSpy(room) {
 }
 
 // ----- quick rounds: blitz (true/false) and emoji (4 options) -----
+// The quick rounds are all the same shape: a handful of items, everyone
+// answers against a clock, points for right plus points for fast. Only the
+// labels and the numbers differ, so they live in one table instead of being
+// spelled out again in every branch — which is what made adding a third one
+// a refactor rather than a line.
+const QUICK = {
+  blitz: { phase: 'blitz', result: 'blitzResult', base: 200, speed: 20 },
+  emoji: { phase: 'emoji', result: 'emojiResult', base: 300, speed: 30 },
+  odd: { phase: 'odd', result: 'oddResult', base: 300, speed: 30 },
+};
+
 function startQuickItem(room) {
   const c = room.current;
   c.itemStart = Date.now();
-  room.phase = c.type === 'blitz' ? 'blitz' : 'emoji';
+  room.phase = QUICK[c.type].phase;
   c.itemDur = pace(room, room.phase) * 1000;
   setTimer(room, c.itemDur / 1000, () => resolveQuickItem(room));
   broadcast(room);
@@ -749,7 +782,7 @@ function startQuickItem(room) {
 
 function submitQuick(room, p, value) {
   const c = room.current;
-  if (!c || room.phase !== (c.type === 'blitz' ? 'blitz' : 'emoji')) return { error: 'late' };
+  if (!c || !QUICK[c.type] || room.phase !== QUICK[c.type].phase) return { error: 'late' };
   const ans = c.answers[c.idx];
   if (ans[p.id]) return { error: 'dup' };
   if (c.type === 'blitz') ans[p.id] = { v: !!value, t: Date.now() - c.itemStart };
@@ -763,7 +796,8 @@ function submitQuick(room, p, value) {
 
 function resolveQuickItem(room) {
   const c = room.current;
-  if (room.phase !== 'blitz' && room.phase !== 'emoji') return;
+  const q = QUICK[c && c.type];
+  if (!q || room.phase !== q.phase) return;
   const ans = c.answers[c.idx];
   const blitz = c.type === 'blitz';
   let fastest = null;
@@ -771,14 +805,14 @@ function resolveQuickItem(room) {
     a.correct = blitz ? a.v === c.items[c.idx].t : a.id === c.items[c.idx].correctId;
     if (!a.correct) continue;
     const speed = Math.max(0, 1 - a.t / c.itemDur);
-    gain(room, pid, blitz ? 'blitz' : 'emoji', blitz ? 200 : 300);
-    gain(room, pid, 'speed', Math.round(speed * (blitz ? 20 : 30)) * 10);
+    gain(room, pid, c.type, q.base);
+    gain(room, pid, 'speed', Math.round(speed * q.speed) * 10);
     c.correctCount[pid] = (c.correctCount[pid] || 0) + 1;
     if (!fastest || a.t < ans[fastest].t) fastest = pid;
   }
   if (fastest) { gain(room, fastest, 'fastest', 100); const fp = room.players.get(fastest); if (fp) fp.stats.fastest += 1; }
   c.fastest[c.idx] = fastest;
-  room.phase = blitz ? 'blitzResult' : 'emojiResult';
+  room.phase = q.result;
   setTimer(room, pace(room, room.phase), () => {
     if (c.idx + 1 < c.items.length) { c.idx += 1; startQuickItem(room); return; }
     for (const p of connected(room)) {
@@ -834,8 +868,15 @@ function payLaughs(room) {
   }
 }
 
+// Every phase a round can end on. Derived rather than listed, because the
+// hand-written version silently froze any round type somebody forgot to add
+// to it — the game simply stopped, with no error anywhere.
+const isRevealPhase = ph =>
+  ['bluffReveal', 'numReveal', 'likelyReveal', 'spyReveal'].includes(ph) ||
+  Object.values(QUICK).some(q => q.result === ph);
+
 function showScores(room) {
-  if (!['bluffReveal', 'numReveal', 'blitzResult', 'emojiResult', 'likelyReveal', 'spyReveal'].includes(room.phase)) return;
+  if (!isRevealPhase(room.phase)) return;
   if (room.phase === 'bluffReveal') payLaughs(room);
   room.phase = 'scores';
   setTimer(room, pace(room, 'scores'), () => nextRound(room));
@@ -1022,6 +1063,7 @@ io.on('connection', socket => {
   socket.on('guess', (v, cb) => room && reply(cb, submitGuess(room, player, v)));
   socket.on('blitz', (v, cb) => room && reply(cb, submitQuick(room, player, v)));
   socket.on('emoji', (id, cb) => room && reply(cb, submitQuick(room, player, id)));
+  socket.on('odd', (id, cb) => room && reply(cb, submitQuick(room, player, id)));
   socket.on('likely', (target, cb) => room && reply(cb, submitLikely(room, player, target)));
   socket.on('power', (kind, cb) => room && reply(cb, usePower(room, player, kind)));
   socket.on('spyClue', (text, cb) => room && reply(cb, submitSpyClue(room, player, text)));

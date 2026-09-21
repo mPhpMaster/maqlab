@@ -34,7 +34,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       round: 'الجولة', spinning: 'وش بتكون الجولة الجاية؟',
       type_bluff: 'المقلب', desc_bluff: 'اكتب كذبة مقنعة تخدع فيها الشلة', type_number: 'أقرب رقم', desc_number: 'خمّن الرقم… الأقرب يكسب', type_blitz: 'صح ولا خطأ', desc_blitz: '3 عبارات سريعة، والسرعة تفرق!',
       type_likely: 'مين فينا؟', desc_likely: 'صوّت على واحد من الشلة… ووافق الأغلبية', type_emoji: 'فكّ الإيموجي', desc_emoji: '3 ألغاز إيموجي… الأسرع يكسب',
-      type_spy: 'الجاسوس', desc_spy: 'واحد بينكم جاسوس ما يعرف الكلمة… لقّطوه! 🕵️',
+      type_odd: 'الدخيل', desc_odd: '٤ كلمات، وحدة منهم ما لها دخل… لقّطها بسرعة', type_spy: 'الجاسوس', desc_spy: 'واحد بينكم جاسوس ما يعرف الكلمة… لقّطوه! 🕵️',
       category: 'الفئة', youAreSpy: 'أنت الجاسوس! 🕵️', spyHintSpy: 'اكتب تلميح يخليهم يحسبونك تعرف الكلمة', spyHintCivilian: 'اكتب تلميح عن الكلمة بدون ما تقولها',
       writeClue: 'اكتب تلميحك…', yourClue: 'تلميحك', spyPickSuspect: 'مين تحس إنه الجاسوس؟ 🤔', spyWordIs: 'الكلمة: {n}',
       guessWord: 'خمّن الكلمة السرية (اختياري)', spyGuessBtn: 'خمّن 🎯', guessSent: 'خمّنت: {n}',
@@ -53,7 +53,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       kicked: 'تم إخراجك من الغرفة', confirmKick: 'تبي تطلّع {n} من الغرفة؟', yes: 'إيه', cancel: 'إلغاء', reconnecting: 'انقطع الاتصال… نحاول نرجع', loading: 'جاري الدخول…', close: 'تمام', pokedYou: '{n} نغزك 👉',
       power_peek: 'كشّاف', power_double: 'دبل', powerOn: 'مفعّل ✓', peekDone: 'شلنا خيارين غلط 🔍', doubleDone: 'نقاطك بهالجولة ×2 💎', doubledBy: '💎 {n} فعّل الدبل!',
       err_truth: 'هذي الإجابة الصحيحة! اكتب كذبة 😏', err_own: 'ما تقدر تختار كذبتك 😅', err_selfvote: 'ما تقدر تصوت لنفسك 😅', err_noroom: 'الغرفة غير موجودة', err_full: 'الغرفة ممتلئة', err_nan: 'اكتب رقم صحيح', err_empty: 'اكتب شيء أول', err_late: 'انتهى الوقت ⏰', err_host: 'للمضيف فقط', err_dup: 'استخدمتها خلاص', err_nopower: 'خلصت هالقدرة', err_nopeek: 'الكشّاف يشتغل وقت الاختيار بس 🔍', err_bad: 'خيار غير صالح', err_signin: 'سجّل دخولك بديسكورد أول',
-      g_correct: 'إجابة صحيحة', g_fooled: 'خدعت لاعبين', g_betLoss: 'خسارة الرهان', g_streak: 'سلسلة 🔥', g_bullseye: 'في الصميم 🎯', g_closest: 'الأقرب', g_second: 'المركز الثاني', g_third: 'المركز الثالث', g_blitz: 'إجابات صحيحة', g_emoji: 'إجابات صحيحة', g_speed: 'مكافأة السرعة', g_fastest: 'الأسرع ⚡', g_jackpot: 'صندوق الحظ 🎁', g_majority: 'مع الأغلبية 👥', g_famous: 'اختاروك 🌟', g_double: 'دبل 💎', g_spyCatch: 'لقّط الجاسوس', g_spyEvade: 'هرب من اللقطة', g_spyGuess: 'خمّن الكلمة',
+      g_correct: 'إجابة صحيحة', g_fooled: 'خدعت لاعبين', g_betLoss: 'خسارة الرهان', g_streak: 'سلسلة 🔥', g_bullseye: 'في الصميم 🎯', g_closest: 'الأقرب', g_second: 'المركز الثاني', g_third: 'المركز الثالث', g_blitz: 'إجابات صحيحة', g_emoji: 'إجابات صحيحة', g_odd: 'إجابات صحيحة', g_speed: 'مكافأة السرعة', g_fastest: 'الأسرع ⚡', g_jackpot: 'صندوق الحظ 🎁', g_majority: 'مع الأغلبية 👥', g_famous: 'اختاروك 🌟', g_double: 'دبل 💎', g_spyCatch: 'لقّط الجاسوس', g_spyEvade: 'هرب من اللقطة', g_spyGuess: 'خمّن الكلمة',
       a_liar: 'سيد المقالب', a_liar_d: 'خدع {n} مرة', a_detective: 'المحقق', a_detective_d: '{n} إجابات صحيحة', a_sniper: 'القناص', a_sniper_d: '{n} تخمينات دقيقة', a_lightning: 'البرق', a_lightning_d: 'الأسرع {n} مرات', a_gambler: 'المغامر', a_gambler_d: 'راهن بقوة {n} مرات', a_fire: 'ولّعت', a_fire_d: 'سلسلة {n} 🔥', a_star: 'نجم الشلة', a_star_d: 'اختاروه {n} مرات',
       ann_first: 'صرت الأول! 👑', ann_combo: 'كومبو ×{n} 🔥', ann_unstoppable: 'ما ينوقف!! 🔥🔥', ann_legend: 'مقلب أسطوري! 😈', ann_perfect: 'مثالي! 3 من 3 ✨', ann_golden: 'الجولة الذهبية! 👑',
       achievements: 'إنجازاتي', achUnlocked: 'إنجاز جديد! 🏅',
@@ -77,7 +77,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
       rank: 'الترتيب', games: 'ألعاب', wins: 'فوز', winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
       curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: 'متابِعين', followingN: 'يتابع', memberSince: 'عضو منذ',
-      addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
+      whichOdd: 'مين الدخيل بينهم؟', addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
       matchResult: 'نتيجة المباراة', shareMatch: 'انسخ رابط المباراة', matchGone: 'المباراة هذي ما عادت موجودة', place1: 'الأول', placeN: 'المركز {n}', roundsN: '{n} جولات', openMatch: 'افتح',
       report: 'بلاغ', reportTitle: 'بلاغ عن {n}', reportWhy: 'وش المشكلة؟', r_cheat: 'غش', r_name: 'اسم مسيء', r_chat: 'إساءة بالدردشة', r_other: 'غير ذلك',
       reportDetails: 'تفاصيل (اختياري)', reportSent: 'وصلنا البلاغ، شكراً 🙏', suggestPlaceholder: 'وش تبي نضيف أو نغيّر؟',
@@ -102,7 +102,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       round: 'Round', spinning: "What's next?",
       type_bluff: 'The Bluff', desc_bluff: 'Write a convincing lie to fool everyone', type_number: 'Closest Number', desc_number: 'Guess the number — closest wins', type_blitz: 'True or False', desc_blitz: '3 quick statements — speed matters!',
       type_likely: "Who's Most Likely?", desc_likely: 'Vote for a friend… and side with the crowd', type_emoji: 'Emoji Decode', desc_emoji: '3 emoji puzzles — fastest wins',
-      type_spy: 'The Spy', desc_spy: "One of you is a spy who doesn't know the word… catch them! 🕵️",
+      type_odd: 'Odd One Out', desc_odd: "4 things, one does not belong — spot it fast", type_spy: 'The Spy', desc_spy: "One of you is a spy who doesn't know the word… catch them! 🕵️",
       category: 'Category', youAreSpy: "You're the SPY! 🕵️", spyHintSpy: 'Write a clue that makes them think you know the word', spyHintCivilian: 'Write a clue about the word without saying it',
       writeClue: 'Type your clue…', yourClue: 'Your clue', spyPickSuspect: "Who do you think is the spy? 🤔", spyWordIs: 'The word: {n}',
       guessWord: 'Guess the secret word (optional)', spyGuessBtn: 'Guess 🎯', guessSent: 'You guessed: {n}',
@@ -121,7 +121,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       kicked: 'You were removed from the room', confirmKick: 'Remove {n} from the room?', yes: 'Yes', cancel: 'Cancel', reconnecting: 'Connection lost… reconnecting', loading: 'Joining…', close: 'Got it', pokedYou: '{n} poked you 👉',
       power_peek: 'Peek', power_double: 'Double', powerOn: 'Active ✓', peekDone: 'Removed two wrong options 🔍', doubleDone: 'Your points this round ×2 💎', doubledBy: '💎 {n} used Double!',
       err_truth: "That's the real answer! Write a lie 😏", err_own: "You can't pick your own lie 😅", err_selfvote: "You can't vote for yourself 😅", err_noroom: "Room doesn't exist", err_full: 'Room is full', err_nan: 'Enter a valid number', err_empty: 'Type something first', err_late: "Time's up ⏰", err_host: 'Host only', err_dup: 'Already used', err_nopower: 'No uses left', err_nopeek: 'Peek only works while choosing 🔍', err_bad: 'Invalid choice', err_signin: 'Sign in with Discord first',
-      g_correct: 'Correct answer', g_fooled: 'Fooled players', g_betLoss: 'Lost bet', g_streak: 'Streak 🔥', g_bullseye: 'Bullseye 🎯', g_closest: 'Closest', g_second: '2nd closest', g_third: '3rd closest', g_blitz: 'Correct answers', g_emoji: 'Correct answers', g_speed: 'Speed bonus', g_fastest: 'Fastest ⚡', g_jackpot: 'Jackpot 🎁', g_majority: 'With the crowd 👥', g_famous: 'Crowd pick 🌟', g_double: 'Double 💎', g_spyCatch: 'Caught the spy', g_spyEvade: 'Evaded capture', g_spyGuess: 'Guessed the word',
+      g_correct: 'Correct answer', g_fooled: 'Fooled players', g_betLoss: 'Lost bet', g_streak: 'Streak 🔥', g_bullseye: 'Bullseye 🎯', g_closest: 'Closest', g_second: '2nd closest', g_third: '3rd closest', g_blitz: 'Correct answers', g_emoji: 'Correct answers', g_odd: 'Correct answers', g_speed: 'Speed bonus', g_fastest: 'Fastest ⚡', g_jackpot: 'Jackpot 🎁', g_majority: 'With the crowd 👥', g_famous: 'Crowd pick 🌟', g_double: 'Double 💎', g_spyCatch: 'Caught the spy', g_spyEvade: 'Evaded capture', g_spyGuess: 'Guessed the word',
       a_liar: 'Master Liar', a_liar_d: 'Fooled {n} times', a_detective: 'Detective', a_detective_d: '{n} correct answers', a_sniper: 'Sniper', a_sniper_d: '{n} spot-on guesses', a_lightning: 'Lightning', a_lightning_d: 'Fastest {n} times', a_gambler: 'High Roller', a_gambler_d: 'Bet big {n} times', a_fire: 'On Fire', a_fire_d: '{n} streak 🔥', a_star: 'Crowd Favorite', a_star_d: 'Picked {n} times',
       ann_first: "You're #1! 👑", ann_combo: 'Combo ×{n} 🔥', ann_unstoppable: 'UNSTOPPABLE!! 🔥🔥', ann_legend: 'Legendary bluff! 😈', ann_perfect: 'Perfect! 3 of 3 ✨', ann_golden: 'GOLDEN ROUND! 👑',
       achievements: 'Achievements', achUnlocked: 'Achievement unlocked! 🏅',
@@ -145,7 +145,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       profile: 'Profile', leaderboard: 'Leaderboard', suggestBtn: 'Send a suggestion', about: 'About', adminPanel: 'Admin',
       rank: 'Rank', games: 'Games', wins: 'Wins', winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
       curStreak: 'Win streak', bestStreak: 'Longest streak', followers: 'Followers', followingN: 'Following', memberSince: 'Member since',
-      addBot: 'Add bot', soloHint: 'On your own? Add a bot, or just start — we will sit some down for you 🤖', discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
+      whichOdd: "Which one doesn't belong?", addBot: 'Add bot', soloHint: 'On your own? Add a bot, or just start — we will sit some down for you 🤖', discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
       matchResult: 'Match result', shareMatch: 'Copy match link', matchGone: 'That match is no longer around', place1: '1st', placeN: 'Place {n}', roundsN: '{n} rounds', openMatch: 'Open',
       report: 'Report', reportTitle: 'Report {n}', reportWhy: "What's wrong?", r_cheat: 'Cheating', r_name: 'Offensive name', r_chat: 'Abusive chat', r_other: 'Something else',
       reportDetails: 'Details (optional)', reportSent: 'Report received, thank you 🙏', suggestPlaceholder: 'What should we add or change?',
@@ -203,7 +203,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   const later = (ms, fn) => state.timeouts.push(setTimeout(fn, ms));
   function applyDir() { document.documentElement.lang = state.lang; document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr'; document.title = 'MAQLAB | مقلب'; }
 
-  const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', spy: '🕵️' };
+  const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', spy: '🕵️' };
   const MODS = { normal: '✨', double: '💎', speed: '⏱️', jackpot: '🎁', golden: '👑' };
   const AWARD_E = { liar: '🤥', detective: '🕵️', sniper: '🎯', lightning: '⚡', gambler: '🎲', fire: '🔥', star: '🌟' };
   const ACH = [['first_game', '🎮'], ['first_win', '🏆'], ['liar5', '🤥'], ['bull', '🎯'], ['streak4', '🔥'], ['allin', '🎲'], ['famous', '🌟'], ['speedy', '⚡'], ['games10', '🏅'], ['wins5', '👑']];
@@ -497,7 +497,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   }
 
   // ================= render =================
-  const STATIC = new Set(['spin', 'bluffReveal', 'numReveal', 'blitzResult', 'emojiResult', 'likelyReveal', 'spyReveal', 'scores', 'final']);
+  const STATIC = new Set(['spin', 'bluffReveal', 'numReveal', 'blitzResult', 'emojiResult', 'oddResult', 'likelyReveal', 'spyReveal', 'scores', 'final']);
   function screenKey() {
     const r = state.route, s = state.room;
     if (r.name === 'room' && s && state.code === r.code) return `room:${s.phase}:${s.gameNo}:${s.round}:${s.current && s.current.idx != null ? s.current.idx : ''}`;
@@ -546,7 +546,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     if (key === 'enter') return enterView();
     const views = {
       lobby: lobbyView, spin: spinView, write: writeView, vote: voteView, bluffReveal: bluffRevealView, guess: guessView, numReveal: numRevealView,
-      blitz: blitzView, blitzResult: blitzResultView, likelyVote: likelyVoteView, likelyReveal: likelyRevealView, emoji: emojiView, emojiResult: emojiResultView,
+      blitz: blitzView, blitzResult: blitzResultView, likelyVote: likelyVoteView, likelyReveal: likelyRevealView, emoji: emojiView, emojiResult: emojiResultView, odd: oddView, oddResult: oddResultView,
       spyClue: spyClueView, spyVote: spyVoteView, spyReveal: spyRevealView,
       scores: scoresView, final: finalView,
     };
@@ -581,7 +581,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   }
   function timerRing() {
     const s = state.room;
-    if (!s.deadline || !['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'spyClue', 'spyVote'].includes(s.phase)) return '<div style="width:48px"></div>';
+    if (!s.deadline || !['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'spyClue', 'spyVote'].includes(s.phase)) return '<div style="width:48px"></div>';
     return `<div class="timer" data-deadline="${s.deadline}"><svg viewBox="0 0 48 48"><circle class="track" cx="24" cy="24" r="20"/><circle class="prog" cx="24" cy="24" r="20" stroke-dasharray="125.66" stroke-dashoffset="0"/></svg><span>0</span></div>`;
   }
   function gameTop() {
@@ -616,7 +616,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     const s = state.room, c = s.current, m = me();
     if (!m || !m.powers) return '';
     const doubled = c.doubled.includes(m.id);
-    const peekable = (s.phase === 'vote' && !c.myVote) || (s.phase === 'emoji' && c.myAnswer == null);
+    const peekable = (s.phase === 'vote' && !c.myVote) || ((s.phase === 'emoji' || s.phase === 'odd') && c.myAnswer == null);
     const peekUsedNow = c.options && c.options.some(o => o.hidden);
     return `<div class="powers">
       <button class="pw peek" data-act="power" data-k="peek" ${!m.powers.peek || !peekable || peekUsedNow ? 'disabled' : ''}><span class="e">🔍</span><b>${t('power_peek')}</b><i>×${m.powers.peek}</i></button>
@@ -1030,6 +1030,30 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     </div></div></div></div>`;
   }
 
+  // ---------- odd one out ----------
+  function oddView() {
+    const c = state.room.current, a = c.myAnswer;
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      ${quickDots(c)}
+      <div class="q-card glass"><span class="type-tag odd">${TYPES.odd} ${t('type_odd')}</span><div class="q">${t('whichOdd')}</div></div>
+      <div class="timebar"><i data-bar="${state.room.deadline}"></i></div>
+      <div class="grid4">${c.options.map((o, i) => `<button class="opt ${o.hidden ? 'gone' : ''} ${a === o.id ? 'picked' : ''}" style="animation-delay:${i * 60}ms" data-act="odd" data-id="${o.id}" ${a != null || o.hidden ? 'disabled' : ''}>${o.hidden ? '<span class="tag">🔍</span>' : ''}${esc(o.text)}</button>`).join('')}</div>
+      ${powerBar()}
+      ${a != null ? `<div class="center muted" style="margin-top:14px"><span class="dots">${t('waitOthers')}</span></div>` : ''}
+      ${whoRow(c.answered)}
+    </div></div></div></div>`;
+  }
+  function oddResultView() {
+    const c = state.room.current;
+    const right = c.options.find(o => o.id === c.correctId);
+    // The reason is the payoff: without it a wrong guess just feels unfair.
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      ${quickDots(c, true)}
+      <div class="q-card glass"><span class="type-tag odd">${TYPES.odd} ${t('type_odd')}</span><div class="q">${t('whichOdd')}</div></div>
+      ${quickResult(c, `<div class="verdict t">${esc(right ? right.text : '')}</div><div class="why">${esc(c.why || '')}</div>${imgSearch(right ? right.text : '')}`)}
+    </div></div></div></div>`;
+  }
+
   // ---------- who's most likely ----------
   function likelyVoteView() {
     const c = state.room.current, v = c.myVote;
@@ -1255,7 +1279,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   function mountHooks() {
     const s = state.room;
     if (!s || state.route.name !== 'room') return;
-    ({ spin: mountSpin, bluffReveal: mountBluffReveal, numReveal: mountNumReveal, blitzResult: mountQuickResult, emojiResult: mountQuickResult, likelyReveal: mountLikelyReveal, spyReveal: mountSpyReveal, scores: mountScores, final: mountFinal }[s.phase] || (() => {}))();
+    ({ spin: mountSpin, bluffReveal: mountBluffReveal, numReveal: mountNumReveal, blitzResult: mountQuickResult, emojiResult: mountQuickResult, oddResult: mountQuickResult, likelyReveal: mountLikelyReveal, spyReveal: mountSpyReveal, scores: mountScores, final: mountFinal }[s.phase] || (() => {}))();
   }
 
   // ---------- reactions ----------
@@ -1879,6 +1903,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     async vote(el) { sfx.send(); buzz(20); await emit('vote', { id: el.dataset.id, bet: state.bet }); },
     async tf(el) { sfx.send(); buzz(20); await emit('blitz', el.dataset.v === '1'); },
     async emoji(el) { sfx.send(); buzz(20); await emit('emoji', el.dataset.id); },
+    async odd(el) { sfx.send(); buzz(20); await emit('odd', el.dataset.id); },
     async likely(el) { sfx.send(); buzz(20); await emit('likely', el.dataset.id); },
     async spyvote(el) { sfx.send(); buzz(20); await emit('spyVote', el.dataset.id); },
     async power(el) {

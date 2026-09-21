@@ -67,6 +67,23 @@ const SHAPES = {
       seen.add(k);
     }
   },
+  odd: (x, i) => {
+    bilingual(x.odd, 'odd', i, 'odd');
+    bilingual(x.why, 'odd', i, 'why');
+    if (!Array.isArray(x.rest) || x.rest.length !== 3) return err('odd', i, 'needs exactly 3 others');
+    x.rest.forEach((r, j) => bilingual(r, 'odd', i, `rest[${j}]`));
+    const seen = new Set([norm(x.odd && x.odd.ar)]);
+    for (const r of x.rest) {
+      const k = norm(r.ar);
+      if (seen.has(k)) err('odd', i, `option "${r.ar}" appears twice`);
+      seen.add(k);
+    }
+    // The reason must not name the odd one out, or the reveal spoils itself
+    // the moment anyone reads ahead.
+    for (const lang of ['ar', 'en']) {
+      if (norm(x.why[lang]).includes(norm(x.odd[lang]))) err('odd', i, `why (${lang}) gives away the answer`);
+    }
+  },
   spy: (x, i) => { bilingual(x.cat, 'spy', i, 'cat'); bilingual(x.w, 'spy', i, 'w'); },
 };
 
@@ -77,6 +94,7 @@ const KEYS = {
   blitz: x => [norm(x.s && x.s.ar), norm(x.s && x.s.en)],
   likely: x => [norm(x.ar), norm(x.en)],
   emoji: x => [x.e, norm(x.a && x.a.ar)],
+  odd: x => [norm(x.odd && x.odd.ar), norm(x.odd && x.odd.en)],
   spy: x => [norm(x.w && x.w.ar), norm(x.w && x.w.en)],
 };
 
@@ -150,12 +168,14 @@ function bias(bank, list) {
 
   // A 4-option question is exploitable when the right answer is visibly the
   // longest — players learn to pick the long one without reading.
-  if (bank === 'emoji') {
+  if (bank === 'emoji' || bank === 'odd') {
     let exploitable = 0;
     for (const x of list) {
-      if (!x.a || !Array.isArray(x.d)) continue;
+      const right = bank === 'odd' ? x.odd : x.a;
+      const others = bank === 'odd' ? x.rest : x.d;
+      if (!right || !Array.isArray(others)) continue;
       for (const lang of ['ar', 'en']) {
-        const lens = [x.a[lang], ...x.d.map(d => d[lang])].map(s => String(s || '').length);
+        const lens = [right[lang], ...others.map(d => d[lang])].map(s => String(s || '').length);
         const [correct] = lens;
         const max = Math.max(...lens), min = Math.min(...lens);
         const mean = lens.reduce((a, b) => a + b, 0) / lens.length;
@@ -164,8 +184,8 @@ function bias(bank, list) {
       }
     }
     const pct = Math.round((exploitable / list.length) * 100);
-    if (pct > 15) warn(`emoji: ${pct}% of entries give the answer away by length (${exploitable}/${list.length}) — shorten the correct option or lengthen the distractors`);
-    else if (exploitable) console.log(`  emoji: ${exploitable} length-biased entries (${pct}%, under the 15% limit)`);
+    if (pct > 15) warn(`${bank}: ${pct}% of entries give the answer away by length (${exploitable}/${list.length}) — shorten the correct option or lengthen the others`);
+    else if (exploitable) console.log(`  ${bank}: ${exploitable} length-biased entries (${pct}%, under the 15% limit)`);
   }
 
   // If most statements are true, "always true" beats actually knowing.

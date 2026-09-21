@@ -715,3 +715,7 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 .pcard.is-bot { border-style: dashed; opacity: .92; }
 .pcard .bot-tag { position: absolute; top: -8px; inset-inline-start: -6px; font-size: 14px; filter: saturate(.8); }
 .pcard.empty[data-act="addbot"] { font-size: 22px; }
+
+/* odd one out */
+.type-tag.odd { background: rgba(120,200,160,.18); color: #7fe0b0; }
+.why { margin-top: 8px; font-size: 13px; color: var(--muted); font-weight: 700; }
