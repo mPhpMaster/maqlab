@@ -75,8 +75,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       phrases: ['ما راح تعرفها 😏', 'أنا الفايز 🏆', 'يا ساتر 😂', 'ركّز يا بطل!', 'كذّاب! 🤥', 'يلا بسرعة ⏰', 'حظ أوفر 😅', 'الله عليك 👏', 'مستحيل! 😱', 'صدقني هذي الصح 😇', 'خلاص تعبت 😴', 'انتقامي قادم 😈'],
       signIn: 'دخول بديسكورد', signInToPlay: 'سجّل دخولك بديسكورد عشان تلعب — اسمك وصورتك يجونك منه', signOut: 'تسجيل خروج', guestNote: 'تلعب كضيف — تقدمك ما ينحفظ', signedInAs: 'مسجّل باسم',
       profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
-      rank: 'الترتيب', games: 'ألعاب', wins: 'فوز', winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
-      curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: 'متابِعين', followingN: 'يتابع', memberSince: 'عضو منذ',
+      rank: 'الترتيب', games: { one: 'لعبة', two: 'لعبتان', few: 'ألعاب', many: 'لعبة', other: 'لعبة' }, wins: { one: 'فوز', two: 'فوزان', few: 'فوزات', many: 'فوز', other: 'فوز' }, winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
+      curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: { one: 'متابِع', two: 'متابِعان', few: 'متابِعين', many: 'متابِع', other: 'متابِع' }, followingN: 'يتابع', memberSince: 'عضو منذ',
       whichOdd: 'مين الدخيل بينهم؟', type_order: 'رتّبها', desc_order: 'رتّب ٤ أشياء… كل جارَين بالترتيب الصح لك نقاط', clear: 'امسح', lockIn: 'ثبّت الترتيب ✅', pickAll: 'باقي {n}', youSaid: 'حطيتها {n}', perfectOrder: 'ترتيب مثالي! 🎯', pairsRight: '{n} من ٣ صح', g_orderPairs: 'ترتيب صحيح', g_orderPerfect: 'ترتيب مثالي 🎯', addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', tryAgain: 'جرّب مرة ثانية', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
       repRounds: 'جولات المباراة', repTruth: 'الإجابة الصحيحة', repHouse: 'خيار من اللعبة', repAnswer: 'الجواب',
       repNobody: 'ما أحد', repMostVotes: 'أكثر واحد صوّتوا له', repCaught: 'انكشف 🎯', repEscaped: 'نجا بجلده 😎',
@@ -146,8 +146,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       phrases: ["You'll never get it 😏", "I'm winning 🏆", 'LOL 😂', 'Focus!', 'Liar! 🤥', 'Hurry up ⏰', 'Better luck next time 😅', 'Nice one 👏', 'No way! 😱', "Trust me, that's it 😇", "I'm tired 😴", 'Revenge is coming 😈'],
       signIn: 'Sign in with Discord', signInToPlay: 'Sign in with Discord to play — your name comes from there', signOut: 'Sign out', guestNote: "Playing as a guest — progress isn't saved", signedInAs: 'Signed in as',
       profile: 'Profile', leaderboard: 'Leaderboard', suggestBtn: 'Send a suggestion', about: 'About', adminPanel: 'Admin',
-      rank: 'Rank', games: 'Games', wins: 'Wins', winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
-      curStreak: 'Win streak', bestStreak: 'Longest streak', followers: 'Followers', followingN: 'Following', memberSince: 'Member since',
+      rank: 'Rank', games: { one: 'Game', other: 'Games' }, wins: { one: 'Win', other: 'Wins' }, winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
+      curStreak: 'Win streak', bestStreak: 'Longest streak', followers: { one: 'Follower', other: 'Followers' }, followingN: 'Following', memberSince: 'Member since',
       whichOdd: "Which one doesn't belong?", type_order: 'Line Them Up', desc_order: 'Put 4 things in order — every neighbouring pair you get right scores', clear: 'Clear', lockIn: 'Lock it in ✅', pickAll: '{n} to go', youSaid: 'you said {n}', perfectOrder: 'Perfect order! 🎯', pairsRight: '{n} of 3 right', g_orderPairs: 'Right order', g_orderPerfect: 'Perfect order 🎯', addBot: 'Add bot', soloHint: 'On your own? Add a bot, or just start — we will sit some down for you 🤖', discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', tryAgain: 'Try again', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
       repRounds: 'Round by round', repTruth: 'the true answer', repHouse: 'filler option', repAnswer: 'Answer',
       repNobody: 'Nobody', repMostVotes: 'Most votes', repCaught: 'Caught 🎯', repEscaped: 'Got away 😎',
@@ -1839,14 +1839,14 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       <div class="stats-grid">
         ${tile(t('winRate'), rate + '%')}
         ${tile(t('totalScore'), fmt(p.total_score))}
-        ${tile(t('games'), fmt(games))}
-        ${tile(t('wins'), fmt(p.wins))}
+        ${tile(t('games', { n: games }), fmt(games))}
+        ${tile(t('wins', { n: p.wins }), fmt(p.wins))}
         ${tile(t('bestScore'), fmt(p.best_score))}
         ${tile(t('curStreak'), '🔥 ' + fmt(p.win_streak))}
         ${tile(t('bestStreak'), fmt(p.best_win_streak))}
         ${tile(t('achievements'), `${fmt(ach)}/24`)}
       </div>
-      <div class="section-title"><span>${t('lastGames')}</span><span class="chip">${t('followers')} ${fmt(d.follows.followers)} · ${t('followingN')} ${fmt(d.follows.following)}</span></div>
+      <div class="section-title"><span>${t('lastGames')}</span><span class="chip">${fmt(d.follows.followers)} ${t('followers', { n: d.follows.followers })} · ${t('followingN')} ${fmt(d.follows.following)}</span></div>
       ${trend}
       ${history}
       <div class="row" style="margin-top:16px;flex-wrap:wrap">
@@ -1987,7 +1987,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
           timer = setTimeout(async () => {
             const r = await post('/api/admin/action', { action: 'search', term: q.value });
             m.querySelector('#adm-results').innerHTML = (r.results || []).map(u =>
-              `<div class="adm-row"><div class="grow"><b data-act="profile" data-uid="${esc(u.user_id)}">${esc(u.name)}</b><small>${fmt(u.games)} ${t('games')} · ${fmt(u.total_score)}</small></div>
+              `<div class="adm-row"><div class="grow"><b data-act="profile" data-uid="${esc(u.user_id)}">${esc(u.name)}</b><small>${fmt(u.games)} ${t('games', { n: u.games })} · ${fmt(u.total_score)}</small></div>
                <button class="btn sm ${u.banned_at ? 'mint' : 'coral'}" data-adm="${u.banned_at ? 'unban' : 'ban'}" data-id="${esc(u.user_id)}" data-name="${esc(u.name)}">${u.banned_at ? t('unban') : t('ban')}</button></div>`).join('');
           }, 350);
         });

@@ -66,8 +66,9 @@ test('every plural string carries the forms its language needs', () => {
 test('the winner announcement is not shadowed by the profile label again', () => {
   assert.match(src, /winnerIs: '\{n\} wins! 🏆'/, 'the English announcement key is gone');
   assert.match(src, /t\('winnerIs', \{ n: esc\(ranked\[0\]\.name\) \}\)/, 'the final screen does not use it');
-  // the label it used to collide with must still exist on its own
-  assert.match(src, /wins: 'Wins'/, 'the profile label went missing');
+  // the label it used to collide with must still exist on its own, and it is
+  // now a plural object too, so the profile reads "1 Win" not "1 Wins"
+  assert.match(src, /wins: \{ one: 'Win', other: 'Wins' \}/, 'the profile label went missing');
 });
 
 // Counts reach t() already formatted — Arabic-Indic digits and separators.
@@ -97,4 +98,15 @@ test('an Arabic count of three picks the few form, not the fallback', () => {
   assert.equal(PLURAL.ar(countOf('٣')), 'few');
   assert.equal(PLURAL.ar(countOf('١١')), 'many');
   assert.equal(PLURAL.ar(countOf('٢')), 'two');
+});
+
+test('stat labels agree with the number shown above them', () => {
+  for (const key of ['games', 'wins', 'followers']) {
+    const objs = [...src.matchAll(new RegExp(key + ": \{ one: .*? \}", 'g'))].map(m => m[0]);
+    assert.equal(objs.length, 2, `${key} should be a plural object in both languages`);
+  }
+  // and every call site says which count it is labelling
+  assert.match(src, /t\('games', \{ n: games \}\)/, 'the games tile lost its count');
+  assert.match(src, /t\('wins', \{ n: p\.wins \}\)/, 'the wins tile lost its count');
+  assert.match(src, /t\('followers', \{ n: d\.follows\.followers \}\)/, 'the follower count lost its count');
 });
