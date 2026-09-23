@@ -11,6 +11,7 @@ const auth = require('./auth');
 const achievements = require('./achievements');
 const { matchAnswerCase } = require('./text');
 const bots = require('./bots');
+const replay = require('./replay');
 
 const PORT = process.env.PORT || 3000;
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
@@ -433,7 +434,7 @@ function createRoom() {
     code: newCode(), hostId: null, phase: 'lobby',
     settings: { lang: 'en', rounds: 8, types: { bluff: true, number: true, blitz: true, likely: true, emoji: true, odd: true, order: true, spy: true }, pace: 'normal', teams: false, public: true },
     players: new Map(), round: 0, gameNo: 0, current: null, deadline: null, timer: null,
-    used: {}, plan: [], gains: {}, prevRank: {}, awards: [], bestLie: null, pairs: {}, rivals: {}, touched: Date.now(),
+    used: {}, plan: [], gains: {}, prevRank: {}, awards: [], bestLie: null, pairs: {}, rivals: {}, log: [], touched: Date.now(),
     balloon: { size: 0, target: 20 + rnd(20), pops: {} },
   };
   rooms.set(room.code, room);
@@ -498,7 +499,7 @@ function fillForSolo(room) {
 }
 
 function startGame(room) {
-  Object.assign(room, { round: 0, gameNo: room.gameNo + 1, gains: {}, awards: [], bestLie: null, used: {} });
+  Object.assign(room, { round: 0, gameNo: room.gameNo + 1, gains: {}, awards: [], bestLie: null, used: {}, log: [] });
   for (const p of room.players.values()) { p.score = 0; p.streak = 0; p.stats = freshStats(); p.powers = freshPowers(); }
   room.pairs = {}; room.rivals = {};
   for (const p of room.players.values()) p.ready = false;
@@ -949,6 +950,12 @@ const isRevealPhase = ph =>
 function showScores(room) {
   if (!isRevealPhase(room.phase)) return;
   if (room.phase === 'bluffReveal') payLaughs(room);
+  // Keep the round before the state moves on. This is the only point where
+  // every reveal has run and room.gains still holds this round alone.
+  if (room.log.length < replay.MAX_ROUNDS) {
+    const entry = replay.roundEntry(room, room.settings.lang);
+    if (entry) room.log.push(entry);
+  }
   room.phase = 'scores';
   setTimer(room, pace(room, 'scores'), () => nextRound(room));
   broadcast(room);
@@ -974,6 +981,18 @@ async function recordResults(room) {
   // Every row of this game shares one id, so /match/<id> can gather them back
   // into a single scoreboard that anyone holding the link can open.
   const matchId = crypto.randomUUID();
+  // Saved before the per-player rows, and separately from them, because the
+  // replay has to hold everyone who played — guests and bots included — and
+  // game_results only ever has rows for accounts.
+  try {
+    await db.saveMatch({
+      id: matchId, roomCode: room.code, gameNo: room.gameNo,
+      lang: room.settings.lang, rounds: room.settings.rounds,
+      data: { v: 1, players: replay.roster(ranked), log: room.log },
+    });
+  } catch (e) {
+    console.error('could not save match replay', e.message);
+  }
   for (let i = 0; i < ranked.length; i++) {
     const p = ranked[i];
     if (!p.userId) continue;
@@ -1469,16 +1488,30 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 app.get('/api/match/:id', async (req, res) => {
   if (needsDb(res)) return;
   if (!UUID.test(req.params.id)) return res.status(404).json({ error: 'not_found' });
-  const rows = await db.getMatch(req.params.id);
-  if (!rows.length) return res.status(404).json({ error: 'not_found' });
+  const [rows, rep] = await Promise.all([db.getMatch(req.params.id), db.getReplay(req.params.id)]);
+  if (!rows.length && !rep) return res.status(404).json({ error: 'not_found' });
+  // The replay's roster is the whole table; game_results is only the accounts.
+  // Games finished before replays existed have no roster, so fall back to it.
+  let players;
+  if (rep) {
+    const top = Math.max(0, ...rep.data.players.map(p => p.score));
+    players = rep.data.players.map(p => ({
+      userId: p.userId, pid: p.pid, name: p.name, avatar: p.avatar, bot: !!p.bot,
+      score: p.score, place: p.place, won: p.score > 0 && p.score === top,
+    }));
+  } else {
+    players = rows.map(r => ({
+      userId: r.user_id, pid: null, name: r.name, avatar: r.avatar, bot: false,
+      score: r.score, place: r.place, won: r.won,
+    }));
+  }
   res.json({
     id: req.params.id,
-    finishedAt: rows[0].finished_at,
-    rounds: rows[0].rounds,
-    players: rows.map(r => ({
-      userId: r.user_id, name: r.name, avatar: r.avatar,
-      score: r.score, place: r.place, won: r.won,
-    })),
+    finishedAt: rep ? rep.finished_at : rows[0].finished_at,
+    rounds: rep ? rep.rounds : rows[0].rounds,
+    lang: rep ? rep.lang : null,
+    players,
+    log: rep ? rep.data.log || [] : null,
   });
 });
 

@@ -105,3 +105,17 @@ create table if not exists suggestions (
   handled_by text,
   check (char_length(body) between 3 and 2000)
 );
+
+-- The full record of one finished game: every question, every answer players
+-- typed, every vote. game_results keeps the score; this keeps the match, and
+-- it is what /match/<id> replays. Guests and bots are in here too, because a
+-- round whose winning lie was written by a guest is unreadable without them.
+create table if not exists matches (
+  id          uuid primary key,
+  room_code   text not null,
+  game_no     integer not null,
+  lang        text not null default 'en',
+  rounds      integer not null,
+  data        jsonb not null,
+  finished_at timestamptz not null default now()
+);

@@ -128,6 +128,15 @@ const getMatch = matchId =>
        from game_results r left join profiles p on p.user_id = r.user_id
       where r.match_id = $1 order by r.place asc`, [matchId]).then(r => r.rows);
 
+// The round-by-round record of one game: the questions, what everyone wrote
+// and how every vote fell. Written once, when the game ends.
+const saveMatch = ({ id, roomCode, gameNo, lang, rounds, data }) =>
+  q(`insert into matches (id, room_code, game_no, lang, rounds, data)
+     values ($1,$2,$3,$4,$5,$6) on conflict (id) do nothing`,
+    [id, roomCode, gameNo, lang, rounds, JSON.stringify(data)]);
+
+const getReplay = id => one('select * from matches where id = $1', [id]);
+
 // ---------------- social ----------------
 const follow = (followerId, followeeId) =>
   q(`insert into follows (follower_id, followee_id) values ($1,$2) on conflict do nothing`, [followerId, followeeId]);
@@ -189,7 +198,7 @@ const searchProfiles = term =>
     [`%${term.replace(/[%_\\]/g, m => '\\' + m)}%`, term]).then(r => r.rows);
 
 module.exports = {
-  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, recordGame, addAchievements, getMatch,
+  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, recordGame, addAchievements, getMatch, saveMatch, getReplay,
   follow, unfollow, following, followCounts, isFollowing,
   createReport, createSuggestion,
   isBanned, setBan, unban, resetProfile,

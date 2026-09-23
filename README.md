@@ -52,7 +52,7 @@ Two round types need company: "who's most likely" needs three people before it i
 A bot is an ordinary player with no socket. It reaches the game only through the same submit functions a human uses, so it cannot skip a check a human cannot skip and never sees more than its own view would show — a bot spy guesses from the category alone, exactly like a human one.
 
 ## Accounts and profiles
-Players sign in with Discord — there is no typed name, so nobody can sit down as someone else. Signing in gives you a profile with lifetime stats, achievements, a place on the leaderboard, and your last five matches. Any finished match has its own shareable page at `/match/<id>` that anyone can open, whether or not they were in the room.
+Players sign in with Discord — there is no typed name, so nobody can sit down as someone else. Signing in gives you a profile with lifetime stats, achievements, a place on the leaderboard, and your last five matches. Any finished match has its own shareable page at `/match/<id>` that anyone can open, whether or not they were in the room. It is the whole match, not just the final table: open a round and you get the question, the true answer, every lie somebody wrote and who fell for it, every guess, every vote, and what the round was worth. Guests and bots are in there too — a round whose winning lie was written by a guest would be unreadable without them. Nothing on that page was private: every line of it was on screen for the whole room when the round was revealed.
 
 ## 🎮 Running it as a Discord Activity
 The game runs inside Discord (launched from the rocket 🚀 button in a voice channel) — everyone in that channel lands in the same room automatically, and their names come from their Discord accounts.
@@ -76,9 +76,10 @@ The game runs inside Discord (launched from the rocket 🚀 button in a voice ch
 ## Files
 - `server.js`: the game engine (rooms, round scheduling, scoring, powers, titles)
 - `content.js`: all the content in English and Arabic — 843 questions (bluff 157, numbers 125, true/false 152, most likely 117, emoji 106, odd one out 45, line them up 30, spy 111). `npm run check` validates the banks for duplicates, schema, and answers that give themselves away by length.
-- `db.js` + `db/schema.sql`: profiles, match results, follows, reports, suggestions
+- `db.js` + `db/schema.sql`: profiles, match results, match replays, follows, reports, suggestions
 - `auth.js`: signed session tokens, Discord sign-in, admin checks
 - `bots.js`: what a bot does in each round (the server decides when)
+- `replay.js`: what is kept from each round so `/match/<id>` can replay it
 - `public/`: the front end (`app.js`, `avatar.js` for the characters, `style.css`, `discord.js` for the Discord Activity integration)
 
 ---
@@ -137,7 +138,7 @@ npm start          # http://localhost:3000
 البوت لاعب عادي بلا سوكِت. ما يوصل للعبة إلا من نفس الدوال اللي يمر منها الإنسان، فما يقدر يتجاوز تحققاً ولا يشوف أكثر من نصيبه — والبوت لما يصير جاسوساً يخمّن من الفئة فقط، تماماً مثل الإنسان.
 
 ## الحسابات والبروفايلات
-الدخول عن طريق ديسكورد، وما فيه اسم يُكتب باليد — يعني ما أحد يقدر يدخل باسم غيره. تسجيل الدخول يعطيك بروفايل فيه إحصائياتك، وإنجازاتك، ومركزك في لوحة الترتيب، وآخر ٥ مباريات. كل مباراة خلصت لها صفحة خاصة على `‎/match/<id>` تقدر تشاركها مع أي أحد حتى لو ما كان معكم بالغرفة.
+الدخول عن طريق ديسكورد، وما فيه اسم يُكتب باليد — يعني ما أحد يقدر يدخل باسم غيره. تسجيل الدخول يعطيك بروفايل فيه إحصائياتك، وإنجازاتك، ومركزك في لوحة الترتيب، وآخر ٥ مباريات. كل مباراة خلصت لها صفحة خاصة على `‎/match/<id>` تقدر تشاركها مع أي أحد حتى لو ما كان معكم بالغرفة. وهي المباراة كاملة مو بس جدول النتائج: تفتح أي جولة وتشوف السؤال، والإجابة الصحيحة، وكل كذبة كتبها أحد ومين وقع فيها، وكل تخمين، وكل تصويت، وكم كانت تسوى الجولة. الضيوف والبوتات موجودين برضه — جولة أحلى كذبة فيها كتبها ضيف ما تنقرأ بدونهم. وما فيه شي بالصفحة كان مخفي: كل سطر فيها كان معروضاً على الغرفة كلها وقت كشف الجولة.
 
 ## 🎮 تشغيلها كـ Discord Activity
 اللعبة تشتغل جوّا ديسكورد (تفتح من زر الروكيت 🚀 في قناة صوتية) — كل الشلة اللي بنفس القناة تدخل نفس الغرفة تلقائياً، وأسماؤهم تنسحب من حساباتهم في ديسكورد بدون ما يكتبونها. الخطوات الكاملة موجودة في القسم الإنجليزي فوق.

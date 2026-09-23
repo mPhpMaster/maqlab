@@ -78,6 +78,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       rank: 'الترتيب', games: 'ألعاب', wins: 'فوز', winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
       curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: 'متابِعين', followingN: 'يتابع', memberSince: 'عضو منذ',
       whichOdd: 'مين الدخيل بينهم؟', type_order: 'رتّبها', desc_order: 'رتّب ٤ أشياء… كل جارَين بالترتيب الصح لك نقاط', clear: 'امسح', lockIn: 'ثبّت الترتيب ✅', pickAll: 'باقي {n}', youSaid: 'حطيتها {n}', perfectOrder: 'ترتيب مثالي! 🎯', pairsRight: '{n} من ٣ صح', g_orderPairs: 'ترتيب صحيح', g_orderPerfect: 'ترتيب مثالي 🎯', addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
+      repRounds: 'جولات المباراة', repTruth: 'الإجابة الصحيحة', repHouse: 'خيار من اللعبة', repAnswer: 'الجواب',
+      repNobody: 'ما أحد', repMostVotes: 'أكثر واحد صوّتوا له', repCaught: 'انكشف 🎯', repEscaped: 'نجا بجلده 😎',
+      repSpyGuess: 'تخمين الجاسوس', repRoundPts: 'نقاط الجولة', repCorrect: 'الترتيب الصحيح',
       matchResult: 'نتيجة المباراة', shareMatch: 'انسخ رابط المباراة', matchGone: 'المباراة هذي ما عادت موجودة', place1: 'الأول', placeN: 'المركز {n}', roundsN: '{n} جولات', openMatch: 'افتح',
       report: 'بلاغ', reportTitle: 'بلاغ عن {n}', reportWhy: 'وش المشكلة؟', r_cheat: 'غش', r_name: 'اسم مسيء', r_chat: 'إساءة بالدردشة', r_other: 'غير ذلك',
       reportDetails: 'تفاصيل (اختياري)', reportSent: 'وصلنا البلاغ، شكراً 🙏', suggestPlaceholder: 'وش تبي نضيف أو نغيّر؟',
@@ -146,6 +149,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       rank: 'Rank', games: 'Games', wins: 'Wins', winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
       curStreak: 'Win streak', bestStreak: 'Longest streak', followers: 'Followers', followingN: 'Following', memberSince: 'Member since',
       whichOdd: "Which one doesn't belong?", type_order: 'Line Them Up', desc_order: 'Put 4 things in order — every neighbouring pair you get right scores', clear: 'Clear', lockIn: 'Lock it in ✅', pickAll: '{n} to go', youSaid: 'you said {n}', perfectOrder: 'Perfect order! 🎯', pairsRight: '{n} of 3 right', g_orderPairs: 'Right order', g_orderPerfect: 'Perfect order 🎯', addBot: 'Add bot', soloHint: 'On your own? Add a bot, or just start — we will sit some down for you 🤖', discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
+      repRounds: 'Round by round', repTruth: 'the true answer', repHouse: 'filler option', repAnswer: 'Answer',
+      repNobody: 'Nobody', repMostVotes: 'Most votes', repCaught: 'Caught 🎯', repEscaped: 'Got away 😎',
+      repSpyGuess: "Spy's guess", repRoundPts: 'Round points', repCorrect: 'Correct order',
       matchResult: 'Match result', shareMatch: 'Copy match link', matchGone: 'That match is no longer around', place1: '1st', placeN: 'Place {n}', roundsN: '{n} rounds', openMatch: 'Open',
       report: 'Report', reportTitle: 'Report {n}', reportWhy: "What's wrong?", r_cheat: 'Cheating', r_name: 'Offensive name', r_chat: 'Abusive chat', r_other: 'Something else',
       reportDetails: 'Details (optional)', reportSent: 'Report received, thank you 🙏', suggestPlaceholder: 'What should we add or change?',
@@ -1609,6 +1615,103 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   };
   const medal = n => (n === 1 ? '🥇' : n === 2 ? '🥈' : n === 3 ? '🥉' : '#' + n);
 
+  // The match itself, round by round: every question, every lie somebody
+  // wrote, every vote. All of it was on screen during the game — this is the
+  // same thing, kept. Rounds start collapsed so the scoreboard stays the first
+  // thing you see; opening one is the point of the page.
+  function replayHtml(d) {
+    if (!d.log || !d.log.length) return '';
+    const by = {};
+    for (const p of d.players) if (p.pid) by[p.pid] = p;
+    const who = pid => by[pid] || null;
+    // A player, as a small avatar-and-name pill. `tail` is whatever they did:
+    // the option they picked, the number they guessed, their bet.
+    const chip = (pid, cls, tail) => {
+      const p = who(pid);
+      return `<span class="repp ${cls || ''}">${J(p && p.avatar ? p.avatar : {})}${esc(p ? p.name : '—')}${
+        tail ? ` <b>${esc(String(tail))}</b>` : ''}</span>`;
+    };
+    const chips = (ids, cls) => (ids.length ? ids.map(i => chip(i, cls)).join('') : `<span class="by">${t('repNobody')}</span>`);
+    const line = (main, note, right, cls) => `<div class="repo ${cls || ''}">
+      <span class="txt">${main}</span>${note ? `<span class="by">${note}</span>` : ''}
+      ${right ? `<span class="repw">${right}</span>` : ''}</div>`;
+
+    const bluff = r => r.options.map(o => {
+      const voters = Object.entries(r.votes || {})
+        .filter(([, v]) => v.id === o.id)
+        .map(([pid, v]) => chip(pid, o.truth ? 'ok' : 'no', v.bet > 1 ? '×' + v.bet : ''));
+      const note = o.truth ? `✅ ${t('repTruth')}`
+        : o.house ? t('repHouse')
+        : `✍️ ${esc(o.authors.map(a => (who(a) || {}).name || '—').join('، '))}`;
+      return line(esc(o.text), note, voters.join(''), o.truth ? 'ok' : '');
+    }).join('');
+
+    const number = r => line(fmt(r.answer), t('repAnswer'), '', 'ok') +
+      Object.entries(r.guesses || {})
+        .sort((a, b) => Math.abs(a[1] - r.answer) - Math.abs(b[1] - r.answer))
+        .map(([pid, g]) => line(chip(pid, (r.bulls || []).includes(pid) ? 'ok' : ''), '', `<b>${fmt(g)}</b>${(r.bulls || []).includes(pid) ? ' 🎯' : ''}`))
+        .join('');
+
+    const likely = r => line(chips(r.winners || [], 'ok'), t('repMostVotes'), '', 'ok') +
+      Object.entries(r.votes || {}).map(([pid, target]) =>
+        line(chip(pid), '→', chip(target, (r.winners || []).includes(target) ? 'ok' : ''))).join('');
+
+    const spy = r =>
+      line(`🕵️ ${chip(r.spyId)}`, r.caught ? t('repCaught') : t('repEscaped'), '', r.caught ? 'ok' : 'no') +
+      Object.entries(r.clues || {}).map(([pid, clue]) =>
+        line(chip(pid, pid === r.spyId ? 'no' : ''), '', `<b>${esc(clue)}</b>`)).join('') +
+      Object.entries(r.votes || {}).map(([pid, target]) =>
+        line(chip(pid), '→', chip(target, target === r.spyId ? 'ok' : ''))).join('') +
+      (r.guess ? line(esc(r.guess), t('repSpyGuess'), r.guessRight ? '✅' : '❌', r.guessRight ? 'ok' : '') : '');
+
+    // blitz, emoji and odd are one shape: a few items, one right answer each.
+    const quick = (r, type) => r.items.map(it => {
+      const said = a => (type === 'blitz' ? (a.v ? t('true') : t('false'))
+        : (it.opts.find(o => o.id === a.id) || {}).text || '—');
+      const head = type === 'blitz' ? esc(it.text)
+        : type === 'emoji' ? `<span style="font-size:22px">${esc(it.e)}</span>`
+        : it.opts.map(o => esc(o.text)).join(' · ');
+      const right = type === 'blitz' ? (it.truth ? t('true') : t('false'))
+        : (it.opts.find(o => o.id === it.correctId) || {}).text || '';
+      const answers = Object.entries(it.answers || {})
+        .map(([pid, a]) => chip(pid, a.ok ? 'ok' : 'no', said(a)));
+      return `<div class="repi">${line(head, '', '', '')}
+        ${line(`✅ ${esc(right)}`, type === 'odd' ? esc(it.why) : '', answers.join('') || `<span class="by">${t('repNobody')}</span>`, 'ok')}</div>`;
+    }).join('');
+
+    const order = r => {
+      const text = {};
+      for (const it of r.items) text[it.id] = it;
+      const seq = ids => ids.map(id => esc((text[id] || {}).text || '?')).join(' › ');
+      return line(seq(r.truth), t('repCorrect'), '', 'ok') +
+        r.truth.map((id, i) => line(`${i + 1}. ${esc((text[id] || {}).text || '?')}`, '', `<b>${fmt((text[id] || {}).v)}</b>`)).join('') +
+        Object.entries(r.orders || {}).map(([pid, s]) => line(chip(pid), '', `<b>${seq(s)}</b>`)).join('');
+    };
+
+    // The question is the summary line, so it is not repeated in the body.
+    const bodyFor = r =>
+      (r.type === 'spy' ? `<div class="repq">${esc(r.word)} <span class="by">· ${esc(r.cat)}</span></div>` : '') +
+      (r.type === 'bluff' ? bluff(r)
+        : r.type === 'number' ? number(r)
+        : r.type === 'likely' ? likely(r)
+        : r.type === 'spy' ? spy(r)
+        : r.type === 'order' ? order(r)
+        : quick(r, r.type));
+
+    const rounds = d.log.map(r => {
+      const pts = Object.entries(r.pts || {}).sort((a, b) => b[1] - a[1])
+        .map(([pid, n]) => chip(pid, n > 0 ? 'ok' : 'no', (n > 0 ? '+' : '') + fmt(n)));
+      const head = r.type === 'spy' ? t('type_spy') : r.q || t('type_' + r.type);
+      return `<details class="rep">
+        <summary><span class="rn">${r.n}</span><span>${TYPES[r.type] || ''} ${MODS[r.mod] || ''}</span>
+          <span class="rq">${esc(head)}</span></summary>
+        <div class="repbody">${bodyFor(r)}
+          ${pts.length ? line(`<span class="by">${t('repRoundPts')}</span>`, '', pts.join('')) : ''}</div>
+      </details>`;
+    }).join('');
+    return `<div style="margin-top:14px"><div class="muted" style="font-size:12px;font-weight:800;margin-bottom:4px">${t('repRounds')}</div>${rounds}</div>`;
+  }
+
   // The scoreboard of one finished game. Reachable from a profile and from a
   // /match/<id> link, which is the whole point — it has to stand on its own
   // for someone who was never in the room.
@@ -1623,14 +1726,17 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     }
     const url = `${location.origin}/match/${d.id}`;
     const rows = d.players.map(g => `
-      <div class="brow ${g.won ? 'me' : ''}" data-mt-uid="${esc(g.userId)}">
+      <div class="brow ${g.won ? 'me' : ''}" ${g.userId ? `data-mt-uid="${esc(g.userId)}"` : ''}>
         <span class="rk">${medal(g.place)}</span>${J(g.avatar && g.avatar.s != null ? g.avatar : {})}
-        <span class="nm">${esc(g.name || '—')}</span>
+        <span class="nm">${esc(g.name || '—')}${g.bot ? ' 🤖' : ''}</span>
         <span class="sc">${fmt(g.score)}</span>
       </div>`).join('');
     modal(`<h3>🏁 ${t('matchResult')}</h3>
       <div class="center muted" style="font-size:12px;margin-bottom:10px">${shortDate(d.finishedAt)} · ${t('roundsN', { n: d.rounds })}</div>
-      <div class="board" style="max-height:52vh;overflow-y:auto">${rows}</div>
+      <div style="max-height:56vh;overflow-y:auto">
+        <div class="board">${rows}</div>
+        ${replayHtml(d)}
+      </div>
       <div class="row" style="margin-top:14px">
         <button class="btn sm mint grow" data-mt="share">🔗 ${t('shareMatch')}</button>
         <button class="btn sm ghost grow" data-close>${t('close')}</button>
