@@ -77,7 +77,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
       rank: 'الترتيب', games: 'ألعاب', wins: 'فوز', winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
       curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: 'متابِعين', followingN: 'يتابع', memberSince: 'عضو منذ',
-      whichOdd: 'مين الدخيل بينهم؟', type_order: 'رتّبها', desc_order: 'رتّب ٤ أشياء… كل جارَين بالترتيب الصح لك نقاط', clear: 'امسح', lockIn: 'ثبّت الترتيب ✅', pickAll: 'باقي {n}', youSaid: 'حطيتها {n}', perfectOrder: 'ترتيب مثالي! 🎯', pairsRight: '{n} من ٣ صح', g_orderPairs: 'ترتيب صحيح', g_orderPerfect: 'ترتيب مثالي 🎯', addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
+      whichOdd: 'مين الدخيل بينهم؟', type_order: 'رتّبها', desc_order: 'رتّب ٤ أشياء… كل جارَين بالترتيب الصح لك نقاط', clear: 'امسح', lockIn: 'ثبّت الترتيب ✅', pickAll: 'باقي {n}', youSaid: 'حطيتها {n}', perfectOrder: 'ترتيب مثالي! 🎯', pairsRight: '{n} من ٣ صح', g_orderPairs: 'ترتيب صحيح', g_orderPerfect: 'ترتيب مثالي 🎯', addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', tryAgain: 'جرّب مرة ثانية', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
       repRounds: 'جولات المباراة', repTruth: 'الإجابة الصحيحة', repHouse: 'خيار من اللعبة', repAnswer: 'الجواب',
       repNobody: 'ما أحد', repMostVotes: 'أكثر واحد صوّتوا له', repCaught: 'انكشف 🎯', repEscaped: 'نجا بجلده 😎',
       repSpyGuess: 'تخمين الجاسوس', repRoundPts: 'نقاط الجولة', repCorrect: 'الترتيب الصحيح',
@@ -148,7 +148,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       profile: 'Profile', leaderboard: 'Leaderboard', suggestBtn: 'Send a suggestion', about: 'About', adminPanel: 'Admin',
       rank: 'Rank', games: 'Games', wins: 'Wins', winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
       curStreak: 'Win streak', bestStreak: 'Longest streak', followers: 'Followers', followingN: 'Following', memberSince: 'Member since',
-      whichOdd: "Which one doesn't belong?", type_order: 'Line Them Up', desc_order: 'Put 4 things in order — every neighbouring pair you get right scores', clear: 'Clear', lockIn: 'Lock it in ✅', pickAll: '{n} to go', youSaid: 'you said {n}', perfectOrder: 'Perfect order! 🎯', pairsRight: '{n} of 3 right', g_orderPairs: 'Right order', g_orderPerfect: 'Perfect order 🎯', addBot: 'Add bot', soloHint: 'On your own? Add a bot, or just start — we will sit some down for you 🤖', discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
+      whichOdd: "Which one doesn't belong?", type_order: 'Line Them Up', desc_order: 'Put 4 things in order — every neighbouring pair you get right scores', clear: 'Clear', lockIn: 'Lock it in ✅', pickAll: '{n} to go', youSaid: 'you said {n}', perfectOrder: 'Perfect order! 🎯', pairsRight: '{n} of 3 right', g_orderPairs: 'Right order', g_orderPerfect: 'Perfect order 🎯', addBot: 'Add bot', soloHint: 'On your own? Add a bot, or just start — we will sit some down for you 🤖', discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', tryAgain: 'Try again', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
       repRounds: 'Round by round', repTruth: 'the true answer', repHouse: 'filler option', repAnswer: 'Answer',
       repNobody: 'Nobody', repMostVotes: 'Most votes', repCaught: 'Caught 🎯', repEscaped: 'Got away 😎',
       repSpyGuess: "Spy's guess", repRoundPts: 'Round points', repCorrect: 'Correct order',
@@ -192,7 +192,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     meKnown: false,
     // Set only inside the Discord Activity, where cookies are unreliable and
     // the session has to ride along as a bearer token instead.
-    bearer: null, inDiscord: IN_DISCORD, discordDone: false, discordStage: '',
+    bearer: null, inDiscord: IN_DISCORD, discordDone: false, discordStage: '', discordError: null,
     lastKey: '', phaseTotal: 1, timeouts: [], editor: null,
   };
   state.draft.name = state.profile.name;
@@ -574,7 +574,19 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       // iframe — Discord blocks it and the player just gets a white page. In
       // there, signing in is the Activity's own job, so we say so instead of
       // offering a button that goes nowhere.
-      if (state.inDiscord) return `<div class="center muted" style="font-size:14px">${t('discordSignInBusy')}${state.discordStage ? ` <b>${esc(state.discordStage)}</b>` : ''}</div>`;
+      // While the bootstrap is still running, name the stage it is on. Once it
+      // has given up, say so — a player left on "signing you in…" forever has
+      // no way to tell a dead Activity from a slow one, which is exactly how
+      // this looked the last time it broke. A sign-in button cannot help in
+      // here (Discord blocks the top-level redirect), so the honest offer is
+      // to start the Activity over.
+      if (state.inDiscord && !state.discordDone) {
+        return `<div class="center muted" style="font-size:14px">${t('discordSignInBusy')}${state.discordStage ? ` <b>${esc(state.discordStage)}</b>` : ''}</div>`;
+      }
+      if (state.inDiscord) return `<div class="col" style="gap:10px">
+        <div class="center muted" style="font-size:14px">${t('discordFailed', { e: state.discordError || '—' })}</div>
+        <button class="btn lilac block" data-act="retry">↻ ${t('tryAgain')}</button>
+      </div>`;
       return `<div class="col" style="gap:10px">
         <div class="center muted" style="font-size:14px">${t('signInToPlay')}</div>
         <button class="btn lilac block" data-act="signin">💬 ${t('signIn')}</button>
@@ -1989,6 +2001,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   const actions = {
     menu: openMenu, how: howTo, edit: openEditor, achievements: showAchievements,
     home: () => navigate('/'),
+    retry: () => location.reload(),
     signin: () => {
       if (state.inDiscord) { toast(t('discordSignInBusy'), 'err'); return; }
       location.href = '/api/auth/discord/start';
@@ -2156,7 +2169,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     state.lastKey = '';
     // Not in Discord: this is an ordinary web visit, so ask who we are.
     if (!info) { await loadMe(); render(); return; }
-    if (info.failed) { await loadMe(); render(); toast(t('discordFailed', { e: info.failed }), 'err'); return; }
+    if (info.failed) { state.discordError = info.failed; await loadMe(); render(); toast(t('discordFailed', { e: info.failed }), 'err'); return; }
 
     // The bootstrap already carries the answer /api/auth/me would give, and
     // it was verified against Discord on the server. Asking again here would
@@ -2171,5 +2184,5 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     history.replaceState(null, '', `/room/${info.roomCode}`);
     state.route = parseRoute();
     join(info.roomCode);
-  }).catch(async () => { state.discordDone = true; await loadMe(); state.lastKey = ''; render(); });
+  }).catch(async e => { state.discordDone = true; state.discordError = (e && e.message) || 'unexpected'; await loadMe(); state.lastKey = ''; render(); });
 })();
