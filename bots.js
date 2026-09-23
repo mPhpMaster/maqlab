@@ -39,16 +39,80 @@ const ACCURACY = { blitz: 0.62, emoji: 0.55, order: 0.3 };
 // exactly what a careful human writes when they do not want to give it away.
 // The spy gets the same pool, because a spy who only has the category is in
 // precisely this position for real.
+//
+// Fourteen each, not five. Five was fewer than the five bots a room can hold,
+// so at a full table a repeat was arithmetic rather than bad luck, and three
+// bots writing the same words does not read as three careful people.
+//
+// Every clue has to hold for *every* word in its category, which rules out
+// more than it sounds: "cheap" is a lie about a phone and "fairly small" is a
+// lie about a camel, and either one tells the table who is guessing.
 const CLUES = {
-  Place: [['مزدحم', 'Crowded'], ['أروح له أحياناً', 'I go sometimes'], ['فيه ناس', 'People there'], ['تنتظر فيه', 'You wait there'], ['مو بعيد', 'Not far']],
-  Job: [['دوام طويل', 'Long hours'], ['متعب', 'Tiring'], ['يحتاج صبر', 'Needs patience'], ['له راتب', 'It pays'], ['ناس تحترمه', 'Respected']],
-  Food: [['أحبه', 'I like it'], ['ريحته حلوة', 'Smells good'], ['نتشاركه', 'We share it'], ['مو كل يوم', 'Not every day'], ['يشبع', 'Filling']],
-  Animal: [['شفت واحد', "I've seen one"], ['يتحرك', 'It moves'], ['مو أليف دايماً', 'Not always a pet'], ['صوته مميز', 'Distinct sound'], ['صغير نسبياً', 'Fairly small']],
-  Object: [['في البيت', 'In the house'], ['رخيص', 'Cheap'], ['ينكسر', 'It breaks'], ['أستخدمه', 'I use it'], ['تحمله بيدك', 'You hold it']],
-  Activity: [['نهاية الأسبوع', 'At the weekend'], ['مع الربع', 'With friends'], ['ياخذ وقت', 'Takes time'], ['متعب بس حلو', 'Tiring but good'], ['مو كل يوم', 'Not every day']],
-  Sport: [['عرق', 'Sweat'], ['فيه قوانين', 'It has rules'], ['أشوفه بالتلفزيون', 'I watch it'], ['متعب', 'Tiring'], ['يحتاج لياقة', 'Needs fitness']],
+  Place: [
+    ['مزدحم', 'Crowded'], ['أروح له أحياناً', 'I go sometimes'], ['فيه ناس', 'People there'],
+    ['تنتظر فيه', 'You wait there'], ['مو بعيد', 'Not far'], ['رحت له قبل', "I've been before"],
+    ['أعرف مكانه', 'I know where it is'], ['ما أقعد فيه كثير', "I don't stay long"],
+    ['يختلف بالليل', 'Different at night'], ['فيه أصوات', "There's noise"],
+    ['مو مكان غريب', 'Nothing unusual'], ['أحياناً أحتاجه', 'I need it sometimes'],
+    ['ما يعجب الجميع', 'Not for everyone'], ['شفته كثير', "I've seen it plenty"],
+  ],
+  Job: [
+    ['دوام طويل', 'Long hours'], ['متعب', 'Tiring'], ['يحتاج صبر', 'Needs patience'],
+    ['له راتب', 'It pays'], ['ناس تحترمه', 'Respected'], ['يحتاج تدريب', 'Needs training'],
+    ['ما يناسب الكل', 'Not for everyone'], ['أعرف واحد يشتغله', 'I know someone in it'],
+    ['يتعامل مع ناس', 'You deal with people'], ['فيه ضغط', "There's pressure"],
+    ['يحتاج خبرة', 'Needs experience'], ['مطلوب دايماً', 'Always needed'],
+    ['تتعلمه مع الوقت', 'You learn it over time'], ['ما هو سهل', 'Not an easy one'],
+  ],
+  Food: [
+    ['أحبه', 'I like it'], ['ريحته حلوة', 'Smells good'], ['نتشاركه', 'We share it'],
+    ['مو كل يوم', 'Not every day'], ['يشبع', 'Filling'], ['آكله أحياناً', 'I have it sometimes'],
+    ['متوفر', 'Easy to find'], ['يعجب الصغار', 'Kids like it'], ['له طعم مميز', 'Distinct taste'],
+    ['أطلبه أحياناً', 'I order it sometimes'], ['ما أمل منه', "I don't get bored of it"],
+    ['يختلف من مكان لمكان', 'Varies by place'], ['ما هو غريب', 'Nothing exotic'],
+    ['يذكرني بشي', 'It reminds me of things'],
+  ],
+  Animal: [
+    ['شفت واحد', "I've seen one"], ['يتحرك', 'It moves'], ['مو أليف دايماً', 'Not always a pet'],
+    ['صوته مميز', 'Distinct sound'], ['شفته بالتلفزيون', "I've seen it on TV"],
+    ['له اسم معروف', 'Everyone knows it'], ['الأطفال يحبونه', 'Kids like it'],
+    ['موجود بالطبيعة', 'Found in nature'], ['ما أشوفه يومياً', "I don't see it daily"],
+    ['له لون معروف', 'A known colour'], ['يأكل', 'It eats'],
+    ['شكله يميزه', 'Known by its look'], ['تشوفه بحديقة حيوان', 'Zoos have them'],
+    ['ما أخاف منه', "I'm not scared of it"],
+  ],
+  Object: [
+    ['في البيت', 'In the house'], ['ينكسر', 'It breaks'], ['أستخدمه', 'I use it'],
+    ['تحمله بيدك', 'You hold it'], ['عندي واحد', 'I own one'],
+    ['أحتاجه أحياناً', 'I need it sometimes'], ['ما هو جديد', 'Not a new invention'],
+    ['له شكل معروف', 'A familiar shape'], ['تلقاه بأي بيت', 'Any house has one'],
+    ['ضاع مني قبل', "I've lost one before"], ['سهل تلقاه', 'Easy to find'],
+    ['ما يحتاج شرح', 'Needs no explaining'], ['ما أنتبه له', "I don't notice it much"],
+    ['صعب أستغني عنه', 'Hard to do without'],
+  ],
+  Activity: [
+    ['نهاية الأسبوع', 'At the weekend'], ['مع الربع', 'With friends'], ['ياخذ وقت', 'Takes time'],
+    ['متعب بس حلو', 'Tiring but good'], ['مو كل يوم', 'Not every day'],
+    ['أسويه أحياناً', 'I do it sometimes'], ['يحتاج مزاج', 'Needs the right mood'],
+    ['ما يحتاج ناس كثير', "Doesn't need a crowd"], ['أول مرة كانت صعبة', 'First time was hard'],
+    ['ناس تحبه وناس لا', 'Some love it, some not'], ['يحتاج تجهيز', 'Needs some prep'],
+    ['ينسيك الوقت', 'You lose track of time'], ['ما أمل منه', "I don't get bored of it"],
+    ['تتحسن فيه بالممارسة', 'You get better at it'],
+  ],
+  Sport: [
+    ['عرق', 'Sweat'], ['فيه قوانين', 'It has rules'], ['أشوفه بالتلفزيون', 'I watch it'],
+    ['متعب', 'Tiring'], ['يحتاج لياقة', 'Needs fitness'], ['له بطولات', 'It has tournaments'],
+    ['ناس تتابعه', 'People follow it'], ['يحتاج تدريب', 'Needs training'],
+    ['جربته قبل', "I've tried it"], ['مو سهل', 'Not easy'], ['يحتاج تركيز', 'Needs focus'],
+    ['فيه فوز وخسارة', 'You win or you lose'], ['يبدأون فيه صغار', 'People start young'],
+    ['ما يناسب الكل', 'Not for everyone'],
+  ],
 };
-const FALLBACK_CLUES = [['صعب أوصفه', 'Hard to describe'], ['معروف', 'Well known'], ['عادي', 'Ordinary'], ['ما أدري وش أقول', 'Not sure what to say']];
+const FALLBACK_CLUES = [
+  ['صعب أوصفه', 'Hard to describe'], ['معروف', 'Well known'], ['عادي', 'Ordinary'],
+  ['ما أدري وش أقول', 'Not sure what to say'], ['شي معتاد', 'A familiar thing'],
+  ['ما عندي وصف أحسن', 'No better word for it'],
+];
 
 // A name nobody in the room already has.
 function freeName(taken) {
