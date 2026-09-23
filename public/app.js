@@ -30,7 +30,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       tab_s: 'الشكل', tab_c: 'اللون', tab_e: 'العيون', tab_m: 'الفم', tab_h: 'القبعة', lockedAt: 'تنفتح في المستوى {n} 🔒', hatUnlocked: 'فتحت قبعة جديدة! 🎩',
       roomCode: 'كود الغرفة', copyLink: 'انسخ الرابط', share: 'شارك', copied: 'تم النسخ ✅', players: 'اللاعبين', invite: 'ادعُ', pokeHint: 'اضغط على أي لاعب عشان تنغزه 👉',
       settings: 'الإعدادات', qLang: 'لغة الأسئلة', rounds: 'عدد الجولات', types: 'أنواع الجولات', pace: 'السرعة', chill: 'رايق 😌', normal: 'عادي', fast: 'سريع ⚡',
-      start: 'يلا نبدأ! 🚀', waitHost: 'بانتظار المضيف يبدأ اللعبة', soloHint: 'تقدر تجرب لحالك، بس الوناسة مع الشلة 😉', enterRoom: 'ادخل الغرفة', room: 'غرفة',
+      start: 'يلا نبدأ! 🚀', waitHost: 'بانتظار المضيف يبدأ اللعبة', enterRoom: 'ادخل الغرفة', room: 'غرفة',
       round: 'الجولة', spinning: 'وش بتكون الجولة الجاية؟',
       type_bluff: 'المقلب', desc_bluff: 'اكتب كذبة مقنعة تخدع فيها الشلة', type_number: 'أقرب رقم', desc_number: 'خمّن الرقم… الأقرب يكسب', type_blitz: 'صح ولا خطأ', desc_blitz: '3 عبارات سريعة، والسرعة تفرق!',
       type_likely: 'مين فينا؟', desc_likely: 'صوّت على واحد من الشلة… ووافق الأغلبية', type_emoji: 'فكّ الإيموجي', desc_emoji: '3 ألغاز إيموجي… الأسرع يكسب',
@@ -45,16 +45,16 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       pickTruth: 'وين الإجابة الصحيحة؟ 🤔', bet1: 'آمن', bet2: 'واثق', bet3: 'متأكد 100%', yours: 'كذبتك', betInfo: 'صح = 500 × رهانك • غلط = −150 لكل مستوى زيادة', voted: 'تم التصويت ✓',
       lieBy: 'كذبة {n}', houseLie: 'كذبة اللعبة 🤖', truth: 'الصح ✅', fooledN: 'انخدع {n} 😈', gotIt: 'عرفوها 🧠', nobody: 'ما أحد عرفها! 😱', next: 'التالي ⏭', nextIn: 'التالي بعد', seeImages: 'شوف صور', gotFooledBy: 'انقلبت على يد {n} 😂',
       yourGuess: 'تخمينك', typeNumber: 'اكتب رقم', true: 'صح', false: 'خطأ', rightAns: 'أصبت! 🎉', wrongAns: 'أخطأت 😬', noAns: 'ما جاوبت ⏰', fastestIs: '⚡ الأسرع: {n}',
-      pickPlayer: 'اختار واحد من الشلة 👇', youPicked: 'اخترت {n}', likelyWinner: 'الشلة اختارت: {n}!', votesN: '{n} صوت', withCrowd: 'مع الأغلبية +300 👥', noVotes: 'ما أحد صوّت',
+      pickPlayer: 'اختار واحد من الشلة 👇', youPicked: 'اخترت {n}', likelyWinner: 'الشلة اختارت: {n}!', votesN: { one: 'صوت واحد', two: 'صوتان', few: '{n} أصوات', many: '{n} صوتاً', other: '{n} صوتاً' }, withCrowd: 'مع الأغلبية +300 👥', noVotes: 'ما أحد صوّت',
       whatEmoji: 'وش تعني هالإيموجيات؟', answerWas: 'الجواب: {v}',
-      scores: 'الترتيب', final: 'انتهت اللعبة! 🎉', wins: '{n} فاز! 🏆', awards: 'الألقاب', playAgain: 'جولة ثانية 🔁', home: 'الرئيسية', bestLie: 'أفضل كذبة في اللعبة', bestLieBy: '{n} • خدعت {f}',
+      scores: 'الترتيب', final: 'انتهت اللعبة! 🎉', winnerIs: '{n} فاز! 🏆', awards: 'الألقاب', playAgain: 'جولة ثانية 🔁', home: 'الرئيسية', bestLie: 'أفضل كذبة في اللعبة', bestLieBy: '{n} • خدعت {f}',
       level: 'مستوى', levelUp: 'مستوى جديد! 🎉',
       leave: 'غادر الغرفة', endGame: 'أنهِ اللعبة الحين', sound: 'الأصوات', music: 'الموسيقى', on: 'شغّال', off: 'مطفي', uiLang: 'English', menu: 'القائمة',
       kicked: 'تم إخراجك من الغرفة', confirmKick: 'تبي تطلّع {n} من الغرفة؟', yes: 'إيه', cancel: 'إلغاء', reconnecting: 'انقطع الاتصال… نحاول نرجع', loading: 'جاري الدخول…', close: 'تمام', pokedYou: '{n} نغزك 👉',
       power_peek: 'كشّاف', power_double: 'دبل', powerOn: 'مفعّل ✓', peekDone: 'شلنا خيارين غلط 🔍', doubleDone: 'نقاطك بهالجولة ×2 💎', doubledBy: '💎 {n} فعّل الدبل!',
       err_truth: 'هذي الإجابة الصحيحة! اكتب كذبة 😏', err_own: 'ما تقدر تختار كذبتك 😅', err_selfvote: 'ما تقدر تصوت لنفسك 😅', err_noroom: 'الغرفة غير موجودة', err_full: 'الغرفة ممتلئة', err_nan: 'اكتب رقم صحيح', err_empty: 'اكتب شيء أول', err_late: 'انتهى الوقت ⏰', err_host: 'للمضيف فقط', err_dup: 'استخدمتها خلاص', err_nopower: 'خلصت هالقدرة', err_nopeek: 'الكشّاف يشتغل وقت الاختيار بس 🔍', err_bad: 'خيار غير صالح', err_signin: 'سجّل دخولك بديسكورد أول',
       g_correct: 'إجابة صحيحة', g_fooled: 'خدعت لاعبين', g_betLoss: 'خسارة الرهان', g_streak: 'سلسلة 🔥', g_bullseye: 'في الصميم 🎯', g_closest: 'الأقرب', g_second: 'المركز الثاني', g_third: 'المركز الثالث', g_blitz: 'إجابات صحيحة', g_emoji: 'إجابات صحيحة', g_odd: 'إجابات صحيحة', g_speed: 'مكافأة السرعة', g_fastest: 'الأسرع ⚡', g_jackpot: 'صندوق الحظ 🎁', g_majority: 'مع الأغلبية 👥', g_famous: 'اختاروك 🌟', g_double: 'دبل 💎', g_spyCatch: 'لقّط الجاسوس', g_spyEvade: 'هرب من اللقطة', g_spyGuess: 'خمّن الكلمة',
-      a_liar: 'سيد المقالب', a_liar_d: 'خدع {n} مرة', a_detective: 'المحقق', a_detective_d: '{n} إجابات صحيحة', a_sniper: 'القناص', a_sniper_d: '{n} تخمينات دقيقة', a_lightning: 'البرق', a_lightning_d: 'الأسرع {n} مرات', a_gambler: 'المغامر', a_gambler_d: 'راهن بقوة {n} مرات', a_fire: 'ولّعت', a_fire_d: 'سلسلة {n} 🔥', a_star: 'نجم الشلة', a_star_d: 'اختاروه {n} مرات',
+      a_liar: 'سيد المقالب', a_liar_d: { one: 'خدع مرة واحدة', two: 'خدع مرتين', few: 'خدع {n} مرات', many: 'خدع {n} مرة', other: 'خدع {n} مرة' }, a_detective: 'المحقق', a_detective_d: { one: 'إجابة صحيحة واحدة', two: 'إجابتان صحيحتان', few: '{n} إجابات صحيحة', many: '{n} إجابة صحيحة', other: '{n} إجابة صحيحة' }, a_sniper: 'القناص', a_sniper_d: { one: 'تخمين دقيق واحد', two: 'تخمينان دقيقان', few: '{n} تخمينات دقيقة', many: '{n} تخميناً دقيقاً', other: '{n} تخميناً دقيقاً' }, a_lightning: 'البرق', a_lightning_d: { one: 'الأسرع مرة واحدة', two: 'الأسرع مرتين', few: 'الأسرع {n} مرات', many: 'الأسرع {n} مرة', other: 'الأسرع {n} مرة' }, a_gambler: 'المغامر', a_gambler_d: { one: 'راهن بقوة مرة واحدة', two: 'راهن بقوة مرتين', few: 'راهن بقوة {n} مرات', many: 'راهن بقوة {n} مرة', other: 'راهن بقوة {n} مرة' }, a_fire: 'ولّعت', a_fire_d: 'سلسلة {n} 🔥', a_star: 'نجم الشلة', a_star_d: { one: 'اختاروه مرة واحدة', two: 'اختاروه مرتين', few: 'اختاروه {n} مرات', many: 'اختاروه {n} مرة', other: 'اختاروه {n} مرة' },
       ann_first: 'صرت الأول! 👑', ann_combo: 'كومبو ×{n} 🔥', ann_unstoppable: 'ما ينوقف!! 🔥🔥', ann_legend: 'مقلب أسطوري! 😈', ann_perfect: 'مثالي! 3 من 3 ✨', ann_golden: 'الجولة الذهبية! 👑',
       achievements: 'إنجازاتي', achUnlocked: 'إنجاز جديد! 🏅',
       ach_games50: 'مدمن فعلي', achd_games50: 'العب ٥٠ لعبة', ach_wins25: 'بطل', achd_wins25: 'افز بـ٢٥ لعبة',
@@ -71,7 +71,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ready: 'جاهز ✋', notReady: 'مو جاهز بعد', readyN: '{n}/{m} جاهزين',
       balloonTitle: '🎈 لين تبدأ اللعبة… نفّخوا البالون!', balloonHint: 'اضغط على البالون بسرعة، اللي يفجّره يكسب 💥', popped: '💥 {n} فجّر البالون!', balloonKing: 'ملك البالون: {n} 🎈 ×{c}',
       laughHint: 'اضحك على أحلى كذبة 😂 وصاحبها ياخذ +200', g_funniest: 'أضحك كذبة 😂',
-      rivals: '⚔️ خصومك', nemesis: 'عدوك اللدود', nemesisD: 'قلبك {n} مرات 😤', victim: 'ضحيتك المفضلة', victimD: 'قلبته {n} مرات 😈',
+      rivals: '⚔️ خصومك', nemesis: 'عدوك اللدود', nemesisD: { one: 'قلبك مرة واحدة 😤', two: 'قلبك مرتين 😤', few: 'قلبك {n} مرات 😤', many: 'قلبك {n} مرة 😤', other: 'قلبك {n} مرة 😤' }, victim: 'ضحيتك المفضلة', victimD: { one: 'قلبته مرة واحدة 😈', two: 'قلبته مرتين 😈', few: 'قلبته {n} مرات 😈', many: 'قلبته {n} مرة 😈', other: 'قلبته {n} مرة 😈' },
       phrases: ['ما راح تعرفها 😏', 'أنا الفايز 🏆', 'يا ساتر 😂', 'ركّز يا بطل!', 'كذّاب! 🤥', 'يلا بسرعة ⏰', 'حظ أوفر 😅', 'الله عليك 👏', 'مستحيل! 😱', 'صدقني هذي الصح 😇', 'خلاص تعبت 😴', 'انتقامي قادم 😈'],
       signIn: 'دخول بديسكورد', signInToPlay: 'سجّل دخولك بديسكورد عشان تلعب — اسمك وصورتك يجونك منه', signOut: 'تسجيل خروج', guestNote: 'تلعب كضيف — تقدمك ما ينحفظ', signedInAs: 'مسجّل باسم',
       profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
@@ -81,7 +81,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       repRounds: 'جولات المباراة', repTruth: 'الإجابة الصحيحة', repHouse: 'خيار من اللعبة', repAnswer: 'الجواب',
       repNobody: 'ما أحد', repMostVotes: 'أكثر واحد صوّتوا له', repCaught: 'انكشف 🎯', repEscaped: 'نجا بجلده 😎',
       repSpyGuess: 'تخمين الجاسوس', repRoundPts: 'نقاط الجولة', repCorrect: 'الترتيب الصحيح',
-      matchResult: 'نتيجة المباراة', shareMatch: 'انسخ رابط المباراة', matchGone: 'المباراة هذي ما عادت موجودة', place1: 'الأول', placeN: 'المركز {n}', roundsN: '{n} جولات', openMatch: 'افتح',
+      matchResult: 'نتيجة المباراة', shareMatch: 'انسخ رابط المباراة', matchGone: 'المباراة هذي ما عادت موجودة', place1: 'الأول', placeN: 'المركز {n}', roundsN: { one: 'جولة واحدة', two: 'جولتان', few: '{n} جولات', many: '{n} جولة', other: '{n} جولة' }, openMatch: 'افتح',
       report: 'بلاغ', reportTitle: 'بلاغ عن {n}', reportWhy: 'وش المشكلة؟', r_cheat: 'غش', r_name: 'اسم مسيء', r_chat: 'إساءة بالدردشة', r_other: 'غير ذلك',
       reportDetails: 'تفاصيل (اختياري)', reportSent: 'وصلنا البلاغ، شكراً 🙏', suggestPlaceholder: 'وش تبي نضيف أو نغيّر؟',
       sent: 'تم الإرسال ✅', signInFirst: 'سجّل دخول أول', slowDown: 'على مهلك شوي ⏳',
@@ -101,7 +101,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       tab_s: 'Shape', tab_c: 'Color', tab_e: 'Eyes', tab_m: 'Mouth', tab_h: 'Hat', lockedAt: 'Unlocks at level {n} 🔒', hatUnlocked: 'New hat unlocked! 🎩',
       roomCode: 'ROOM CODE', copyLink: 'Copy link', share: 'Share', copied: 'Copied ✅', players: 'Players', invite: 'Invite', pokeHint: 'Tap a player to poke them 👉',
       settings: 'Settings', qLang: 'Question language', rounds: 'Rounds', types: 'Round types', pace: 'Pace', chill: 'Chill 😌', normal: 'Normal', fast: 'Fast ⚡',
-      start: "Let's go! 🚀", waitHost: 'Waiting for the host to start', soloHint: "You can try it solo — but it's way better with friends 😉", enterRoom: 'Enter room', room: 'Room',
+      start: "Let's go! 🚀", waitHost: 'Waiting for the host to start', enterRoom: 'Enter room', room: 'Room',
       round: 'Round', spinning: "What's next?",
       type_bluff: 'The Bluff', desc_bluff: 'Write a convincing lie to fool everyone', type_number: 'Closest Number', desc_number: 'Guess the number — closest wins', type_blitz: 'True or False', desc_blitz: '3 quick statements — speed matters!',
       type_likely: "Who's Most Likely?", desc_likely: 'Vote for a friend… and side with the crowd', type_emoji: 'Emoji Decode', desc_emoji: '3 emoji puzzles — fastest wins',
@@ -116,16 +116,16 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       pickTruth: 'Which one is the truth? 🤔', bet1: 'Safe', bet2: 'Sure', bet3: 'All in', yours: 'yours', betInfo: 'Right = 500 × bet • Wrong = −150 per extra level', voted: 'Voted ✓',
       lieBy: "{n}'s lie", houseLie: 'House lie 🤖', truth: 'TRUTH ✅', fooledN: '{n} fooled 😈', gotIt: 'Got it 🧠', nobody: 'Nobody got it! 😱', next: 'Next ⏭', nextIn: 'Next in', seeImages: 'See images', gotFooledBy: '{n} got you! 😂',
       yourGuess: 'Your guess', typeNumber: 'Type a number', true: 'True', false: 'False', rightAns: 'Correct! 🎉', wrongAns: 'Wrong 😬', noAns: 'No answer ⏰', fastestIs: '⚡ Fastest: {n}',
-      pickPlayer: 'Pick someone 👇', youPicked: 'You picked {n}', likelyWinner: 'The crowd picked: {n}!', votesN: '{n} votes', withCrowd: 'With the crowd +300 👥', noVotes: 'No votes',
+      pickPlayer: 'Pick someone 👇', youPicked: 'You picked {n}', likelyWinner: 'The crowd picked: {n}!', votesN: { one: '1 vote', other: '{n} votes' }, withCrowd: 'With the crowd +300 👥', noVotes: 'No votes',
       whatEmoji: 'What do these emojis mean?', answerWas: 'Answer: {v}',
-      scores: 'Leaderboard', final: 'Game over! 🎉', wins: '{n} wins! 🏆', awards: 'Awards', playAgain: 'Play again 🔁', home: 'Home', bestLie: 'Best lie of the game', bestLieBy: '{n} • fooled {f}',
+      scores: 'Leaderboard', final: 'Game over! 🎉', winnerIs: '{n} wins! 🏆', awards: 'Awards', playAgain: 'Play again 🔁', home: 'Home', bestLie: 'Best lie of the game', bestLieBy: '{n} • fooled {f}',
       level: 'Level', levelUp: 'Level up! 🎉',
       leave: 'Leave room', endGame: 'End game now', sound: 'Sound effects', music: 'Music', on: 'On', off: 'Off', uiLang: 'العربية', menu: 'Menu',
       kicked: 'You were removed from the room', confirmKick: 'Remove {n} from the room?', yes: 'Yes', cancel: 'Cancel', reconnecting: 'Connection lost… reconnecting', loading: 'Joining…', close: 'Got it', pokedYou: '{n} poked you 👉',
       power_peek: 'Peek', power_double: 'Double', powerOn: 'Active ✓', peekDone: 'Removed two wrong options 🔍', doubleDone: 'Your points this round ×2 💎', doubledBy: '💎 {n} used Double!',
       err_truth: "That's the real answer! Write a lie 😏", err_own: "You can't pick your own lie 😅", err_selfvote: "You can't vote for yourself 😅", err_noroom: "Room doesn't exist", err_full: 'Room is full', err_nan: 'Enter a valid number', err_empty: 'Type something first', err_late: "Time's up ⏰", err_host: 'Host only', err_dup: 'Already used', err_nopower: 'No uses left', err_nopeek: 'Peek only works while choosing 🔍', err_bad: 'Invalid choice', err_signin: 'Sign in with Discord first',
       g_correct: 'Correct answer', g_fooled: 'Fooled players', g_betLoss: 'Lost bet', g_streak: 'Streak 🔥', g_bullseye: 'Bullseye 🎯', g_closest: 'Closest', g_second: '2nd closest', g_third: '3rd closest', g_blitz: 'Correct answers', g_emoji: 'Correct answers', g_odd: 'Correct answers', g_speed: 'Speed bonus', g_fastest: 'Fastest ⚡', g_jackpot: 'Jackpot 🎁', g_majority: 'With the crowd 👥', g_famous: 'Crowd pick 🌟', g_double: 'Double 💎', g_spyCatch: 'Caught the spy', g_spyEvade: 'Evaded capture', g_spyGuess: 'Guessed the word',
-      a_liar: 'Master Liar', a_liar_d: 'Fooled {n} times', a_detective: 'Detective', a_detective_d: '{n} correct answers', a_sniper: 'Sniper', a_sniper_d: '{n} spot-on guesses', a_lightning: 'Lightning', a_lightning_d: 'Fastest {n} times', a_gambler: 'High Roller', a_gambler_d: 'Bet big {n} times', a_fire: 'On Fire', a_fire_d: '{n} streak 🔥', a_star: 'Crowd Favorite', a_star_d: 'Picked {n} times',
+      a_liar: 'Master Liar', a_liar_d: { one: 'Fooled once', other: 'Fooled {n} times' }, a_detective: 'Detective', a_detective_d: { one: '1 correct answer', other: '{n} correct answers' }, a_sniper: 'Sniper', a_sniper_d: { one: '1 spot-on guess', other: '{n} spot-on guesses' }, a_lightning: 'Lightning', a_lightning_d: { one: 'Fastest once', other: 'Fastest {n} times' }, a_gambler: 'High Roller', a_gambler_d: { one: 'Bet big once', other: 'Bet big {n} times' }, a_fire: 'On Fire', a_fire_d: '{n} streak 🔥', a_star: 'Crowd Favorite', a_star_d: { one: 'Picked once', other: 'Picked {n} times' },
       ann_first: "You're #1! 👑", ann_combo: 'Combo ×{n} 🔥', ann_unstoppable: 'UNSTOPPABLE!! 🔥🔥', ann_legend: 'Legendary bluff! 😈', ann_perfect: 'Perfect! 3 of 3 ✨', ann_golden: 'GOLDEN ROUND! 👑',
       achievements: 'Achievements', achUnlocked: 'Achievement unlocked! 🏅',
       ach_games50: 'Veteran', achd_games50: 'Play 50 games', ach_wins25: 'Champion', achd_wins25: 'Win 25 games',
@@ -142,7 +142,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ready: 'Ready ✋', notReady: 'Not ready', readyN: '{n}/{m} ready',
       balloonTitle: '🎈 While you wait… pump the balloon!', balloonHint: 'Tap the balloon fast — whoever pops it wins 💥', popped: '💥 {n} popped the balloon!', balloonKing: 'Balloon king: {n} 🎈 ×{c}',
       laughHint: 'Laugh at the funniest lie 😂 — its author gets +200', g_funniest: 'Funniest lie 😂',
-      rivals: '⚔️ Your rivals', nemesis: 'Your nemesis', nemesisD: 'Fooled you {n} times 😤', victim: 'Favourite victim', victimD: 'You fooled them {n} times 😈',
+      rivals: '⚔️ Your rivals', nemesis: 'Your nemesis', nemesisD: { one: 'Fooled you once 😤', other: 'Fooled you {n} times 😤' }, victim: 'Favourite victim', victimD: { one: 'You fooled them once 😈', other: 'You fooled them {n} times 😈' },
       phrases: ["You'll never get it 😏", "I'm winning 🏆", 'LOL 😂', 'Focus!', 'Liar! 🤥', 'Hurry up ⏰', 'Better luck next time 😅', 'Nice one 👏', 'No way! 😱', "Trust me, that's it 😇", "I'm tired 😴", 'Revenge is coming 😈'],
       signIn: 'Sign in with Discord', signInToPlay: 'Sign in with Discord to play — your name comes from there', signOut: 'Sign out', guestNote: "Playing as a guest — progress isn't saved", signedInAs: 'Signed in as',
       profile: 'Profile', leaderboard: 'Leaderboard', suggestBtn: 'Send a suggestion', about: 'About', adminPanel: 'Admin',
@@ -152,7 +152,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       repRounds: 'Round by round', repTruth: 'the true answer', repHouse: 'filler option', repAnswer: 'Answer',
       repNobody: 'Nobody', repMostVotes: 'Most votes', repCaught: 'Caught 🎯', repEscaped: 'Got away 😎',
       repSpyGuess: "Spy's guess", repRoundPts: 'Round points', repCorrect: 'Correct order',
-      matchResult: 'Match result', shareMatch: 'Copy match link', matchGone: 'That match is no longer around', place1: '1st', placeN: 'Place {n}', roundsN: '{n} rounds', openMatch: 'Open',
+      matchResult: 'Match result', shareMatch: 'Copy match link', matchGone: 'That match is no longer around', place1: '1st', placeN: 'Place {n}', roundsN: { one: '1 round', other: '{n} rounds' }, openMatch: 'Open',
       report: 'Report', reportTitle: 'Report {n}', reportWhy: "What's wrong?", r_cheat: 'Cheating', r_name: 'Offensive name', r_chat: 'Abusive chat', r_other: 'Something else',
       reportDetails: 'Details (optional)', reportSent: 'Report received, thank you 🙏', suggestPlaceholder: 'What should we add or change?',
       sent: 'Sent ✅', signInFirst: 'Sign in first', slowDown: 'Slow down a little ⏳',
@@ -197,7 +197,40 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   };
   state.draft.name = state.profile.name;
 
-  const t = (k, v = {}) => { let s = (STR[state.lang][k] ?? STR.ar[k] ?? k); if (typeof s === 'string') for (const [a, b] of Object.entries(v)) s = s.split(`{${a}}`).join(b); return s; };
+  // Which form of a counted noun to use. English has two; Arabic has five,
+  // and "just add an s" has no equivalent — one thing, two things (dual),
+  // a few (3–10) and many (11+) each take a different form, and for one and
+  // two the numeral is normally dropped altogether. So a plural string is an
+  // object of forms rather than one string with {n} glued into it.
+  const PLURAL = {
+    en: n => (n === 1 ? 'one' : 'other'),
+    ar: n => {
+      const r = n % 100;
+      if (n === 1) return 'one';
+      if (n === 2) return 'two';
+      if (r >= 3 && r <= 10) return 'few';
+      if (r >= 11 && r <= 99) return 'many';
+      return 'other';
+    },
+  };
+  // Callers pass counts already run through fmt(), which in Arabic means
+  // Arabic-Indic digits and thousands separators — Number('٣') is NaN, and a
+  // NaN count silently picks the wrong form everywhere. So read the number
+  // back out rather than trusting it to be one.
+  const countOf = v => {
+    const s = String(v ?? '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[^\d]/g, '');
+    return s ? Number(s) : 0;
+  };
+  const t = (k, v = {}) => {
+    let s = (STR[state.lang][k] ?? STR.ar[k] ?? k);
+    // Arrays (how-to steps, chat phrases) are picked from, not counted.
+    if (s && typeof s === 'object' && !Array.isArray(s)) {
+      const form = (PLURAL[state.lang] || PLURAL.en)(countOf(v.n));
+      s = s[form] ?? s.many ?? s.other ?? s.one ?? k;
+    }
+    if (typeof s === 'string') for (const [a, b] of Object.entries(v)) s = s.split(`{${a}}`).join(b);
+    return s;
+  };
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const J = (av, cls) => Jelly.svg(av, cls);
   const now = () => Date.now() + (state.clockOffset || 0);
@@ -1289,7 +1322,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     return `<div class="screen"><div class="topbar">${menuBtn}<div class="mid"><div class="logo sm">${t('appName')}</div></div><div style="width:44px"></div></div>
       <div class="scroll" data-scroll="f"><div class="wrap" style="padding-bottom:16px">
         <h1 class="center" style="margin:6px 0 0;font-size:32px">${t('final')}</h1>
-        ${ranked[0] ? `<div class="center muted" style="font-weight:700">${t('wins', { n: esc(ranked[0].name) })}</div>` : ''}
+        ${ranked[0] ? `<div class="center muted" style="font-weight:700">${t('winnerIs', { n: esc(ranked[0].name) })}</div>` : ''}
         <div class="podium">${pod(ranked[1], 2)}${pod(ranked[0], 1)}${pod(ranked[2], 3)}</div>
         ${s.teamScores ? `<div class="team-result">${s.teamScores.A === s.teamScores.B ? t('teamTie') : t('teamWins', { n: t('team_' + (s.teamScores.A > s.teamScores.B ? 'A' : 'B')) })}</div>${teamBars()}` : ''}
         ${rivalsCard(s.rivals && s.rivals[mid])}
@@ -1744,7 +1777,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         <span class="sc">${fmt(g.score)}</span>
       </div>`).join('');
     modal(`<h3>🏁 ${t('matchResult')}</h3>
-      <div class="center muted" style="font-size:12px;margin-bottom:10px">${shortDate(d.finishedAt)} · ${t('roundsN', { n: d.rounds })}</div>
+      <div class="center muted" style="font-size:12px;margin-bottom:10px">${shortDate(d.finishedAt)} · ${t('roundsN', { n: fmt(d.rounds) })}</div>
       <div style="max-height:56vh;overflow-y:auto">
         <div class="board">${rows}</div>
         ${replayHtml(d)}
