@@ -352,7 +352,7 @@ function botAction(room, b) {
     // The clue comes from the category alone whether or not this bot is the
     // spy, so a bot that happens to know the word cannot leak it by being
     // suspiciously specific.
-    return () => submitSpyClue(room, b, bots.spyClue({ category: c.cat.en })[L]);
+    return () => submitSpyClue(room, b, bots.spyClue({ category: c.cat.en, taken: Object.values(c.clues) })[L]);
   }
   if (ph === 'spyVote' && !c.votes[b.id]) {
     const t = bots.votePlayer({ players: connected(room), myId: b.id });

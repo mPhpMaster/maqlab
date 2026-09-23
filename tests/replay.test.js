@@ -122,3 +122,21 @@ test('rounds worth nothing are not padded with zeroes', () => {
   assert.deepEqual(e.pts, { p2: 150 });
   assert.deepEqual(e.winners, ['p2']);
 });
+
+// Three bots in one spy round used to write the same words, which reads as
+// three bots rather than three cautious people.
+const botsMod = require('../bots');
+test('a bot does not repeat a clue already on the board', () => {
+  const taken = [];
+  for (let i = 0; i < 5; i++) {
+    const c = botsMod.spyClue({ category: 'Food', taken });
+    assert.ok(!taken.includes(c.en), `repeated "${c.en}" with ${JSON.stringify(taken)}`);
+    taken.push(c.en);
+  }
+});
+
+test('when every clue is taken it still answers rather than stalling', () => {
+  const all = ['I like it', 'Smells good', 'We share it', 'Not every day', 'Filling'];
+  const c = botsMod.spyClue({ category: 'Food', taken: all });
+  assert.ok(c && c.en && c.ar, 'a bot with no free clue must still say something');
+});

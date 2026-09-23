@@ -104,9 +104,15 @@ function votePlayer({ players, myId }) {
   return others.length ? pick(others).id : null;
 }
 
-function spyClue({ category }) {
+// `taken` is every clue already on the board. Without it three bots in one
+// round routinely wrote the same words — which does not read as three people
+// being vague, it reads as three bots, and it hands the round away before
+// anyone has voted.
+function spyClue({ category, taken = [] }) {
   const pool = CLUES[category] || FALLBACK_CLUES;
-  const [ar, en] = pick(pool);
+  const used = taken.map(t => String(t).trim().toLowerCase());
+  const free = pool.filter(([ar, en]) => !used.includes(ar.toLowerCase()) && !used.includes(en.toLowerCase()));
+  const [ar, en] = pick(free.length ? free : pool);
   return { ar, en };
 }
 
