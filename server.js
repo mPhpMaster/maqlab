@@ -1397,7 +1397,7 @@ const OG_BLOCK = /<!--og-->[\s\S]*?<!--\/og-->/;
 // stamp is a hash of the client modules: it moves on a real change and
 // stays put across restarts that changed nothing.
 const ASSET_V = crypto.createHash('sha1')
-  .update(['app.js', 'discord.js', 'avatar.js'].map(f => {
+  .update(['app.js', 'discord.js', 'avatar.js', 'style.css'].map(f => {
     try { return fs.readFileSync(path.join(__dirname, 'public', f)); } catch { return ''; }
   }).join('|'))
   .digest('hex').slice(0, 10);
@@ -1410,6 +1410,11 @@ function page(req, title, desc) {
   return INDEX_HTML
     .replace('src="/app.js"', `src="/app.js?v=${ASSET_V}"`)
     .replace('src="/avatar.js"', `src="/avatar.js?v=${ASSET_V}"`)
+    // The stylesheet needs the stamp as much as the scripts do. It was the one
+    // asset without it, and Discord's proxy serves what it likes regardless of
+    // cache headers — so a player could get new markup with the old stylesheet,
+    // which is markup carrying class names the stylesheet has never heard of.
+    .replace('href="/style.css"', `href="/style.css?v=${ASSET_V}"`)
     .replace(OG_BLOCK, [
     '<meta property="og:type" content="website">',
     '<meta property="og:site_name" content="MAQLAB">',
