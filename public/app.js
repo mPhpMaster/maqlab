@@ -35,7 +35,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       type_bluff: 'المقلب', desc_bluff: 'اكتب كذبة مقنعة تخدع فيها الشلة', type_number: 'أقرب رقم', desc_number: 'خمّن الرقم… الأقرب يكسب', type_blitz: 'صح ولا خطأ', desc_blitz: '3 عبارات سريعة، والسرعة تفرق!',
       type_likely: 'مين فينا؟', desc_likely: 'صوّت على واحد من الشلة… ووافق الأغلبية', type_emoji: 'فكّ الإيموجي', desc_emoji: '3 ألغاز إيموجي… الأسرع يكسب',
       type_odd: 'الدخيل', desc_odd: '4 كلمات، وحدة منهم ما لها دخل… لقّطها بسرعة', type_spy: 'الجاسوس', desc_spy: 'واحد بينكم جاسوس ما يعرف الكلمة… لقّطوه! 🕵️',
-      category: 'الفئة', youAreSpy: 'أنت الجاسوس! 🕵️', spyHintSpy: 'اكتب تلميح يخليهم يحسبونك تعرف الكلمة', spyHintCivilian: 'اكتب تلميح عن الكلمة بدون ما تقولها',
+      youAreCivilian: 'أنت تعرف الكلمة ✅', spyOneDoesnt: 'واحد بينكم ما يعرفها — لقّطوه', spySpyNoWord: 'ما تعرف الكلمة — عندك الفئة فقط', spyTaskCivilian: 'اكتب تلميحاً يثبت أنك تعرفها، وما يفهمه إلا من يعرفها', spyTaskSpy: 'اكتب تلميحاً يوهمهم أنك تعرفها', spyWinCivilian: 'تكشف الجاسوس = +350', spyWinSpy: 'ما تنكشف = +500 · تخمّن الكلمة = +300', spyClueExample: 'مثال: «مزدحم» أو «أروح له أحياناً»', spyWhyCaught: 'أغلب الأصوات راحت للجاسوس، فانكشف', spyWhyEscaped: 'ما اجتمعت عليه الأغلبية، فنجا', category: 'الفئة', youAreSpy: 'أنت الجاسوس! 🕵️', spyHintSpy: 'اكتب تلميح يخليهم يحسبونك تعرف الكلمة', spyHintCivilian: 'اكتب تلميح عن الكلمة بدون ما تقولها',
       writeClue: 'اكتب تلميحك…', yourClue: 'تلميحك', spyPickSuspect: 'مين تحس إنه الجاسوس؟ 🤔', spyWordIs: 'الكلمة: {n}',
       guessWord: 'خمّن الكلمة السرية (اختياري)', spyGuessBtn: 'خمّن 🎯', guessSent: 'خمّنت: {n}',
       spyWas: 'الجاسوس كان: {n}! 🕵️', spyCaught: 'انلقط! ✅', spyEscaped: 'هرب! 😈', spyGuessWas: 'خمّن الكلمة: «{n}»',
@@ -106,7 +106,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       type_bluff: 'The Bluff', desc_bluff: 'Write a convincing lie to fool everyone', type_number: 'Closest Number', desc_number: 'Guess the number — closest wins', type_blitz: 'True or False', desc_blitz: '3 quick statements — speed matters!',
       type_likely: "Who's Most Likely?", desc_likely: 'Vote for a friend… and side with the crowd', type_emoji: 'Emoji Decode', desc_emoji: '3 emoji puzzles — fastest wins',
       type_odd: 'Odd One Out', desc_odd: "4 things, one does not belong — spot it fast", type_spy: 'The Spy', desc_spy: "One of you is a spy who doesn't know the word… catch them! 🕵️",
-      category: 'Category', youAreSpy: "You're the SPY! 🕵️", spyHintSpy: 'Write a clue that makes them think you know the word', spyHintCivilian: 'Write a clue about the word without saying it',
+      youAreCivilian: 'You know the word ✅', spyOneDoesnt: "One of you does not — find them", spySpyNoWord: 'You do not know the word — only the category', spyTaskCivilian: 'Write a clue that proves you know it, and only makes sense if you do', spyTaskSpy: 'Write a clue that makes them think you know it', spyWinCivilian: 'Catch the spy = +350', spyWinSpy: 'Stay hidden = +500 · guess the word = +300', spyClueExample: 'Like "crowded" or "I go sometimes"', spyWhyCaught: 'Most votes landed on the spy, so they were caught', spyWhyEscaped: 'No majority agreed, so the spy got away', category: 'Category', youAreSpy: "You're the SPY! 🕵️", spyHintSpy: 'Write a clue that makes them think you know the word', spyHintCivilian: 'Write a clue about the word without saying it',
       writeClue: 'Type your clue…', yourClue: 'Your clue', spyPickSuspect: "Who do you think is the spy? 🤔", spyWordIs: 'The word: {n}',
       guessWord: 'Guess the secret word (optional)', spyGuessBtn: 'Guess 🎯', guessSent: 'You guessed: {n}',
       spyWas: 'The spy was: {n}! 🕵️', spyCaught: 'Caught! ✅', spyEscaped: 'Got away! 😈', spyGuessWas: 'Guessed the word: "{n}"',
@@ -1284,16 +1284,29 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   // ---------- spy ----------
   function spyClueView() {
     const c = state.room.current;
+    // Three things a player kept having to work out for themselves: which side
+    // they are on, what they are being asked to write, and what any of it is
+    // worth. Each side now gets all three, in that order, above the input.
     const roleCard = c.amSpy
-      ? `<div class="q-card glass spy-card spy"><span class="type-tag spy">${TYPES.spy} ${t('type_spy')}</span><div class="spy-role">${t('youAreSpy')}</div><div class="spy-cat">${t('category')}: <b>${esc(c.category)}</b></div><div class="sub">${t('spyHintSpy')}</div></div>`
-      : `<div class="q-card glass spy-card"><span class="type-tag spy">${TYPES.spy} ${t('type_spy')}</span><div class="spy-word">${esc(c.word)}</div><div class="sub">${t('spyHintCivilian')}</div></div>`;
+      ? `<div class="q-card glass spy-card spy"><span class="type-tag spy">${TYPES.spy} ${t('type_spy')}</span>
+          <div class="spy-role">${t('youAreSpy')}</div>
+          <div class="spy-cat">${t('spySpyNoWord')}</div>
+          <div class="spy-cat">${t('category')}: <b>${esc(c.category)}</b></div>
+          <div class="spy-task">${t('spyTaskSpy')}</div>
+          <div class="spy-win">${t('spyWinSpy')}</div></div>`
+      : `<div class="q-card glass spy-card"><span class="type-tag spy">${TYPES.spy} ${t('type_spy')}</span>
+          <div class="spy-role civ">${t('youAreCivilian')}</div>
+          <div class="spy-word">${esc(c.word)}</div>
+          <div class="spy-cat">${t('spyOneDoesnt')}</div>
+          <div class="spy-task">${t('spyTaskCivilian')}</div>
+          <div class="spy-win">${t('spyWinCivilian')}</div></div>`;
     return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll" data-scroll="sp"><div class="wrap">
       ${roleCard}
       ${whoRow(c.submitted)}
       <div class="answer-box">
         ${c.myClue
           ? `<div class="my-answer"><small>${t('yourClue')}</small>${esc(c.myClue)}</div><div class="center muted"><span class="dots">${t('waitOthers')}</span></div>`
-          : `<form data-form="spyClue" class="col"><input id="spyclue" class="input" maxlength="24" placeholder="${t('writeClue')}" value="${esc(state.draft.spyClue)}" autocomplete="off" data-autofocus><button class="btn coral block" type="submit">${t('send')}</button></form>`}
+          : `<form data-form="spyClue" class="col"><input id="spyclue" class="input" maxlength="24" placeholder="${t('writeClue')}" value="${esc(state.draft.spyClue)}" autocomplete="off" data-autofocus><div class="center muted" style="font-size:12px">${t('spyClueExample')}</div><button class="btn coral block" type="submit">${t('send')}</button></form>`}
       </div>
       ${powerBar()}
     </div></div></div></div>`;
@@ -1304,7 +1317,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     const online = state.room.players.filter(p => p.connected);
     const clueMap = Object.fromEntries((c.clues || []).map(o => [o.id, o.text]));
     const cluesList = online.map((p, i) => `<div class="spy-clue-row" style="animation-delay:${i * 60}ms">${J(p.avatar)}<b>${esc(p.name)}</b><span>${esc(clueMap[p.id] || '')}</span></div>`).join('');
-    const roleLine = c.amSpy ? t('youAreSpy') : `${t('category')}: ${esc(c.category)} • ${t('spyWordIs', { n: esc(c.word) })}`;
+    const roleLine = c.amSpy
+      ? `${t('youAreSpy')} — ${t('spyWinSpy')}`
+      : `${t('spyWordIs', { n: esc(c.word) })} — ${t('spyWinCivilian')}`;
     return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll" data-scroll="spv"><div class="wrap">
       <div class="q-card glass spy-card"><span class="type-tag spy">${TYPES.spy} ${t('type_spy')}</span><div class="sub">${roleLine}</div></div>
       <div class="section-title"><span>${t('spyPickSuspect')}</span></div>
@@ -1335,6 +1350,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       <div class="q-card glass spy-card"><span class="type-tag spy">${TYPES.spy} ${t('type_spy')}</span><div class="spy-word">${esc(c.word)}</div>${imgSearch(c.word)}</div>
       <div class="lk-winner" id="spy-reveal-line">${spyP ? t('spyWas', { n: esc(spyP.name) }) : ''}</div>
       <div class="center" style="margin-top:6px"><span class="chip" style="background:${c.caught ? 'rgba(79,224,176,.2)' : 'rgba(255,122,133,.2)'}">${c.caught ? t('spyCaught') : t('spyEscaped')}</span></div>
+      <div class="center muted" style="margin-top:6px;font-size:13px">${c.caught ? t('spyWhyCaught') : t('spyWhyEscaped')}</div>
       ${c.guess ? `<div class="center muted" style="margin-top:8px">${t('spyGuessWas', { n: esc(c.guess) })} ${c.guessRight ? '✅' : '❌'}</div>` : ''}
       <div class="lk-list">${rows}</div>
     </div></div></div>${hostNext()}</div>`;

@@ -778,3 +778,8 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 .ansrow.ok { border-color: var(--mint); background: rgba(79,224,176,.13); }
 .ansrow.no { border-color: rgba(255,122,133,.45); background: rgba(255,122,133,.10); }
 .ansrow.none .said { color: var(--muted); font-weight: 600; }
+
+/* ---- the spy round says what you are, what to do, and what it pays ---- */
+.spy-role.civ { color: var(--mint); }
+.spy-task { margin-top: 10px; font-weight: 700; color: #ded8fb; line-height: 1.5; }
+.spy-win { margin-top: 8px; display: inline-block; padding: 4px 12px; border-radius: 99px; background: var(--card2); font-size: 12px; font-weight: 800; color: var(--lemon); }
