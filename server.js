@@ -154,6 +154,12 @@ function dropBots(room) {
   for (const [id, p] of room.players) if (p.bot) room.players.delete(id);
 }
 
+// One name for "this item, in this round", used both where a peek is stored
+// and where it is read back. Spelling it out separately in each place is how
+// Odd One Out ended up with a button the client happily enabled and the server
+// refused: the round was added, the power was not.
+const peekKey = (c, idx) => (c.type === 'bluff' ? 'vote' : c.type[0] + (idx == null ? c.idx : idx));
+
 function snapshot(room, pid) {
   const c = room.current;
   const s = {
@@ -172,7 +178,7 @@ function snapshot(room, pid) {
     s.current.submitted = Object.keys(c.lies);
     s.current.myLie = c.lies[pid] || null;
     if (ph === 'vote') {
-      const hidden = peeked('vote');
+      const hidden = peeked(peekKey(c));
       s.current.options = c.options.map(o => ({ id: o.id, text: o.text, mine: o.authors.includes(pid), hidden: hidden.includes(o.id) }));
       s.current.voted = Object.keys(c.votes);
       s.current.myVote = c.votes[pid] || null;
@@ -203,7 +209,7 @@ function snapshot(room, pid) {
   }
   if (c.type === 'emoji' && ['emoji', 'emojiResult'].includes(ph)) {
     const it = c.items[c.idx];
-    const hidden = peeked('e' + c.idx);
+    const hidden = peeked(peekKey(c));
     Object.assign(s.current, { idx: c.idx, total: c.items.length, emoji: it.e });
     s.current.options = it.opts.map(o => ({ id: o.id, text: o.text[L], hidden: hidden.includes(o.id) }));
     const ans = c.answers[c.idx];
@@ -226,7 +232,7 @@ function snapshot(room, pid) {
   }
   if (c.type === 'odd' && ['odd', 'oddResult'].includes(ph)) {
     const it = c.items[c.idx];
-    const hidden = peeked('o' + c.idx);
+    const hidden = peeked(peekKey(c));
     Object.assign(s.current, { idx: c.idx, total: c.items.length });
     s.current.options = it.opts.map(o => ({ id: o.id, text: o.text[L], hidden: hidden.includes(o.id) }));
     const ans = c.answers[c.idx];
@@ -803,6 +809,11 @@ const QUICK = {
   odd: { phase: 'odd', result: 'oddResult', base: 300, speed: 30 },
 };
 
+// Quick rounds where a peek makes sense: the ones that deal four options.
+// Derived from QUICK so another one added later is covered without anybody
+// having to remember this line.
+const PEEKABLE = TYPES.filter(t => QUICK[t] && t !== 'blitz');
+
 function startQuickItem(room) {
   const c = room.current;
   c.itemStart = Date.now();
@@ -919,17 +930,19 @@ function usePower(room, p, kind) {
     if (c.doubled[p.id]) return { error: 'dup' };
     c.doubled[p.id] = true;
   } else if (kind === 'peek') {
-    let key, wrong;
+    // Peek removes two wrong options, so it only means anything where there
+    // are wrong options to remove: the bluff vote, and the quick rounds that
+    // offer four. True or false offers two, and taking the wrong one away
+    // would simply be handing over the answer.
+    let wrong;
     if (room.phase === 'vote') {
       if (c.votes[p.id]) return { error: 'dup' };
-      key = 'vote';
       wrong = c.options.filter(o => !o.truth && !o.authors.includes(p.id)).map(o => o.id);
-    } else if (room.phase === 'emoji') {
+    } else if (PEEKABLE.includes(c.type) && room.phase === QUICK[c.type].phase) {
       if (c.answers[c.idx][p.id]) return { error: 'dup' };
-      key = 'e' + c.idx;
       wrong = c.items[c.idx].opts.filter(o => !o.ok).map(o => o.id);
     } else return { error: 'nopeek' };
-    c.peeked[p.id] = { key, ids: shuffle(wrong).slice(0, 2) };
+    c.peeked[p.id] = { key: peekKey(c), ids: shuffle(wrong).slice(0, 2) };
   } else return { error: 'bad' };
   p.powers[kind] -= 1;
   broadcast(room);
