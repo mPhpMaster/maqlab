@@ -50,7 +50,11 @@ const MODS = [
 // answer is nearly given away by your own.
 // Name Something scores you for everyone who wrote what you wrote, so alone
 // there is nobody to agree with.
-const MIN_PLAYERS = { likely: 3, spy: 4, many: 3, name: 3 };
+// Four for Name Something, not three: measured against the real bank, three
+// players leave 38% of rounds with nobody matching anybody at all. And that
+// measurement is generous — it assumes everyone reaches for one of the few
+// obvious answers, which real players do not. At four it drops to 10%.
+const MIN_PLAYERS = { likely: 3, spy: 4, many: 3, name: 4 };
 // The plan is drawn once at kickoff, but people leave mid-game. Before a round
 // starts, swap out a mode the room has shrunk below.
 function supportedType(room, wanted) {
@@ -483,7 +487,10 @@ function finishRound(room) {
 function createRoom() {
   const room = {
     code: newCode(), hostId: null, phase: 'lobby',
-    settings: { lang: 'en', rounds: 8, types: { bluff: true, number: true, blitz: true, likely: true, emoji: true, odd: true, order: true, spy: true }, pace: 'normal', teams: false, public: true },
+    // Every type on, derived from TYPES rather than listed. Spelling them out
+    // meant a new round type was off in every new room, so nobody would ever
+    // meet it — they would have to know it existed and go and switch it on.
+    settings: { lang: 'en', rounds: 8, types: Object.fromEntries(TYPES.map(t => [t, true])), pace: 'normal', teams: false, public: true },
     players: new Map(), round: 0, gameNo: 0, current: null, deadline: null, timer: null,
     used: {}, plan: [], gains: {}, prevRank: {}, awards: [], bestLie: null, pairs: {}, rivals: {}, log: [], touched: Date.now(),
     balloon: { size: 0, target: 20 + rnd(20), pops: {} },

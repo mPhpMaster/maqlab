@@ -71,3 +71,11 @@ test('a tied jackpot is drawn, not handed to whoever joined first', () => {
   for (let i = 0; i < 30000; i++) wins[rnd(3)] += 1;
   for (const w of wins) assert.ok(Math.abs(w - 10000) < 800, `uneven draw: ${wins}`);
 });
+
+// A new round type was added to TYPES, to the planner, to the bots and to the
+// screens — and was still off in every new room, because the default settings
+// spelled the eight older types out by name. Nobody would ever have met it.
+test('a new room has every round type switched on', () => {
+  assert.match(server, /types: Object\.fromEntries\(TYPES\.map\(t => \[t, true\]\)\)/,
+    'default round types are listed by hand again, so a new type ships switched off');
+});
