@@ -442,6 +442,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     const prev = state.room;
     state.clockOffset = snap.now - Date.now();
     state.room = snap;
+    // A new round starts from an empty hand. Without this an ordering left
+    // unfinished when the clock ran out stayed in the draft for the next one.
+    if (prev && prev.round !== snap.round) state.draft.order = [];
     const changed = !prev || prev.phase !== snap.phase || prev.round !== snap.round || (snap.current && prev.current && snap.current.idx !== prev.current.idx);
     if (changed) onPhase(prev, snap);
     else if (prev && prev.current && snap.current) {
@@ -1120,9 +1123,20 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   // Tapping, not dragging. Dragging four cards into order on a phone, against
   // a clock, with a thumb, is a worse game than the one being played — so you
   // tap them in order and tap again to take one back.
+  // The one place that decides what this round's ordering is. The view used to
+  // filter the draft down to the current round's items while ordsend posted
+  // the draft raw, so a round that ran out of time poisoned the next one: four
+  // items showed as 1-4 on screen while eight ids went to the server, and it
+  // answered "invalid choice" to an order that looked perfectly valid.
+  const orderSeq = () => {
+    const c = state.room && state.room.current;
+    if (!c || !Array.isArray(c.items)) return [];
+    return state.draft.order.filter(id => c.items.some(it => it.id === id));
+  };
+
   function orderView() {
     const c = state.room.current;
-    const picked = state.draft.order.filter(id => c.items.some(it => it.id === id));
+    const picked = orderSeq();
     const done = c.myOrder != null;
     const seq = done ? c.myOrder : picked;
     const byId = Object.fromEntries(c.items.map(it => [it.id, it]));
@@ -2151,7 +2165,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     },
     ordclear() { state.draft.order = []; sfx.tap(); state.lastKey = ''; render(); },
     async ordsend() {
-      const r = await emit('order', state.draft.order);
+      const r = await emit('order', orderSeq());
       if (r && r.error) { toast(t('err_' + r.error), 'err'); return; }
       sfx.send(); buzz(20); state.draft.order = [];
     },
