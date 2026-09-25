@@ -73,3 +73,26 @@ test('the privacy policy still describes what the replay keeps', () => {
   assert.ok(!/never written to disk/i.test(html), 'the disk claim that stopped being true is back');
   assert.ok(!html.includes('ما تُكتب على القرص أبداً'), 'the Arabic disk claim that stopped being true is back');
 });
+
+// The terms told players they could join as a guest while the server refused
+// every join without a session, and the privacy policy said the opposite of
+// the terms. Nothing tied any of the three together, so all three disagreed
+// for as long as nobody read them side by side.
+test('the legal pages agree with the sign-in the server actually enforces', () => {
+  const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+  const signInRequired = /if \(!session\) return reply\(cb, \{ error: 'signin' \}\)/.test(server);
+  assert.ok(signInRequired,
+    'the join handler no longer requires a session — the legal pages say it does, so update them together');
+
+  const terms = read('terms.html');
+  for (const claim of ['play as a guest', 'Signing in with Discord is optional', 'تقدر تلعب كضيف']) {
+    assert.ok(!terms.includes(claim),
+      `terms.html still claims "${claim}" while the server refuses a join without a session`);
+  }
+  assert.match(terms, /Playing requires signing in/i, 'the English terms stopped saying sign-in is required');
+  assert.ok(terms.includes('اللعب يتطلب تسجيل دخول'), 'the Arabic terms stopped saying sign-in is required');
+
+  // and the privacy policy has to tell the same story
+  const privacy = read('privacy.html');
+  assert.match(privacy, /Playing (requires|needs) a Discord sign-in/i, 'the privacy policy disagrees with the terms');
+});
