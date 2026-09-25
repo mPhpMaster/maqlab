@@ -4,10 +4,9 @@
 -- This file is applied on every boot, so every statement must be idempotent.
 
 create table if not exists profiles (
-  user_id      text primary key,          -- Discord id, or guest-<random>
+  user_id      text primary key,          -- a Discord id; playing requires signing in
   name         text not null,
   avatar       jsonb not null default '{}'::jsonb,
-  is_guest     boolean not null default false,
 
   xp           integer not null default 0,
   games        integer not null default 0,
@@ -40,6 +39,12 @@ create table if not exists profiles (
   ban_reason text,
   banned_by  text
 );
+
+-- Playing has required a Discord sign-in for a while, so every profile is a
+-- real account and is_guest was written but never read. Dropped rather than
+-- left behind, in its own deploy: Render keeps the old instance serving while
+-- the new one boots, so the deploy that stopped writing it had to land first.
+alter table profiles drop column if exists is_guest;
 
 -- the leaderboard's exact sort order, so ranking never does a full sort
 create index if not exists profiles_board_idx
