@@ -44,7 +44,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       writeLie: 'اكتب إجابة كاذبة مقنعة…', lieHint: 'كل واحد ينخدع بكذبتك = +300', send: 'أرسل 😈', yourLie: 'كذبتك', waitOthers: 'ننتظر الباقين',
       pickTruth: 'وين الإجابة الصحيحة؟ 🤔', bet1: 'آمن', bet2: 'واثق', bet3: 'متأكد 100%', yours: 'كذبتك', betInfo: 'صح = 500 × رهانك • غلط = −150 لكل مستوى زيادة', voted: 'تم التصويت ✓',
       lieBy: 'كذبة {n}', houseLie: 'كذبة اللعبة 🤖', truth: 'الصح ✅', fooledN: 'انخدع {n} 😈', gotIt: 'عرفوها 🧠', nobody: 'ما أحد عرفها! 😱', next: 'التالي ⏭', nextIn: 'التالي بعد', seeImages: 'شوف صور', gotFooledBy: 'انقلبت على يد {n} 😂',
-      yourGuess: 'تخمينك', typeNumber: 'اكتب رقم', true: 'صح', false: 'خطأ', rightAns: 'أصبت! 🎉', wrongAns: 'أخطأت 😬', noAns: 'ما جاوبت ⏰', fastestIs: '⚡ الأسرع: {n}',
+      yourGuess: 'تخمينك', typeNumber: 'اكتب رقم', true: 'صح', false: 'خطأ', whatTheySaid: 'وش جاوبوا', rightAns: 'أصبت! 🎉', wrongAns: 'أخطأت 😬', noAns: 'ما جاوبت ⏰', fastestIs: '⚡ الأسرع: {n}',
       pickPlayer: 'اختار واحد من الشلة 👇', youPicked: 'اخترت {n}', likelyWinner: 'الشلة اختارت: {n}!', votesN: { one: 'صوت واحد', two: 'صوتان', few: '{n} أصواتٍ', many: '{n} صوتاً', other: '{n} صوتٍ' }, withCrowd: 'مع الأغلبية +300 👥', noVotes: 'ما أحد صوّت',
       whatEmoji: 'وش تعني هالإيموجيات؟', answerWas: 'الجواب: {v}',
       scores: 'الترتيب', final: 'انتهت اللعبة! 🎉', winnerIs: '{n} فاز! 🏆', awards: 'الألقاب', playAgain: 'جولة ثانية 🔁', home: 'الرئيسية', bestLie: 'أفضل كذبة في اللعبة', bestLieBy: '{n} • خدعت {f}',
@@ -115,7 +115,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       writeLie: 'Type a convincing fake answer…', lieHint: 'Every player you fool = +300', send: 'Send 😈', yourLie: 'Your lie', waitOthers: 'Waiting for others',
       pickTruth: 'Which one is the truth? 🤔', bet1: 'Safe', bet2: 'Sure', bet3: 'All in', yours: 'yours', betInfo: 'Right = 500 × bet • Wrong = −150 per extra level', voted: 'Voted ✓',
       lieBy: "{n}'s lie", houseLie: 'House lie 🤖', truth: 'TRUTH ✅', fooledN: '{n} fooled 😈', gotIt: 'Got it 🧠', nobody: 'Nobody got it! 😱', next: 'Next ⏭', nextIn: 'Next in', seeImages: 'See images', gotFooledBy: '{n} got you! 😂',
-      yourGuess: 'Your guess', typeNumber: 'Type a number', true: 'True', false: 'False', rightAns: 'Correct! 🎉', wrongAns: 'Wrong 😬', noAns: 'No answer ⏰', fastestIs: '⚡ Fastest: {n}',
+      yourGuess: 'Your guess', typeNumber: 'Type a number', true: 'True', false: 'False', whatTheySaid: 'What everyone said', rightAns: 'Correct! 🎉', wrongAns: 'Wrong 😬', noAns: 'No answer ⏰', fastestIs: '⚡ Fastest: {n}',
       pickPlayer: 'Pick someone 👇', youPicked: 'You picked {n}', likelyWinner: 'The crowd picked: {n}!', votesN: { one: '1 vote', other: '{n} votes' }, withCrowd: 'With the crowd +300 👥', noVotes: 'No votes',
       whatEmoji: 'What do these emojis mean?', answerWas: 'Answer: {v}',
       scores: 'Leaderboard', final: 'Game over! 🎉', winnerIs: '{n} wins! 🏆', awards: 'Awards', playAgain: 'Play again 🔁', home: 'Home', bestLie: 'Best lie of the game', bestLieBy: '{n} • fooled {f}',
@@ -1069,19 +1069,35 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ${whoRow(c.answered)}
     </div></div></div></div>`;
   }
-  function quickResult(c, header) {
+  // After a result, who actually said what. A tick tells you that you were
+  // wrong; seeing that three people picked the same wrong answer, and which
+  // one, is the part everyone argues about afterwards.
+  function answerList(say) {
+    const c = state.room.current;
+    const rows = state.room.players.filter(p => p.connected).map(p => {
+      const r = c.results && c.results[p.id];
+      const said = r ? say(r, c) : null;
+      const cls = !r ? 'none' : r.correct ? 'ok' : 'no';
+      return `<div class="ansrow ${cls}">${J(p.avatar)}<span class="nm">${esc(p.name)}</span>
+        <span class="said">${said ? esc(said) : '—'}</span></div>`;
+    }).join('');
+    return `<div class="answers"><div class="ans-title">${t('whatTheySaid')}</div>${rows}</div>`;
+  }
+
+  function quickResult(c, header, say) {
     const mine = c.results[myId()];
     const fast = c.fastest && P(c.fastest);
     return `${header}
       <div class="center" style="font-weight:800;font-size:20px;margin-top:6px">${mine ? (mine.correct ? t('rightAns') : t('wrongAns')) : t('noAns')}</div>
       ${fast ? `<div class="center" style="margin-top:8px"><span class="chip">${t('fastestIs', { n: esc(fast.name) })}</span></div>` : ''}
+      ${say ? answerList(say) : ''}
       ${whoRow(null, c.results)}`;
   }
   function blitzResultView() {
     const c = state.room.current;
     return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
       ${quickDots(c, true)}${qCard('blitz', c.statement)}
-      ${quickResult(c, `<div class="verdict ${c.truth ? 't' : 'f'}">${c.truth ? '✅ ' + t('true') : '❌ ' + t('false')}</div>`)}
+      ${quickResult(c, `<div class="verdict ${c.truth ? 't' : 'f'}">${c.truth ? '✅ ' + t('true') : '❌ ' + t('false')}</div>`, r => (r.v ? t('true') : t('false')))}
     </div></div></div></div>`;
   }
   function mountQuickResult() {
@@ -1115,7 +1131,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
       ${quickDots(c, true)}
       <div class="q-card glass emoji-card"><span class="type-tag emoji">${TYPES.emoji} ${t('type_emoji')}</span><div class="big-emoji">${esc(c.emoji)}</div></div>
-      ${quickResult(c, `<div class="verdict t">${esc(right ? right.text : '')}</div>${imgSearch(right ? right.text : '')}`)}
+      ${quickResult(c, `<div class="verdict t">${esc(right ? right.text : '')}</div>${imgSearch(right ? right.text : '')}`, (r, c) => (c.options.find(o => o.id === r.id) || {}).text)}
     </div></div></div></div>`;
   }
 
@@ -1160,6 +1176,20 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     </div></div></div></div>`;
   }
 
+  // Everyone else's ordering, not just your own. Half the fun of this round is
+  // finding out that someone put the whale last.
+  function everyOrder(c) {
+    const by = Object.fromEntries(c.truth.map(it => [it.id, it.text]));
+    const rows = state.room.players.filter(p => p.connected).map(p => {
+      const r = c.results && c.results[p.id];
+      const seq = r ? r.seq.map(id => by[id] || '?').join(' › ') : null;
+      const perfect = r && r.pairs === c.truth.length - 1;
+      return `<div class="ansrow ${!r ? 'none' : perfect ? 'ok' : ''}">${J(p.avatar)}<span class="nm">${esc(p.name)}</span>
+        <span class="said">${seq ? esc(seq) : '—'}${r ? ` <b>${t('pairsRight', { n: r.pairs })}</b>` : ''}</span></div>`;
+    }).join('');
+    return `<div class="answers"><div class="ans-title">${t('whatTheySaid')}</div>${rows}</div>`;
+  }
+
   function orderResultView() {
     const c = state.room.current, mid = myId();
     const mine = (c.results && c.results[mid]) || null;
@@ -1177,6 +1207,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         </div>`;
       }).join('')}</div>
       ${mine ? `<div class="center" style="margin-top:14px;font-weight:800">${mine.pairs === c.truth.length - 1 ? t('perfectOrder') : t('pairsRight', { n: mine.pairs })}</div>` : ''}
+      ${everyOrder(c)}
     </div></div></div></div>`;
   }
 
@@ -1200,7 +1231,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
       ${quickDots(c, true)}
       <div class="q-card glass"><span class="type-tag odd">${TYPES.odd} ${t('type_odd')}</span><div class="q">${t('whichOdd')}</div></div>
-      ${quickResult(c, `<div class="verdict t">${esc(right ? right.text : '')}</div><div class="why">${esc(c.why || '')}</div>${imgSearch(right ? right.text : '')}`)}
+      ${quickResult(c, `<div class="verdict t">${esc(right ? right.text : '')}</div><div class="why">${esc(c.why || '')}</div>${imgSearch(right ? right.text : '')}`, (r, c) => (c.options.find(o => o.id === r.id) || {}).text)}
     </div></div></div></div>`;
   }
 

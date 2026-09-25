@@ -767,3 +767,14 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 #conn { position: fixed; top: 0; left: 0; right: 0; z-index: 250; display: none; justify-content: center; pointer-events: none; }
 #conn.on { display: flex; }
 .conn-bar { margin-top: 10px; padding: 9px 18px; border-radius: 99px; background: #5a2440; border: 1px solid rgba(255,122,133,.5); color: var(--text); font-weight: 700; font-size: 13px; box-shadow: 0 10px 30px -10px rgba(0,0,0,.6); animation: pop .3s; max-width: 92vw; text-align: center; }
+
+/* ---- who answered what, on a result screen ---- */
+.answers { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.ans-title { text-align: center; color: var(--muted); font-size: 12px; font-weight: 800; margin-bottom: 2px; }
+.ansrow { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); font-size: 14px; }
+.ansrow svg { width: 26px; height: 26px; flex: none; }
+.ansrow .nm { font-weight: 700; }
+.ansrow .said { margin-inline-start: auto; font-weight: 800; text-align: end; }
+.ansrow.ok { border-color: var(--mint); background: rgba(79,224,176,.13); }
+.ansrow.no { border-color: rgba(255,122,133,.45); background: rgba(255,122,133,.10); }
+.ansrow.none .said { color: var(--muted); font-weight: 600; }
