@@ -12,6 +12,7 @@ const achievements = require('./achievements');
 const { matchAnswerCase } = require('./text');
 const bots = require('./bots');
 const replay = require('./replay');
+const persist = require('./persist');
 
 const PORT = process.env.PORT || 3000;
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
@@ -376,6 +377,7 @@ function broadcast(room) {
   room.touched = Date.now();
   for (const p of room.players.values()) if (p.socketId) io.to(p.socketId).emit('room', snapshot(room, p.id));
   scheduleBots(room);
+  saveRoom(room);
 }
 
 function clearTimer(room) { if (room.timer) clearTimeout(room.timer); room.timer = null; }
@@ -383,6 +385,9 @@ function setTimer(room, sec, fn) {
   clearTimer(room);
   room.deadline = Date.now() + sec * 1000;
   room.timer = setTimeout(fn, sec * 1000);
+  // Every phase change comes through here, which makes it the one checkpoint
+  // worth writing down without waiting for the throttle.
+  saveRoom(room, true);
 }
 const pace = (room, key) => {
   const base = T[room.settings.pace][key];
@@ -840,17 +845,24 @@ function resolveQuickItem(room) {
   if (fastest) { gain(room, fastest, 'fastest', 100); const fp = room.players.get(fastest); if (fp) fp.stats.fastest += 1; }
   c.fastest[c.idx] = fastest;
   room.phase = q.result;
-  setTimer(room, pace(room, room.phase), () => {
-    if (c.idx + 1 < c.items.length) { c.idx += 1; startQuickItem(room); return; }
-    for (const p of connected(room)) {
-      const n = c.correctCount[p.id] || 0;
-      p.stats.correct += n;
-      streakResult(room, p.id, n >= 2);
-    }
-    finishRound(room);
-    showScores(room);
-  });
+  setTimer(room, pace(room, room.phase), () => advanceQuick(room));
   broadcast(room);
+}
+
+// On to the next item, or out of the round. Named rather than inline because
+// a restored room has to be able to pick this up again, and a closure cannot
+// be written to a database.
+function advanceQuick(room) {
+  const c = room.current;
+  if (!c) return;
+  if (c.idx + 1 < c.items.length) { c.idx += 1; startQuickItem(room); return; }
+  for (const p of connected(room)) {
+    const n = c.correctCount[p.id] || 0;
+    p.stats.correct += n;
+    streakResult(room, p.id, n >= 2);
+  }
+  finishRound(room);
+  showScores(room);
 }
 
 // ----- line them up -----
@@ -1033,6 +1045,8 @@ function finishGame(room) {
   room.phase = 'final';
   broadcast(room);
   recordResults(room).catch(e => console.error('recordResults', e.message));
+  // Nothing to come back to once the scores are final.
+  forgetRoom(room.code);
 }
 
 function backToLobby(room) {
@@ -1274,13 +1288,86 @@ setInterval(() => {
       // Bots do not keep a room alive, and they do not outlive the last
       // person in it either.
       if (r.players.size !== people.length) dropBots(r);
-      if (now - r.touched > (people.length ? ROOM_TTL_MS : 5 * 60 * 1000)) { clearTimer(r); rooms.delete(code); }
+      if (now - r.touched > (people.length ? ROOM_TTL_MS : 5 * 60 * 1000)) { clearTimer(r); rooms.delete(code); forgetRoom(code); }
     }
   }
   for (const [instanceId, code] of discordInstanceRooms) {
     if (!rooms.has(code)) discordInstanceRooms.delete(instanceId);
   }
 }, 60 * 1000);
+
+// ---------------- surviving a restart ----------------
+// What a phase is waiting for. A timer is a live callback and cannot be
+// written down, so it is derived from the phase on the way back — the same
+// call the phase set for itself when it began.
+const RESUME = {
+  spin: beginRound,
+  write: startVote,
+  vote: revealBluff,
+  guess: revealNumber,
+  likelyVote: revealLikely,
+  spyClue: startSpyVote,
+  spyVote: revealSpy,
+  order: revealOrder,
+  bluffReveal: showScores,
+  numReveal: showScores,
+  likelyReveal: showScores,
+  spyReveal: showScores,
+  orderResult: r => { finishRound(r); showScores(r); },
+  scores: nextRound,
+};
+for (const q of Object.values(QUICK)) {
+  RESUME[q.phase] = resolveQuickItem;
+  RESUME[q.result] = advanceQuick;
+}
+
+// Long enough for a page to reload and a socket to come back, so nobody loses
+// a round to the restart itself.
+const RESUME_GRACE_MS = 20 * 1000;
+
+// Writes are throttled per room: broadcast fires on every answer, and a round
+// does not need to be written down that often to survive.
+const SAVE_EVERY_MS = 3000;
+const lastSave = new Map();
+function saveRoom(room, force = false) {
+  if (!db.on() || !persist.worthSaving(room)) return;
+  const now = Date.now();
+  if (!force && now - (lastSave.get(room.code) || 0) < SAVE_EVERY_MS) return;
+  lastSave.set(room.code, now);
+  db.saveRoom(room.code, persist.dump(room)).catch(e => console.error('could not save room', room.code, e.message));
+}
+function forgetRoom(code) {
+  lastSave.delete(code);
+  if (db.on()) db.dropRoom(code).catch(() => {});
+}
+
+async function restoreRooms() {
+  if (!db.on()) return;
+  let saved = [];
+  try {
+    saved = await db.liveRooms(persist.MAX_AGE_MS);
+  } catch (e) {
+    return console.error('could not read rooms back:', e.message);
+  }
+  let back = 0;
+  for (const data of saved) {
+    if (persist.tooOld(data) || rooms.has(data.code)) continue;
+    try {
+      const room = persist.load(data);
+      rooms.set(room.code, room);
+      const resume = RESUME[room.phase];
+      if (resume) {
+        // Whatever was left on the clock, plus enough time to get back in.
+        const left = Math.max(data.remainingMs || 0, RESUME_GRACE_MS);
+        setTimer(room, left / 1000, () => resume(room));
+      }
+      back += 1;
+    } catch (e) {
+      console.error('could not restore room', data && data.code, e.message);
+    }
+  }
+  if (back) console.log(`restored ${back} room(s) in progress`);
+}
 
 // ---------------- http ----------------
 app.set('trust proxy', 1); // Render terminates TLS ahead of us; needed for secure cookies + req.protocol
@@ -1726,7 +1813,13 @@ process.on('unhandledRejection', e => console.error('unhandled rejection:', e &&
 process.on('uncaughtException', e => console.error('uncaught exception:', e && e.stack ? e.stack : e));
 
 db.init()
-  .then(ok => console.log(ok ? 'database connected' : 'no DATABASE_URL — profiles, leaderboard and moderation are off'))
+  .then(ok => {
+    console.log(ok ? 'database connected' : 'no DATABASE_URL — profiles, leaderboard and moderation are off');
+    // Games that were in progress when this process last stopped. Done after
+    // the schema is applied and before anyone can rejoin, so a returning
+    // player finds their room already waiting rather than gone.
+    if (ok) return restoreRooms();
+  })
   .catch(e => console.error('database unavailable, running without it:', e.message));
 
 server.listen(PORT, () => console.log(`MAQLAB running on http://localhost:${PORT}`));

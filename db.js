@@ -142,6 +142,25 @@ const saveMatch = ({ id, roomCode, gameNo, lang, rounds, data }) =>
 
 const getReplay = id => one('select * from matches where id = $1', [id]);
 
+// ---------------- rooms in progress ----------------
+// Upsert rather than insert: a room is written many times over its life, and
+// only the latest state is ever read back.
+const saveRoom = (code, data) =>
+  q(`insert into live_rooms (code, data, updated_at) values ($1, $2, now())
+     on conflict (code) do update set data = excluded.data, updated_at = now()`,
+    [code, JSON.stringify(data)]);
+
+const dropRoom = code => q('delete from live_rooms where code = $1', [code]);
+
+// Only rooms recent enough to still have someone waiting on them. The rest are
+// cleared out in the same breath, so the table cannot grow without bound.
+async function liveRooms(maxAgeMs) {
+  const secs = Math.round(maxAgeMs / 1000);
+  await q(`delete from live_rooms where updated_at < now() - ($1 || ' seconds')::interval`, [secs * 3]);
+  const r = await q(`select data from live_rooms where updated_at > now() - ($1 || ' seconds')::interval`, [secs]);
+  return r.rows.map(x => x.data);
+}
+
 // ---------------- social ----------------
 const follow = (followerId, followeeId) =>
   q(`insert into follows (follower_id, followee_id) values ($1,$2) on conflict do nothing`, [followerId, followeeId]);
@@ -203,7 +222,7 @@ const searchProfiles = term =>
     [`%${term.replace(/[%_\\]/g, m => '\\' + m)}%`, term]).then(r => r.rows);
 
 module.exports = {
-  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, recordGame, addAchievements, getMatch, saveMatch, getReplay,
+  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, recordGame, addAchievements, getMatch, saveMatch, getReplay, saveRoom, dropRoom, liveRooms,
   follow, unfollow, following, followCounts, isFollowing,
   createReport, createSuggestion,
   isBanned, setBan, unban, resetProfile,

@@ -124,3 +124,13 @@ create table if not exists matches (
   data        jsonb not null,
   finished_at timestamptz not null default now()
 );
+
+-- A game in progress, so a deploy or a crash does not take it with it. Rows
+-- are short-lived by nature: written while a room is live, deleted when it
+-- ends, and ignored on boot once they are older than a few minutes.
+create table if not exists live_rooms (
+  code       text primary key,
+  data       jsonb not null,
+  updated_at timestamptz not null default now()
+);
+create index if not exists live_rooms_updated_idx on live_rooms (updated_at desc);
