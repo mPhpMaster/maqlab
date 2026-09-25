@@ -33,14 +33,19 @@ const q = (text, params) => pool.query(text, params);
 const one = async (text, params) => (await q(text, params)).rows[0] || null;
 
 // ---------------- profiles ----------------
-async function touchProfile({ userId, name, avatar, isGuest = false }) {
+// is_guest is not written any more: playing has required a Discord sign-in
+// for a while, so every profile is a real account and the column was only ever
+// written, never read. It is dropped in a follow-up deploy rather than this
+// one, because Render keeps the old instance serving while the new one boots —
+// dropping it here would break sign-in on the instance still taking traffic.
+async function touchProfile({ userId, name, avatar }) {
   return one(
-    `insert into profiles (user_id, name, avatar, is_guest)
-     values ($1, $2, $3, $4)
+    `insert into profiles (user_id, name, avatar)
+     values ($1, $2, $3)
      on conflict (user_id) do update
        set name = excluded.name, avatar = excluded.avatar, last_seen_at = now()
      returning *`,
-    [userId, name, JSON.stringify(avatar || {}), isGuest]
+    [userId, name, JSON.stringify(avatar || {})]
   );
 }
 
