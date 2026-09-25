@@ -75,7 +75,7 @@ The game runs inside Discord (launched from the rocket 🚀 button in a voice ch
 
 ## Files
 - `server.js`: the game engine (rooms, round scheduling, scoring, powers, titles)
-- `content.js`: all the content in English and Arabic — 918 questions (bluff 157, numbers 125, true/false 152, most likely 117, emoji 106, odd one out 90, line them up 60, spy 111). `npm run check` validates the banks for duplicates, schema, and answers that give themselves away by length.
+- `content.js`: all the content in English and Arabic — 1,055 questions (bluff 157, numbers 125, true/false 152, most likely 117, emoji 167, odd one out 135, line them up 91, spy 111). `npm run check` validates the banks for duplicates, schema, and answers that give themselves away by length.
 - `db.js` + `db/schema.sql`: profiles, match results, match replays, follows, reports, suggestions
 - `auth.js`: signed session tokens, Discord sign-in, admin checks
 - `bots.js`: what a bot does in each round (the server decides when)
