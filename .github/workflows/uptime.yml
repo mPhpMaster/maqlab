@@ -1,0 +1,55 @@
+name: Uptime check
+
+# This used to try to keep the free instance awake by pinging every ten
+# minutes. It does not work, and the measurement is worth keeping: GitHub
+# throttles scheduled workflows hard, and over ten hours it delivered four runs
+# instead of ninety, with gaps of 136, 194 and 241 minutes. Render sleeps after
+# fifteen. A cron this frequent is simply not honoured, and no amount of tuning
+# inside the workflow changes that — one run even arrived outside its own hour
+# window.
+#
+# So it is what it actually is: a check that the game is still up. Keeping the
+# instance warm needs something built for it — an external pinger that fires on
+# the minute.
+#
+# A failure here is worth looking at. A single slow reply is not: the first
+# request after a sleep takes about 23 seconds, which is why the timeout is
+# generous and why only a total failure fails the job.
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Probe the game
+        env:
+          URL: https://maqlab.onrender.com/health
+        run: |
+          # Three probes, far enough apart that a restart in progress gets a
+          # second chance, close enough that the job stays short.
+          ok=0
+          for i in 1 2 3; do
+            # curl prints 000 when it cannot connect; `|| true` keeps a failed
+            # probe from aborting the step.
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 90 "$URL" || true)
+            echo "$(date -u '+%H:%M:%S') UTC  probe $i  ->  $code"
+            if [ "$code" = "200" ]; then ok=$((ok + 1)); fi
+            if [ "$i" -lt 3 ]; then sleep 45; fi
+          done
+          echo "$ok of 3 probes answered"
+          if [ "$ok" -eq 0 ]; then
+            echo "::error::No probe answered - the game looks down."
+            exit 1
+          fi

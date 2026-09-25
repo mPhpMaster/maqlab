@@ -50,7 +50,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       scores: 'الترتيب', final: 'انتهت اللعبة! 🎉', winnerIs: '{n} فاز! 🏆', awards: 'الألقاب', playAgain: 'جولة ثانية 🔁', home: 'الرئيسية', bestLie: 'أفضل كذبة في اللعبة', bestLieBy: '{n} • خدعت {f}',
       level: 'مستوى', levelUp: 'مستوى جديد! 🎉',
       leave: 'غادر الغرفة', endGame: 'أنهِ اللعبة الحين', sound: 'الأصوات', music: 'الموسيقى', on: 'شغّال', off: 'مطفي', uiLang: 'English', menu: 'القائمة',
-      kicked: 'تم إخراجك من الغرفة', confirmKick: 'تبي تطلّع {n} من الغرفة؟', yes: 'إيه', cancel: 'إلغاء', reconnecting: 'انقطع الاتصال… نحاول نرجع', loading: 'جاري الدخول…', close: 'تمام', pokedYou: '{n} نغزك 👉',
+      kicked: 'تم إخراجك من الغرفة', confirmKick: 'تبي تطلّع {n} من الغرفة؟', yes: 'إيه', cancel: 'إلغاء', reconnecting: 'انقطع الاتصال… نحاول نرجع', waking: 'نوقظ الخادم… ياخذ نص دقيقة تقريباً', loading: 'جاري الدخول…', close: 'تمام', pokedYou: '{n} نغزك 👉',
       power_peek: 'كشّاف', power_double: 'دبل', powerOn: 'مفعّل ✓', peekDone: 'شلنا خيارين غلط 🔍', doubleDone: 'نقاطك بهالجولة ×2 💎', doubledBy: '💎 {n} فعّل الدبل!',
       err_truth: 'هذي الإجابة الصحيحة! اكتب كذبة 😏', err_own: 'ما تقدر تختار كذبتك 😅', err_selfvote: 'ما تقدر تصوت لنفسك 😅', err_noroom: 'الغرفة غير موجودة', err_full: 'الغرفة ممتلئة', err_nan: 'اكتب رقم صحيح', err_empty: 'اكتب شيء أول', err_late: 'انتهى الوقت ⏰', err_host: 'للمضيف فقط', err_dup: 'استخدمتها خلاص', err_nopower: 'خلصت هالقدرة', err_nopeek: 'الكشّاف يشتغل وقت الاختيار بس 🔍', err_bad: 'خيار غير صالح', err_signin: 'سجّل دخولك بديسكورد أول',
       g_correct: 'إجابة صحيحة', g_fooled: 'خدعت لاعبين', g_betLoss: 'خسارة الرهان', g_streak: 'سلسلة 🔥', g_bullseye: 'في الصميم 🎯', g_closest: 'الأقرب', g_second: 'المركز الثاني', g_third: 'المركز الثالث', g_blitz: 'إجابات صحيحة', g_emoji: 'إجابات صحيحة', g_odd: 'إجابات صحيحة', g_speed: 'مكافأة السرعة', g_fastest: 'الأسرع ⚡', g_jackpot: 'صندوق الحظ 🎁', g_majority: 'مع الأغلبية 👥', g_famous: 'اختاروك 🌟', g_double: 'دبل 💎', g_spyCatch: 'لقّط الجاسوس', g_spyEvade: 'هرب من اللقطة', g_spyGuess: 'خمّن الكلمة',
@@ -121,7 +121,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       scores: 'Leaderboard', final: 'Game over! 🎉', winnerIs: '{n} wins! 🏆', awards: 'Awards', playAgain: 'Play again 🔁', home: 'Home', bestLie: 'Best lie of the game', bestLieBy: '{n} • fooled {f}',
       level: 'Level', levelUp: 'Level up! 🎉',
       leave: 'Leave room', endGame: 'End game now', sound: 'Sound effects', music: 'Music', on: 'On', off: 'Off', uiLang: 'العربية', menu: 'Menu',
-      kicked: 'You were removed from the room', confirmKick: 'Remove {n} from the room?', yes: 'Yes', cancel: 'Cancel', reconnecting: 'Connection lost… reconnecting', loading: 'Joining…', close: 'Got it', pokedYou: '{n} poked you 👉',
+      kicked: 'You were removed from the room', confirmKick: 'Remove {n} from the room?', yes: 'Yes', cancel: 'Cancel', reconnecting: 'Connection lost… reconnecting', waking: 'Waking the server up… this takes about half a minute', loading: 'Joining…', close: 'Got it', pokedYou: '{n} poked you 👉',
       power_peek: 'Peek', power_double: 'Double', powerOn: 'Active ✓', peekDone: 'Removed two wrong options 🔍', doubleDone: 'Your points this round ×2 💎', doubledBy: '💎 {n} used Double!',
       err_truth: "That's the real answer! Write a lie 😏", err_own: "You can't pick your own lie 😅", err_selfvote: "You can't vote for yourself 😅", err_noroom: "Room doesn't exist", err_full: 'Room is full', err_nan: 'Enter a valid number', err_empty: 'Type something first', err_late: "Time's up ⏰", err_host: 'Host only', err_dup: 'Already used', err_nopower: 'No uses left', err_nopeek: 'Peek only works while choosing 🔍', err_bad: 'Invalid choice', err_signin: 'Sign in with Discord first',
       g_correct: 'Correct answer', g_fooled: 'Fooled players', g_betLoss: 'Lost bet', g_streak: 'Streak 🔥', g_bullseye: 'Bullseye 🎯', g_closest: 'Closest', g_second: '2nd closest', g_third: '3rd closest', g_blitz: 'Correct answers', g_emoji: 'Correct answers', g_odd: 'Correct answers', g_speed: 'Speed bonus', g_fastest: 'Fastest ⚡', g_jackpot: 'Jackpot 🎁', g_majority: 'With the crowd 👥', g_famous: 'Crowd pick 🌟', g_double: 'Double 💎', g_spyCatch: 'Caught the spy', g_spyEvade: 'Evaded capture', g_spyGuess: 'Guessed the word',
@@ -194,6 +194,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     // the session has to ride along as a bearer token instead.
     bearer: null, inDiscord: IN_DISCORD, discordDone: false, discordStage: '', discordError: null,
     lastKey: '', phaseTotal: 1, timeouts: [], editor: null,
+    // Down since when, so a blink can be told from the free instance
+    // having gone to sleep. null means connected.
+    offlineSince: null,
   };
   state.draft.name = state.profile.name;
 
@@ -401,8 +404,38 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   // reconnecting — that second handshake was pure latency on the way in.
   const socket = io({ transports: ['websocket', 'polling'], autoConnect: !IN_DISCORD });
   const emit = (ev, data) => new Promise(res => socket.emit(ev, data, r => { if (r && r.error) toast(t('err_' + r.error), 'err'); res(r || {}); }));
-  socket.on('connect', () => { if (state.code && state.route.name === 'room') join(state.code, true); });
-  socket.on('disconnect', () => { if (state.code) toast(t('reconnecting'), 'err'); });
+  // A toast said "connection lost" and then vanished, which left whoever was
+  // looking at a dead screen with nothing to read. On a free instance a drop
+  // that lasts more than a few seconds is almost always the server having gone
+  // to sleep, and waking it takes about half a minute — so say that, and keep
+  // saying it until it is back.
+  const WAKING_AFTER_MS = 5000;
+  let offlineTimer = null;
+  function setOffline(down) {
+    if (down && state.offlineSince) return;
+    state.offlineSince = down ? Date.now() : null;
+    clearInterval(offlineTimer);
+    offlineTimer = null;
+    if (down) {
+      // Re-render once as the wording crosses from "reconnecting" to "waking".
+      offlineTimer = setInterval(() => {
+        if (!state.offlineSince) return clearInterval(offlineTimer);
+        if (Date.now() - state.offlineSince >= WAKING_AFTER_MS) { clearInterval(offlineTimer); offlineTimer = null; drawConnection(); }
+      }, 1000);
+    }
+    drawConnection();
+  }
+  function drawConnection() {
+    const el = document.getElementById('conn');
+    if (!el) return;
+    if (!state.offlineSince) { el.innerHTML = ''; el.classList.remove('on'); return; }
+    const waking = Date.now() - state.offlineSince >= WAKING_AFTER_MS;
+    el.classList.add('on');
+    el.innerHTML = `<div class="conn-bar"><span class="dots">${esc(t(waking ? 'waking' : 'reconnecting'))}</span></div>`;
+  }
+  socket.on('connect', () => { setOffline(false); if (state.code && state.route.name === 'room') join(state.code, true); });
+  socket.on('disconnect', () => setOffline(true));
+  socket.on('connect_error', () => setOffline(true));
   socket.on('room', snap => {
     const prev = state.room;
     state.clockOffset = snap.now - Date.now();
