@@ -60,6 +60,15 @@ function roundEntry(room, L) {
     e.q = say(c.prompt, L);
     e.votes = { ...c.lvotes };
     e.winners = (c.winners || []).slice();
+  } else if (c.type === 'name') {
+    e.q = say(c.q.q, L);
+    e.said = { ...c.said };
+    e.groups = (c.groups || []).map(g => ({ text: g.text, ids: g.ids.slice() }));
+  } else if (c.type === 'many') {
+    e.q = say(c.prompt, L);
+    e.count = c.count;
+    e.yesIds = (c.yesIds || []).slice();
+    e.guesses = { ...c.guesses };
   } else if (c.type === 'spy') {
     e.word = say(c.word, L);
     e.cat = say(c.cat, L);

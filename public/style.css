@@ -783,3 +783,16 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 .spy-role.civ { color: var(--mint); }
 .spy-task { margin-top: 10px; font-weight: 700; color: #ded8fb; line-height: 1.5; }
 .spy-win { margin-top: 8px; display: inline-block; padding: 4px 12px; border-radius: 99px; background: var(--card2); font-size: 12px; font-weight: 800; color: var(--lemon); }
+
+/* ---- how many of us: pick a number the size of the room ---- */
+.type-tag.many { background: rgba(90,174,255,.22); color: var(--sky); }
+.many-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 4px; }
+.many-n { min-width: 54px; padding: 14px 10px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); color: var(--text); font-size: 20px; font-weight: 900; font-family: inherit; cursor: pointer; transition: transform .12s, background .2s; }
+.many-n:hover:not(:disabled) { background: var(--card2); transform: translateY(-2px); }
+.many-n.picked { background: var(--sky); color: var(--ink); border-color: var(--sky); }
+.many-n:disabled { opacity: .55; cursor: default; }
+
+/* ---- name something: clusters of the same answer ---- */
+.type-tag.name { background: rgba(255,130,196,.2); color: var(--pink); }
+.ansrow.mineans { outline: 2px solid var(--lilac); outline-offset: -2px; }
+.ansrow .repw { margin-inline-start: auto; display: flex; gap: 6px; flex-wrap: wrap; }

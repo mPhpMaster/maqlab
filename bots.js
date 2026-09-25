@@ -28,6 +28,9 @@ const THINK = {
   odd: [3000, 8000],
   order: [8000, 20000],
   spyClue: [6000, 14000],
+  nameWrite: [5000, 13000],
+  manyAsk: [3000, 8000],
+  manyGuess: [4000, 10000],
   spyVote: [4000, 10000],
 };
 
@@ -204,7 +207,30 @@ function orderGuess({ correctIds }) {
 // that category and nothing better. Exactly the position a human spy is in.
 const spyGuess = ({ candidates }) => (candidates && candidates.length ? pick(candidates) : null);
 
+// "How many of us": answer about yourself, then guess the room. A bot leans
+// slightly towards yes because the prompts are written to be sayable, and then
+// guesses near the middle rather than at an extreme — which is roughly what a
+// person does when they have no read on the room.
+const manyAnswer = () => Math.random() < 0.55;
+
+// "Name something": a bot picks one of the answers people actually reach for
+// first. Anything cleverer would score nothing, which is the point of the
+// round — and would stop bots clustering the way a table does.
+function nameAnswer({ common, lang }) {
+  if (!common || !common.length) return lang === 'ar' ? 'شي' : 'Something';
+  return pick(common)[lang === 'ar' ? 'ar' : 'en'];
+}
+
+function manyGuess({ total }) {
+  if (!total || total < 1) return 0;
+  const middle = total / 2;
+  const spread = Math.max(1, Math.round(total / 3));
+  const g = Math.round(middle + (Math.random() * 2 - 1) * spread);
+  return Math.min(total, Math.max(0, g));
+}
+
 module.exports = {
   NAMES, freeName, thinkFor,
   lie, bluffVote, numberGuess, blitzAnswer, emojiAnswer, votePlayer, orderGuess, spyClue, spyGuess,
+  manyAnswer, manyGuess, nameAnswer,
 };

@@ -96,6 +96,24 @@ const SHAPES = {
     if (new Set(x.items.map(it => it.v)).size !== x.items.length) err('order', i, 'two items share a value, so there is no single correct order');
   },
   spy: (x, i) => { bilingual(x.cat, 'spy', i, 'cat'); bilingual(x.w, 'spy', i, 'w'); },
+  // A prompt everyone answers the same way has no guess left in it, but that
+  // is a judgement about people, not something a schema can check. All this
+  // can check is that the prompt exists in both languages and asks something.
+  name: (x, i) => {
+    bilingual(x.q, 'name', i, 'q');
+    if (!Array.isArray(x.common) || x.common.length < 3) return err('name', i, 'needs at least 3 common answers for the bots to land on');
+    x.common.forEach((c, j) => bilingual(c, 'name', i, `common[${j}]`));
+    const seen = new Set();
+    for (const c of x.common) {
+      const k = norm(c.ar);
+      if (seen.has(k)) err('name', i, `common answer "${c.ar}" appears twice`);
+      seen.add(k);
+    }
+  },
+  many: (x, i) => {
+    bilingual(x, 'many', i, 'prompt');
+    if (x && x.en && !/\?\s*$/.test(x.en)) err('many', i, 'prompt should be a question');
+  },
 };
 
 // What identifies an entry, for duplicate detection.
@@ -108,6 +126,8 @@ const KEYS = {
   odd: x => [norm(x.odd && x.odd.ar), norm(x.odd && x.odd.en)],
   order: x => [norm(x.q && x.q.ar), norm(x.q && x.q.en)],
   spy: x => [norm(x.w && x.w.ar), norm(x.w && x.w.en)],
+  many: x => [norm(x.ar), norm(x.en)],
+  name: x => [norm(x.q && x.q.ar), norm(x.q && x.q.en)],
 };
 
 function loadHead() {

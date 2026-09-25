@@ -28,14 +28,14 @@ const GHOST_MS = 25 * 1000; // grace for a lobby refresh before the seat is free
 const ROOM_TTL_MS = 30 * 60 * 1000;
 const ITEMS_PER_QUICK_ROUND = 3; // blitz & emoji rounds have 3 quick items
 const REACTIONS = ['😂', '🔥', '😱', '👏', '🤡', '💀', '😈', '❤️'];
-const TYPES = ['bluff', 'number', 'blitz', 'likely', 'emoji', 'odd', 'order', 'spy'];
-const ACTIVE = ['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'order', 'spyClue', 'spyVote'];
+const TYPES = ['bluff', 'number', 'blitz', 'likely', 'emoji', 'odd', 'order', 'spy', 'many', 'name'];
+const ACTIVE = ['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'order', 'spyClue', 'spyVote', 'manyAsk', 'manyGuess', 'nameWrite'];
 const PHRASES = 12; // number of preset taunts the client knows
 
 const T = {
-  chill: { spin: 6, write: 70, vote: 35, guess: 35, blitz: 10, blitzResult: 3.5, numReveal: 9, scores: 12, likelyVote: 30, likelyReveal: 9, emoji: 15, emojiResult: 3.5, odd: 18, oddResult: 4.5, order: 50, orderResult: 11, spyClue: 50, spyVote: 30, spyReveal: 10 },
-  normal: { spin: 6, write: 45, vote: 25, guess: 25, blitz: 8, blitzResult: 3, numReveal: 8, scores: 10, likelyVote: 20, likelyReveal: 8, emoji: 10, emojiResult: 3, odd: 13, oddResult: 4, order: 38, orderResult: 10, spyClue: 35, spyVote: 20, spyReveal: 9 },
-  fast: { spin: 5.5, write: 30, vote: 15, guess: 15, blitz: 5, blitzResult: 2.5, numReveal: 7, scores: 8, likelyVote: 14, likelyReveal: 7, emoji: 7, emojiResult: 2.5, odd: 9, oddResult: 3, order: 24, orderResult: 8, spyClue: 22, spyVote: 13, spyReveal: 7 },
+  chill: { spin: 6, write: 70, vote: 35, guess: 35, blitz: 10, blitzResult: 3.5, numReveal: 9, scores: 12, likelyVote: 30, likelyReveal: 9, emoji: 15, emojiResult: 3.5, odd: 18, oddResult: 4.5, order: 50, orderResult: 11, spyClue: 50, spyVote: 30, spyReveal: 10, manyAsk: 22, manyGuess: 26, manyReveal: 11, nameWrite: 45, nameReveal: 12 },
+  normal: { spin: 6, write: 45, vote: 25, guess: 25, blitz: 8, blitzResult: 3, numReveal: 8, scores: 10, likelyVote: 20, likelyReveal: 8, emoji: 10, emojiResult: 3, odd: 13, oddResult: 4, order: 38, orderResult: 10, spyClue: 35, spyVote: 20, spyReveal: 9, manyAsk: 16, manyGuess: 20, manyReveal: 9, nameWrite: 32, nameReveal: 10 },
+  fast: { spin: 5.5, write: 30, vote: 15, guess: 15, blitz: 5, blitzResult: 2.5, numReveal: 7, scores: 8, likelyVote: 14, likelyReveal: 7, emoji: 7, emojiResult: 2.5, odd: 9, oddResult: 3, order: 24, orderResult: 8, spyClue: 22, spyVote: 13, spyReveal: 7, manyAsk: 11, manyGuess: 14, manyReveal: 7, nameWrite: 22, nameReveal: 8 },
 };
 const MODS = [
   { id: 'normal', w: 50, mult: 1 },
@@ -46,7 +46,11 @@ const MODS = [
 
 // How many people a mode needs to make sense. Voting on "who among us" with
 // two players is not a vote, and a spy round needs a spy plus a few civilians.
-const MIN_PLAYERS = { likely: 3, spy: 4 };
+// "How many of us" needs a group worth counting: with two people the
+// answer is nearly given away by your own.
+// Name Something scores you for everyone who wrote what you wrote, so alone
+// there is nobody to agree with.
+const MIN_PLAYERS = { likely: 3, spy: 4, many: 3, name: 3 };
 // The plan is drawn once at kickoff, but people leave mid-game. Before a round
 // starts, swap out a mode the room has shrunk below.
 function supportedType(room, wanted) {
@@ -248,6 +252,27 @@ function snapshot(room, pid) {
     s.current.myVote = c.lvotes[pid] || null;
     if (ph === 'likelyReveal') Object.assign(s.current, { votes: c.lvotes, tally: c.tally, winners: c.winners });
   }
+  if (c.type === 'name' && ['nameWrite', 'nameReveal'].includes(ph)) {
+    s.current.prompt = c.q.q[L];
+    s.current.submitted = Object.keys(c.said);
+    s.current.mine = c.said[pid] || null;
+    // Everyone's answers go out together at the reveal. Sending them while
+    // people are still writing would turn the round into copying.
+    if (ph === 'nameReveal') s.current.groups = (c.groups || []).map(g => ({ text: g.text, ids: g.ids }));
+  }
+  if (c.type === 'many' && ['manyAsk', 'manyGuess', 'manyReveal'].includes(ph)) {
+    s.current.prompt = c.prompt[L];
+    s.current.answered = Object.keys(c.said);
+    s.current.myAnswer = c.said[pid] == null ? null : c.said[pid];
+    s.current.total = connected(room).length;
+    if (ph === 'manyGuess' || ph === 'manyReveal') {
+      s.current.guessed = Object.keys(c.guesses);
+      s.current.myGuess = c.guesses[pid] == null ? null : c.guesses[pid];
+    }
+    // The count is the answer. It goes out at the reveal and not one phase
+    // before, or there is nothing left to guess.
+    if (ph === 'manyReveal') Object.assign(s.current, { count: c.count, yesIds: c.yesIds, guesses: c.guesses });
+  }
   if (c.type === 'spy' && ['spyClue', 'spyVote', 'spyReveal'].includes(ph)) {
     const amSpy = pid === c.spyId;
     Object.assign(s.current, { amSpy, category: c.cat[L] });
@@ -355,6 +380,15 @@ function botAction(room, b) {
     const seq = bots.orderGuess({ correctIds: c.truth });
     return seq && (() => submitOrder(room, b, seq));
   }
+  if (ph === 'nameWrite' && !c.said[b.id]) {
+    return () => submitName(room, b, bots.nameAnswer({ common: c.q.common, lang: room.settings.lang }));
+  }
+  if (ph === 'manyAsk' && c.said[b.id] == null) {
+    return () => submitMany(room, b, bots.manyAnswer());
+  }
+  if (ph === 'manyGuess' && c.guesses[b.id] == null) {
+    return () => submitManyGuess(room, b, bots.manyGuess({ total: connected(room).length }));
+  }
   if (ph === 'spyClue' && !c.clues[b.id]) {
     // The clue comes from the category alone whether or not this bot is the
     // spy, so a bot that happens to know the word cannot leak it by being
@@ -428,10 +462,16 @@ function finishRound(room) {
     const g = room.gains[pid];
     if (g && g.total > 0) gain(room, pid, 'double', g.total, false);
   }
-  // 🎁 jackpot: round's biggest earner gets a mystery bonus
+  // 🎁 jackpot: round's biggest earner gets a mystery bonus. Ties are drawn
+  // rather than sorted: Array.prototype.sort is stable, so a plain sort handed
+  // the bonus to whoever joined the room first, every single time. That was
+  // invisible while ties were rare, and became the rule the moment a round
+  // arrived where everyone who agrees scores exactly the same.
   if (c.mod === 'jackpot') {
-    const best = Object.entries(room.gains).filter(([, g]) => g.total > 0).sort((a, b) => b[1].total - a[1].total)[0];
-    if (best) gain(room, best[0], 'jackpot', 500 + rnd(21) * 50, false);
+    const earners = Object.entries(room.gains).filter(([, g]) => g.total > 0);
+    const top = Math.max(0, ...earners.map(([, g]) => g.total));
+    const tied = earners.filter(([, g]) => g.total === top);
+    if (tied.length) gain(room, tied[rnd(tied.length)][0], 'jackpot', 500 + rnd(21) * 50, false);
   }
   for (const [pid, g] of Object.entries(room.gains)) {
     const p = room.players.get(pid);
@@ -572,6 +612,17 @@ function beginRound(room) {
     Object.assign(c, { q: entry.q, items, truth, orders: {} });
     room.phase = 'order';
     setTimer(room, pace(room, 'order'), () => revealOrder(room));
+  } else if (c.type === 'name') {
+    Object.assign(c, { q: pickFrom(room, 'name')[0], said: {} });
+    room.phase = 'nameWrite';
+    setTimer(room, pace(room, 'nameWrite'), () => revealName(room));
+  } else if (c.type === 'many') {
+    // The content is the room, not a fact: everyone answers yes or no about
+    // themselves, then guesses how many said yes. That is why the same prompt
+    // never plays the same way twice.
+    Object.assign(c, { prompt: pickFrom(room, 'many')[0], said: {}, guesses: {} });
+    room.phase = 'manyAsk';
+    setTimer(room, pace(room, 'manyAsk'), () => startManyGuess(room));
   } else if (c.type === 'odd') {
     // Four things, one of which does not belong. The group is never named —
     // working out what the other three have in common is the round.
@@ -797,6 +848,115 @@ function revealSpy(room) {
   broadcast(room);
 }
 
+// ----- name something -----
+// You score for every other person who wrote what you wrote, so the round
+// rewards saying the obvious thing — the exact opposite of the bluff round.
+// Alone is worth nothing, which is the whole idea.
+const NAME_MATCH_POINTS = 200;
+
+function submitName(room, p, text) {
+  if (room.phase !== 'nameWrite') return { error: 'late' };
+  if (room.current.said[p.id]) return { error: 'dup' };
+  text = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 30);
+  if (!text) return { error: 'empty' };
+  room.current.said[p.id] = matchAnswerCase(text, room.settings.lang);
+  if (connected(room).every(x => room.current.said[x.id])) revealName(room);
+  else broadcast(room);
+  return { ok: true };
+}
+
+// Answers are grouped by the same fold the rest of the game uses for typed
+// text, so "التفاح" and "تفاح", or "The apple" and "apple", land together —
+// otherwise players would be punished for spelling rather than for thinking.
+function nameGroups(said) {
+  const by = new Map();
+  for (const [pid, text] of Object.entries(said)) {
+    const key = normalize(text);
+    if (!key) continue;
+    if (!by.has(key)) by.set(key, { text, ids: [] });
+    by.get(key).ids.push(pid);
+  }
+  return [...by.values()].sort((a, b) => b.ids.length - a.ids.length);
+}
+
+function revealName(room) {
+  if (room.phase !== 'nameWrite') return;
+  const c = room.current;
+  const groups = nameGroups(c.said);
+  for (const g of groups) {
+    const others = g.ids.length - 1;
+    if (others <= 0) continue;
+    for (const pid of g.ids) {
+      gain(room, pid, 'nameMatch', others * NAME_MATCH_POINTS);
+      const p = room.players.get(pid);
+      if (p) p.stats.correct += 1;
+    }
+  }
+  for (const p of connected(room)) {
+    const mine = groups.find(g => g.ids.includes(p.id));
+    streakResult(room, p.id, !!mine && mine.ids.length > 1);
+  }
+  c.groups = groups;
+  finishRound(room);
+  room.phase = 'nameReveal';
+  setTimer(room, pace(room, 'nameReveal'), () => showScores(room));
+  broadcast(room);
+}
+
+// ----- how many of us -----
+// Exact is the whole game; one either side is close enough to be worth
+// something, because reading a room to within one person is still reading it.
+const MANY_EXACT = 500;
+const MANY_NEAR = 250;
+
+function submitMany(room, p, yes) {
+  if (room.phase !== 'manyAsk') return { error: 'late' };
+  if (room.current.said[p.id] != null) return { error: 'dup' };
+  room.current.said[p.id] = !!yes;
+  if (connected(room).every(x => room.current.said[x.id] != null)) startManyGuess(room);
+  else broadcast(room);
+  return { ok: true };
+}
+
+function startManyGuess(room) {
+  if (room.phase !== 'manyAsk') return;
+  room.phase = 'manyGuess';
+  setTimer(room, pace(room, 'manyGuess'), () => revealMany(room));
+  broadcast(room);
+}
+
+function submitManyGuess(room, p, n) {
+  if (room.phase !== 'manyGuess') return { error: 'late' };
+  if (room.current.guesses[p.id] != null) return { error: 'dup' };
+  const max = connected(room).length;
+  const v = Number(n);
+  if (!Number.isInteger(v) || v < 0 || v > max) return { error: 'bad' };
+  room.current.guesses[p.id] = v;
+  if (connected(room).every(x => room.current.guesses[x.id] != null)) revealMany(room);
+  else broadcast(room);
+  return { ok: true };
+}
+
+function revealMany(room) {
+  if (room.phase !== 'manyGuess') return;
+  const c = room.current;
+  const yesIds = connected(room).filter(p => c.said[p.id]).map(p => p.id);
+  const count = yesIds.length;
+  for (const p of connected(room)) {
+    const g = c.guesses[p.id];
+    if (g == null) { streakResult(room, p.id, false); continue; }
+    const off = Math.abs(g - count);
+    if (off === 0) { gain(room, p.id, 'manyExact', MANY_EXACT); p.stats.correct += 1; p.stats.snipes += 1; }
+    else if (off === 1) gain(room, p.id, 'manyNear', MANY_NEAR);
+    streakResult(room, p.id, off === 0);
+  }
+  Object.assign(c, { yesIds, count });
+  finishRound(room);
+  room.phase = 'manyReveal';
+  setTimer(room, pace(room, 'manyReveal'), () => showScores(room));
+  broadcast(room);
+}
+
 // ----- quick rounds: blitz (true/false) and emoji (4 options) -----
 // The quick rounds are all the same shape: a handful of items, everyone
 // answers against a clock, points for right plus points for fast. Only the
@@ -965,12 +1125,27 @@ function payLaughs(room) {
   }
 }
 
-// Every phase a round can end on. Derived rather than listed, because the
-// hand-written version silently froze any round type somebody forgot to add
-// to it — the game simply stopped, with no error anywhere.
-const isRevealPhase = ph =>
-  ['bluffReveal', 'numReveal', 'likelyReveal', 'spyReveal', 'orderResult'].includes(ph) ||
-  Object.values(QUICK).some(q => q.result === ph);
+// The phase each round type ends on, before the scoreboard opens.
+//
+// This is the one place it is written down, keyed by type so a type without an
+// entry is visible rather than implied. It matters more than it looks: a
+// reveal phase missing from here does not throw, it just stops — showScores
+// returns, no timer is set, and the game sits there. That is exactly what
+// happened when "how many of us" was added and this list was not touched,
+// which is the second time the same omission has frozen a round. The test in
+// tests/rounds.test.js now fails if any type is missing.
+const REVEAL_PHASE = {
+  bluff: 'bluffReveal',
+  number: 'numReveal',
+  likely: 'likelyReveal',
+  spy: 'spyReveal',
+  order: 'orderResult',
+  many: 'manyReveal',
+  name: 'nameReveal',
+  ...Object.fromEntries(Object.entries(QUICK).map(([type, q]) => [type, q.result])),
+};
+const REVEAL_PHASES = new Set(Object.values(REVEAL_PHASE));
+const isRevealPhase = ph => REVEAL_PHASES.has(ph);
 
 function showScores(room) {
   if (!isRevealPhase(room.phase)) return;
@@ -1188,6 +1363,9 @@ io.on('connection', socket => {
   socket.on('spyClue', (text, cb) => room && reply(cb, submitSpyClue(room, player, text)));
   socket.on('spyVote', (id, cb) => room && reply(cb, submitSpyVote(room, player, id)));
   socket.on('spyGuess', (text, cb) => room && reply(cb, submitSpyGuess(room, player, text)));
+  socket.on('name', (text, cb) => room && reply(cb, submitName(room, player, text)));
+  socket.on('many', (yes, cb) => room && reply(cb, submitMany(room, player, yes)));
+  socket.on('manyGuess', (n, cb) => room && reply(cb, submitManyGuess(room, player, n)));
 
   socket.on('next', (_, cb) => {
     if (!host()) return reply(cb, { error: 'host' });
@@ -1328,6 +1506,11 @@ const RESUME = {
   spyReveal: showScores,
   orderResult: r => { finishRound(r); showScores(r); },
   scores: nextRound,
+  nameWrite: revealName,
+  nameReveal: showScores,
+  manyAsk: startManyGuess,
+  manyGuess: revealMany,
+  manyReveal: showScores,
 };
 for (const q of Object.values(QUICK)) {
   RESUME[q.phase] = resolveQuickItem;

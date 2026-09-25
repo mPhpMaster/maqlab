@@ -1106,6 +1106,90 @@ const order = [
   R('رتّبها حسب سمك الطبقة من الأسمك للأرق', 'Order these by thickness, thickest first', ['جدار خرساني', 'A concrete wall', 200], ['باب خشبي', 'A wooden door', 40], ['زجاج نافذة', 'A window pane', 4], ['ورقة', 'A sheet of paper', 1]),
 ];
 
+// many: "how many of us" — the answer is the room, not a fact. Each prompt has
+// to be something a good number of people might honestly say yes to, and a
+// good number no: a prompt everyone answers the same way has no guess in it.
+const many = [
+  { ar: 'مين فيكم كسر عظمة مرة؟', en: 'Who here has broken a bone?' },
+  { ar: 'مين فيكم سافر برا البلد هالسنة؟', en: 'Who here has travelled abroad this year?' },
+  { ar: 'مين فيكم ينام قبل منتصف الليل؟', en: 'Who here goes to sleep before midnight?' },
+  { ar: 'مين فيكم يشرب قهوة كل يوم؟', en: 'Who here drinks coffee every day?' },
+  { ar: 'مين فيكم يقدر يسبح؟', en: 'Who here can swim?' },
+  { ar: 'مين فيكم عنده حيوان أليف؟', en: 'Who here has a pet?' },
+  { ar: 'مين فيكم شاف الثلج بعينه؟', en: 'Who here has seen snow in person?' },
+  { ar: 'مين فيكم يعزف آلة موسيقية؟', en: 'Who here plays a musical instrument?' },
+  { ar: 'مين فيكم نسي عيد ميلاد قريب له؟', en: "Who here has forgotten a close friend's birthday?" },
+  { ar: 'مين فيكم يقرأ كتاباً هالشهر؟', en: 'Who here is reading a book this month?' },
+  { ar: 'مين فيكم يطبخ لنفسه غالباً؟', en: 'Who here usually cooks for themselves?' },
+  { ar: 'مين فيكم ضاع منه جواله مرة؟', en: 'Who here has lost their phone?' },
+  { ar: 'مين فيكم يحب الأفلام المخيفة؟', en: 'Who here likes horror films?' },
+  { ar: 'مين فيكم صحي متأخر اليوم؟', en: 'Who here woke up late today?' },
+  { ar: 'مين فيكم يتكلم أكثر من لغتين؟', en: 'Who here speaks more than two languages?' },
+  { ar: 'مين فيكم يشتغل أو يذاكر بالليل أكثر؟', en: 'Who here works or studies better at night?' },
+  { ar: 'مين فيكم ما يحب الأناناس على البيتزا؟', en: 'Who here does not like pineapple on pizza?' },
+  { ar: 'مين فيكم صار له حادث سيارة بسيط؟', en: 'Who here has had a minor car accident?' },
+  { ar: 'مين فيكم يخاف من المرتفعات؟', en: 'Who here is afraid of heights?' },
+  { ar: 'مين فيكم رد على رسالة بعد أسبوع؟', en: 'Who here has replied to a message a week late?' },
+  { ar: 'مين فيكم يحفظ رقم جواله غيباً؟', en: 'Who here knows their own phone number by heart?' },
+  { ar: 'مين فيكم يشرب الشاي بالنعناع؟', en: 'Who here drinks tea with mint?' },
+  { ar: 'مين فيكم دخل هالغرفة وهو ما يعرف أحد؟', en: 'Who here joined this room not knowing anyone?' },
+  { ar: 'مين فيكم يفضّل الرسائل على المكالمات؟', en: 'Who here prefers texting to calling?' },
+  { ar: 'مين فيكم شاف شروق الشمس هالأسبوع؟', en: 'Who here has seen a sunrise this week?' },
+  { ar: 'مين فيكم يحب الرياضيات؟', en: 'Who here likes maths?' },
+  { ar: 'مين فيكم ما يحط سكر بالقهوة؟', en: 'Who here takes coffee without sugar?' },
+  { ar: 'مين فيكم يغنّي وهو لحاله؟', en: 'Who here sings when they are alone?' },
+  { ar: 'مين فيكم عنده أخ أو أخت أكبر؟', en: 'Who here has an older sibling?' },
+  { ar: 'مين فيكم أكل شي غريب بسفره؟', en: 'Who here has eaten something strange while travelling?' },
+  { ar: 'مين فيكم يرتب سريره كل صباح؟', en: 'Who here makes their bed every morning?' },
+  { ar: 'مين فيكم يحب المشي أكثر من السيارة؟', en: 'Who here would rather walk than drive?' },
+  { ar: 'مين فيكم شارك في مسابقة مرة؟', en: 'Who here has entered a competition?' },
+  { ar: 'مين فيكم يقدر ينام بأي مكان؟', en: 'Who here can fall asleep anywhere?' },
+  { ar: 'مين فيكم يتابع كرة القدم؟', en: 'Who here follows football?' },
+  { ar: 'مين فيكم غيّر رأيه بشي مهم هالسنة؟', en: 'Who here has changed their mind about something big this year?' },
+];
+
+// name: "name something…" — everyone writes one answer and scores for every
+// other person who wrote the same thing. The mirror of the bluff round, where
+// being alone is the whole point; here being obvious is.
+//
+// `common` is what people reach for first. It exists so a bot has somewhere
+// sensible to land, and so bots cluster the way people do rather than each
+// inventing something nobody else would ever say.
+const N = (ar, en, ...common) => ({ q: { ar, en }, common: common.map(([a, e]) => ({ ar: a, en: e })) });
+
+const name = [
+  N('اذكر شيئاً تلقاه في المطبخ', 'Name something you find in a kitchen', ['ملعقة', 'Spoon'], ['ثلاجة', 'Fridge'], ['سكين', 'Knife'], ['صحن', 'Plate'], ['فرن', 'Oven']),
+  N('اذكر فاكهة صفراء', 'Name a yellow fruit', ['موز', 'Banana'], ['ليمون', 'Lemon'], ['أناناس', 'Pineapple'], ['مانجو', 'Mango']),
+  N('اذكر شيئاً تاخذه معك للبحر', 'Name something you take to the beach', ['منشفة', 'Towel'], ['نظارة شمس', 'Sunglasses'], ['ماء', 'Water'], ['كرة', 'A ball']),
+  N('اذكر حيواناً يعيش في الصحراء', 'Name an animal that lives in the desert', ['جمل', 'Camel'], ['ثعبان', 'Snake'], ['عقرب', 'Scorpion'], ['ضب', 'Lizard']),
+  N('اذكر شيئاً يخلي الناس تتأخر', 'Name something that makes people late', ['الزحمة', 'Traffic'], ['النوم', 'Oversleeping'], ['المطر', 'Rain'], ['الجوال', 'The phone']),
+  N('اذكر مشروباً ساخناً', 'Name a hot drink', ['قهوة', 'Coffee'], ['شاي', 'Tea'], ['شوكولاتة ساخنة', 'Hot chocolate'], ['حليب', 'Warm milk']),
+  N('اذكر شيئاً في حقيبة المدرسة', 'Name something in a school bag', ['كتاب', 'A book'], ['قلم', 'A pen'], ['دفتر', 'A notebook'], ['ماء', 'Water']),
+  N('اذكر رياضة تُلعب بالكرة', 'Name a sport played with a ball', ['كرة قدم', 'Football'], ['كرة سلة', 'Basketball'], ['تنس', 'Tennis'], ['كرة طائرة', 'Volleyball']),
+  N('اذكر شيئاً بارداً', 'Name something cold', ['ثلج', 'Ice'], ['آيس كريم', 'Ice cream'], ['ثلاجة', 'A fridge'], ['شتاء', 'Winter']),
+  N('اذكر مهنة يُلبس فيها زي موحد', 'Name a job with a uniform', ['شرطي', 'Police officer'], ['طبيب', 'Doctor'], ['طيار', 'Pilot'], ['ممرض', 'Nurse']),
+  N('اذكر شيئاً تلقاه في السيارة', 'Name something you find in a car', ['مقود', 'A steering wheel'], ['كرسي', 'A seat'], ['مرآة', 'A mirror'], ['بنزين', 'Petrol']),
+  N('اذكر شيئاً يطير', 'Name something that flies', ['طائرة', 'A plane'], ['طير', 'A bird'], ['فراشة', 'A butterfly'], ['بالون', 'A balloon']),
+  N('اذكر لوناً تلقاه في الأعلام', 'Name a colour you find on flags', ['أحمر', 'Red'], ['أخضر', 'Green'], ['أبيض', 'White'], ['أسود', 'Black']),
+  N('اذكر شيئاً يُعطى كهدية', 'Name something given as a gift', ['ساعة', 'A watch'], ['عطر', 'Perfume'], ['ورد', 'Flowers'], ['فلوس', 'Money']),
+  N('اذكر أول شي تسويه لما تصحى', 'Name the first thing you do when you wake up', ['أغسل وجهي', 'Wash my face'], ['أشوف الجوال', 'Check my phone'], ['أشرب ماء', 'Drink water'], ['أصلي', 'Pray']),
+  N('اذكر مكاناً يكون مزدحماً دائماً', 'Name a place that is always crowded', ['السوق', 'The market'], ['المطار', 'The airport'], ['المستشفى', 'The hospital'], ['المطعم', 'A restaurant']),
+  N('اذكر أكلة أساسها الأرز', 'Name a dish made with rice', ['كبسة', 'Kabsa'], ['مندي', 'Mandi'], ['برياني', 'Biryani'], ['سوشي', 'Sushi']),
+  N('اذكر شيئاً ينكسر بسهولة', 'Name something that breaks easily', ['زجاج', 'Glass'], ['بيضة', 'An egg'], ['جوال', 'A phone'], ['صحن', 'A plate']),
+  N('اذكر شيئاً تشوفه في السماء', 'Name something you see in the sky', ['نجوم', 'Stars'], ['قمر', 'The Moon'], ['غيوم', 'Clouds'], ['شمس', 'The Sun']),
+  N('اذكر شيئاً يخوّف الناس', 'Name something that scares people', ['الظلام', 'The dark'], ['الثعابين', 'Snakes'], ['المرتفعات', 'Heights'], ['الصراصير', 'Cockroaches']),
+  N('اذكر شيئاً تلبسه بالشتاء', 'Name something you wear in winter', ['جاكيت', 'A jacket'], ['وشاح', 'A scarf'], ['قفازات', 'Gloves'], ['بوت', 'Boots']),
+  N('اذكر شيئاً في غرفة النوم', 'Name something in a bedroom', ['سرير', 'A bed'], ['وسادة', 'A pillow'], ['خزانة', 'A wardrobe'], ['مصباح', 'A lamp']),
+  N('اذكر شيئاً حلو المذاق', 'Name something sweet', ['شوكولاتة', 'Chocolate'], ['عسل', 'Honey'], ['تمر', 'Dates'], ['كيك', 'Cake']),
+  N('اذكر وسيلة مواصلات', 'Name a way to get around', ['سيارة', 'A car'], ['حافلة', 'A bus'], ['طائرة', 'A plane'], ['دراجة', 'A bicycle']),
+  N('اذكر شيئاً تسويه وأنت تنتظر', 'Name something you do while waiting', ['أشوف الجوال', 'Look at my phone'], ['أسمع موسيقى', 'Listen to music'], ['أقرأ', 'Read'], ['أمشي', 'Pace around']),
+  N('اذكر حيواناً له ذيل', 'Name an animal with a tail', ['قط', 'A cat'], ['كلب', 'A dog'], ['حصان', 'A horse'], ['أسد', 'A lion']),
+  N('اذكر شيئاً يحتاج كهرباء', 'Name something that needs electricity', ['ثلاجة', 'A fridge'], ['تلفزيون', 'A TV'], ['مكيف', 'An air conditioner'], ['جوال', 'A phone']),
+  N('اذكر شيئاً يُشترى كل أسبوع', 'Name something people buy every week', ['خبز', 'Bread'], ['حليب', 'Milk'], ['خضار', 'Vegetables'], ['بنزين', 'Petrol']),
+  N('اذكر شيئاً يصدر صوتاً عالياً', 'Name something loud', ['سيارة إسعاف', 'An ambulance'], ['رعد', 'Thunder'], ['طائرة', 'A plane'], ['منبه', 'An alarm']),
+  N('اذكر شيئاً تلقاه في الحديقة', 'Name something you find in a park', ['شجرة', 'A tree'], ['كرسي', 'A bench'], ['عشب', 'Grass'], ['أرجوحة', 'A swing']),
+];
+
 const spy = [
   { cat: { ar: 'مكان', en: 'Place' }, w: { ar: 'المطار', en: 'The airport' } },
   { cat: { ar: 'مكان', en: 'Place' }, w: { ar: 'المستشفى', en: 'The hospital' } },
@@ -1220,4 +1304,4 @@ const spy = [
   { cat: { ar: 'حيوان', en: 'Animal' }, w: { ar: 'النحلة', en: 'Bee' } },
 ];
 
-module.exports = { bluff, number, blitz, likely, emoji, odd, order, spy };
+module.exports = { bluff, number, blitz, likely, emoji, odd, order, many, name, spy };

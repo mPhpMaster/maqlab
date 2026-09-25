@@ -77,7 +77,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
       rank: 'الترتيب', games: { one: 'لعبة', two: 'لعبتان', few: 'ألعابٍ', many: 'لعبةً', other: 'لعبةٍ' }, wins: { one: 'فوز', two: 'فوزان', few: 'فوزاتٍ', many: 'فوزاً', other: 'فوزٍ' }, winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
       curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: { one: 'متابِع', two: 'متابِعان', few: 'متابِعين', many: 'متابِعاً', other: 'متابِعٍ' }, followingN: 'يتابع', memberSince: 'عضو منذ',
-      whichOdd: 'مين الدخيل بينهم؟', type_order: 'رتّبها', desc_order: 'رتّب 4 أشياء… كل جارَين بالترتيب الصح لك نقاط', clear: 'امسح', lockIn: 'ثبّت الترتيب ✅', pickAll: 'باقي {n}', youSaid: 'حطيتها {n}', perfectOrder: 'ترتيب مثالي! 🎯', pairsRight: '{n} من 3 صح', g_orderPairs: 'ترتيب صحيح', g_orderPerfect: 'ترتيب مثالي 🎯', addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', tryAgain: 'جرّب مرة ثانية', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
+      type_name: 'اذكر شيئاً', desc_name: 'اكتب أول شي يجيك — نقاطك على كل واحد كتب مثلك', nameWritePh: 'اكتب إجابتك…', nameAlone: 'ما وافقك أحد', nameWith: 'وافقك {n}', nameTip: 'الفكرة تكتب اللي الكل بيكتبه، مو اللي ما أحد يفكر فيه', type_many: 'كم واحد فينا؟', desc_many: 'جاوب عن نفسك، ثم خمّن كم واحد قال نعم', manyYes: 'نعم 🙋', manyNo: 'لا 🙅', manyAsked: 'جاوب عن نفسك — أحد ما يشوف جوابك', manyGuessQ: 'كم واحد قال نعم؟', manyYouSaid: 'جوابك: {n}', manyWere: '{n} قالوا نعم', manyExactMsg: 'بالضبط! 🎯 +500', manyNearMsg: 'قريب — فرق واحد · +250', manyOffMsg: 'بعيد هالمرة', manyNobody: 'ولا واحد', manyGuessedN: 'خمّن {n}', whichOdd: 'مين الدخيل بينهم؟', type_order: 'رتّبها', desc_order: 'رتّب 4 أشياء… كل جارَين بالترتيب الصح لك نقاط', clear: 'امسح', lockIn: 'ثبّت الترتيب ✅', pickAll: 'باقي {n}', youSaid: 'حطيتها {n}', perfectOrder: 'ترتيب مثالي! 🎯', pairsRight: '{n} من 3 صح', g_orderPairs: 'ترتيب صحيح', g_orderPerfect: 'ترتيب مثالي 🎯', addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', tryAgain: 'جرّب مرة ثانية', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
       repRounds: 'جولات المباراة', repTruth: 'الإجابة الصحيحة', repHouse: 'خيار من اللعبة', repAnswer: 'الجواب',
       repNobody: 'ما أحد', repMostVotes: 'أكثر واحد صوّتوا له', repCaught: 'انكشف 🎯', repEscaped: 'نجا بجلده 😎',
       repSpyGuess: 'تخمين الجاسوس', repRoundPts: 'نقاط الجولة', repCorrect: 'الترتيب الصحيح',
@@ -148,7 +148,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       profile: 'Profile', leaderboard: 'Leaderboard', suggestBtn: 'Send a suggestion', about: 'About', adminPanel: 'Admin',
       rank: 'Rank', games: { one: 'Game', other: 'Games' }, wins: { one: 'Win', other: 'Wins' }, winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
       curStreak: 'Win streak', bestStreak: 'Longest streak', followers: { one: 'Follower', other: 'Followers' }, followingN: 'Following', memberSince: 'Member since',
-      whichOdd: "Which one doesn't belong?", type_order: 'Line Them Up', desc_order: 'Put 4 things in order — every neighbouring pair you get right scores', clear: 'Clear', lockIn: 'Lock it in ✅', pickAll: '{n} to go', youSaid: 'you said {n}', perfectOrder: 'Perfect order! 🎯', pairsRight: '{n} of 3 right', g_orderPairs: 'Right order', g_orderPerfect: 'Perfect order 🎯', addBot: 'Add bot', soloHint: 'On your own? Add a bot, or just start — we will sit some down for you 🤖', discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', tryAgain: 'Try again', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
+      type_name: 'Name Something', desc_name: 'Write the first thing you think of — you score for everyone who wrote the same', nameWritePh: 'Type your answer…', nameAlone: 'Nobody matched you', nameWith: '{n} matched you', nameTip: 'The trick is writing what everyone writes, not what nobody thinks of', type_many: 'How Many of Us?', desc_many: 'Answer about yourself, then guess how many said yes', manyYes: 'Yes 🙋', manyNo: 'No 🙅', manyAsked: 'Answer about yourself — nobody sees your answer', manyGuessQ: 'How many said yes?', manyYouSaid: 'You said: {n}', manyWere: '{n} said yes', manyExactMsg: 'Exactly right! 🎯 +500', manyNearMsg: 'One off — +250', manyOffMsg: 'Not this time', manyNobody: 'Nobody', manyGuessedN: 'guessed {n}', whichOdd: "Which one doesn't belong?", type_order: 'Line Them Up', desc_order: 'Put 4 things in order — every neighbouring pair you get right scores', clear: 'Clear', lockIn: 'Lock it in ✅', pickAll: '{n} to go', youSaid: 'you said {n}', perfectOrder: 'Perfect order! 🎯', pairsRight: '{n} of 3 right', g_orderPairs: 'Right order', g_orderPerfect: 'Perfect order 🎯', addBot: 'Add bot', soloHint: 'On your own? Add a bot, or just start — we will sit some down for you 🤖', discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', tryAgain: 'Try again', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
       repRounds: 'Round by round', repTruth: 'the true answer', repHouse: 'filler option', repAnswer: 'Answer',
       repNobody: 'Nobody', repMostVotes: 'Most votes', repCaught: 'Caught 🎯', repEscaped: 'Got away 😎',
       repSpyGuess: "Spy's guess", repRoundPts: 'Round points', repCorrect: 'Correct order',
@@ -183,7 +183,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     ach: store.get('ach', { unlocked: [], games: 0, wins: 0, fooled: 0, fastest: 0 }),
     route: { name: 'home' },
     room: null, code: null, joining: false,
-    draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '', order: [] },
+    draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '', order: [], nameAns: '' },
     bet: 1, showQR: false, reactOpen: false,
     me: null, isAdmin: false, lobbies: null, achList: null,
     // meKnown stays false until /api/auth/me answers. Rendering a sign-in
@@ -247,7 +247,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   const later = (ms, fn) => state.timeouts.push(setTimeout(fn, ms));
   function applyDir() { document.documentElement.lang = state.lang; document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr'; document.title = 'MAQLAB | مقلب'; }
 
-  const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', order: '📊', spy: '🕵️' };
+  const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', order: '📊', spy: '🕵️', many: '🙋', name: '🗣️' };
   const MODS = { normal: '✨', double: '💎', speed: '⏱️', jackpot: '🎁', golden: '👑' };
   const AWARD_E = { liar: '🤥', detective: '🕵️', sniper: '🎯', lightning: '⚡', gambler: '🎲', fire: '🔥', star: '🌟' };
   const ACH = [['first_game', '🎮'], ['first_win', '🏆'], ['liar5', '🤥'], ['bull', '🎯'], ['streak4', '🔥'], ['allin', '🎲'], ['famous', '🌟'], ['speedy', '⚡'], ['games10', '🏅'], ['wins5', '👑']];
@@ -625,6 +625,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       lobby: lobbyView, spin: spinView, write: writeView, vote: voteView, bluffReveal: bluffRevealView, guess: guessView, numReveal: numRevealView,
       blitz: blitzView, blitzResult: blitzResultView, likelyVote: likelyVoteView, likelyReveal: likelyRevealView, emoji: emojiView, emojiResult: emojiResultView, odd: oddView, oddResult: oddResultView, order: orderView, orderResult: orderResultView,
       spyClue: spyClueView, spyVote: spyVoteView, spyReveal: spyRevealView,
+      manyAsk: manyAskView, manyGuess: manyGuessView, manyReveal: manyRevealView,
+      nameWrite: nameWriteView, nameReveal: nameRevealView,
       scores: scoresView, final: finalView,
     };
     return (views[state.room.phase] || (() => ''))();
@@ -1208,6 +1210,84 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       }).join('')}</div>
       ${mine ? `<div class="center" style="margin-top:14px;font-weight:800">${mine.pairs === c.truth.length - 1 ? t('perfectOrder') : t('pairsRight', { n: mine.pairs })}</div>` : ''}
       ${everyOrder(c)}
+    </div></div></div></div>`;
+  }
+
+  // ---------- name something ----------
+  function nameWriteView() {
+    const c = state.room.current;
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      <div class="q-card glass"><span class="type-tag name">${TYPES.name} ${t('type_name')}</span><div class="q">${esc(c.prompt)}</div><div class="sub">${t('nameTip')}</div></div>
+      <div class="timebar"><i data-bar="${state.room.deadline}"></i></div>
+      <div class="answer-box">${c.mine
+        ? `<div class="my-answer"><small>${t('yourAnswer')}</small>${esc(c.mine)}</div><div class="center muted"><span class="dots">${t('waitOthers')}</span></div>`
+        : `<form data-form="name" class="col"><input id="nameans" class="input" maxlength="30" placeholder="${t('nameWritePh')}" value="${esc(state.draft.nameAns)}" autocomplete="off" data-autofocus><button class="btn coral block" type="submit">${t('send')}</button></form>`}</div>
+      ${whoRow(c.submitted)}
+    </div></div></div></div>`;
+  }
+  function nameRevealView() {
+    const c = state.room.current, mid = myId();
+    const groups = c.groups || [];
+    const mine = groups.find(g => g.ids.includes(mid));
+    // Biggest cluster first: the shape of the answer is the story here — one
+    // word four people reached for, and one nobody else did.
+    const rows = groups.map((g, i) => `<div class="ansrow ${g.ids.length > 1 ? 'ok' : 'no'} ${g.ids.includes(mid) ? 'mineans' : ''}" style="animation-delay:${i * 70}ms">
+      <span class="nm">${esc(g.text)}</span>
+      <span class="repw">${g.ids.map(id => { const p = P(id); return p ? `<span class="repp">${J(p.avatar)}${esc(p.name)}</span>` : ''; }).join('')}</span>
+      <span class="said">${g.ids.length > 1 ? '+' + fmt((g.ids.length - 1) * 200) : '0'}</span></div>`).join('');
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      <div class="q-card glass"><span class="type-tag name">${TYPES.name} ${t('type_name')}</span><div class="q">${esc(c.prompt)}</div></div>
+      ${mine ? `<div class="center" style="margin-top:10px;font-weight:800">${mine.ids.length > 1 ? t('nameWith', { n: fmt(mine.ids.length - 1) }) : t('nameAlone')}</div>` : ''}
+      <div class="answers">${rows}</div>
+    </div></div></div></div>`;
+  }
+
+  // ---------- how many of us ----------
+  function manyAskView() {
+    const c = state.room.current, a = c.myAnswer;
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      <div class="q-card glass"><span class="type-tag many">${TYPES.many} ${t('type_many')}</span><div class="q">${esc(c.prompt)}</div><div class="sub">${t('manyAsked')}</div></div>
+      <div class="timebar"><i data-bar="${state.room.deadline}"></i></div>
+      <div class="tf">
+        <button class="btn mint ${a === true ? 'chosen' : ''}" data-act="many" data-v="1" ${a != null ? 'disabled' : ''}><span class="emo">🙋</span>${t('manyYes')}</button>
+        <button class="btn coral ${a === false ? 'chosen' : ''}" data-act="many" data-v="0" ${a != null ? 'disabled' : ''}><span class="emo">🙅</span>${t('manyNo')}</button>
+      </div>
+      ${a != null ? `<div class="center muted" style="margin-top:14px"><span class="dots">${t('waitOthers')}</span></div>` : ''}
+      ${whoRow(c.answered)}
+    </div></div></div></div>`;
+  }
+  function manyGuessView() {
+    const c = state.room.current, g = c.myGuess;
+    // Buttons rather than a keypad: the range is the size of the room, and a
+    // number you tap is a number you can pick before the clock runs out.
+    const options = Array.from({ length: (c.total || 0) + 1 }, (_, n) => n);
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      <div class="q-card glass"><span class="type-tag many">${TYPES.many} ${t('type_many')}</span><div class="q">${esc(c.prompt)}</div>
+        <div class="sub">${t('manyYouSaid', { n: c.myAnswer ? t('manyYes') : t('manyNo') })}</div></div>
+      <div class="timebar"><i data-bar="${state.room.deadline}"></i></div>
+      <div class="section-title"><span>${t('manyGuessQ')}</span></div>
+      <div class="many-grid">${options.map(n => `<button class="many-n ${g === n ? 'picked' : ''}" data-act="manyguess" data-n="${n}" ${g != null ? 'disabled' : ''}>${fmt(n)}</button>`).join('')}</div>
+      ${g != null ? `<div class="center muted" style="margin-top:14px"><span class="dots">${t('waitOthers')}</span></div>` : ''}
+      ${whoRow(c.guessed)}
+    </div></div></div></div>`;
+  }
+  function manyRevealView() {
+    const c = state.room.current, mine = c.myGuess;
+    const off = mine == null ? null : Math.abs(mine - c.count);
+    const yes = (c.yesIds || []).map(id => P(id)).filter(Boolean);
+    const rows = state.room.players.filter(p => p.connected).map(p => {
+      const g = c.guesses ? c.guesses[p.id] : null;
+      const d = g == null ? null : Math.abs(g - c.count);
+      return `<div class="ansrow ${d === 0 ? 'ok' : d === 1 ? '' : g == null ? 'none' : 'no'}">${J(p.avatar)}<span class="nm">${esc(p.name)}</span>
+        <span class="said">${g == null ? '—' : t('manyGuessedN', { n: fmt(g) })}</span></div>`;
+    }).join('');
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      <div class="q-card glass"><span class="type-tag many">${TYPES.many} ${t('type_many')}</span><div class="q">${esc(c.prompt)}</div></div>
+      <div class="center" style="font-size:34px;font-weight:900;margin-top:10px">${fmt(c.count)}</div>
+      <div class="center muted" style="font-weight:700">${t('manyWere', { n: fmt(c.count) })}</div>
+      <div class="who-row">${yes.length ? yes.map(p => `<div class="mini done">${J(p.avatar)}<span class="nm">${esc(p.name)}</span></div>`).join('') : `<span class="muted">${t('manyNobody')}</span>`}</div>
+      ${mine != null ? `<div class="center" style="margin-top:10px;font-weight:800">${off === 0 ? t('manyExactMsg') : off === 1 ? t('manyNearMsg') : t('manyOffMsg')}</div>` : ''}
+      <div class="answers"><div class="ans-title">${t('whatTheySaid')}</div>${rows}</div>
     </div></div></div></div>`;
   }
 
@@ -2204,6 +2284,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     async tf(el) { sfx.send(); buzz(20); await emit('blitz', el.dataset.v === '1'); },
     async emoji(el) { sfx.send(); buzz(20); await emit('emoji', el.dataset.id); },
     async odd(el) { sfx.send(); buzz(20); await emit('odd', el.dataset.id); },
+    async many(el) { sfx.send(); buzz(20); await emit('many', el.dataset.v === '1'); },
+    async manyguess(el) { sfx.send(); buzz(20); await emit('manyGuess', Number(el.dataset.n)); },
     ordpick(el) {
       const id = el.dataset.id, cur = state.draft.order;
       // Tapping something already placed takes it out and closes the gap.
@@ -2247,6 +2329,11 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       const inp = document.getElementById('guess');
       const r = await emit('guess', state.draft.guess);
       if (r.ok) { flyFrom(inp, '🎯'); buzz(20); }
+    } else if (f === 'name') {
+      if (!state.draft.nameAns.trim()) return toast(t('err_empty'), 'err');
+      const inp = document.getElementById('nameans');
+      const r = await emit('name', state.draft.nameAns);
+      if (r.ok) { flyFrom(inp); buzz(20); state.draft.nameAns = ''; } else document.getElementById('nameans')?.classList.add('shake');
     } else if (f === 'spyClue') {
       if (!state.draft.spyClue.trim()) return toast(t('err_empty'), 'err');
       const inp = document.getElementById('spyclue');
@@ -2264,6 +2351,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     if (id === 'code') { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, ''); state.draft.code = e.target.value; }
     else if (id === 'lie') { state.draft.lie = e.target.value; sendTyping(); }
     else if (id === 'guess') { state.draft.guess = e.target.value; sendTyping(); }
+    else if (id === 'nameans') { state.draft.nameAns = e.target.value; sendTyping(); }
     else if (id === 'spyclue') { state.draft.spyClue = e.target.value; sendTyping(); }
     else if (id === 'spyguess') { state.draft.spyGuess = e.target.value; }
   });
