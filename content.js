@@ -531,7 +531,7 @@ const likely = [
   { ar: 'مين ينسى موعده مع الدكتور؟', en: 'Who forgets their doctor’s appointment?' },
   { ar: 'مين يجمع أشياء ما يحتاجها أبداً؟', en: 'Who hoards things they will never need?' },
   { ar: 'مين أهدأ واحد وقت المشاكل؟', en: 'Who stays calmest when things go wrong?' },
-  { ar: 'مين يفتح نقاش عميق الساعة ٣ الفجر؟', en: 'Who starts a deep conversation at 3am?' },
+  { ar: 'مين يفتح نقاش عميق الساعة 3 الفجر؟', en: 'Who starts a deep conversation at 3am?' },
   { ar: 'مين يوعد إنه بينام بدري وما يصير؟', en: 'Who promises an early night and never delivers?' },
   { ar: 'مين يعرف مطعم زين بكل مكان؟', en: 'Who knows a good restaurant everywhere?' },
   { ar: 'مين يرجع من السفر بنفس الملابس اللي ما لبسها؟', en: 'Who returns from a trip with clothes they never wore?' },

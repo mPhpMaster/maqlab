@@ -34,7 +34,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       round: 'الجولة', spinning: 'وش بتكون الجولة الجاية؟',
       type_bluff: 'المقلب', desc_bluff: 'اكتب كذبة مقنعة تخدع فيها الشلة', type_number: 'أقرب رقم', desc_number: 'خمّن الرقم… الأقرب يكسب', type_blitz: 'صح ولا خطأ', desc_blitz: '3 عبارات سريعة، والسرعة تفرق!',
       type_likely: 'مين فينا؟', desc_likely: 'صوّت على واحد من الشلة… ووافق الأغلبية', type_emoji: 'فكّ الإيموجي', desc_emoji: '3 ألغاز إيموجي… الأسرع يكسب',
-      type_odd: 'الدخيل', desc_odd: '٤ كلمات، وحدة منهم ما لها دخل… لقّطها بسرعة', type_spy: 'الجاسوس', desc_spy: 'واحد بينكم جاسوس ما يعرف الكلمة… لقّطوه! 🕵️',
+      type_odd: 'الدخيل', desc_odd: '4 كلمات، وحدة منهم ما لها دخل… لقّطها بسرعة', type_spy: 'الجاسوس', desc_spy: 'واحد بينكم جاسوس ما يعرف الكلمة… لقّطوه! 🕵️',
       category: 'الفئة', youAreSpy: 'أنت الجاسوس! 🕵️', spyHintSpy: 'اكتب تلميح يخليهم يحسبونك تعرف الكلمة', spyHintCivilian: 'اكتب تلميح عن الكلمة بدون ما تقولها',
       writeClue: 'اكتب تلميحك…', yourClue: 'تلميحك', spyPickSuspect: 'مين تحس إنه الجاسوس؟ 🤔', spyWordIs: 'الكلمة: {n}',
       guessWord: 'خمّن الكلمة السرية (اختياري)', spyGuessBtn: 'خمّن 🎯', guessSent: 'خمّنت: {n}',
@@ -57,15 +57,15 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       a_liar: 'سيد المقالب', a_liar_d: { one: 'خدع مرةً واحدةً', two: 'خدع مرتين', few: 'خدع {n} مراتٍ', many: 'خدع {n} مرةً', other: 'خدع {n} مرةٍ' }, a_detective: 'المحقق', a_detective_d: { one: 'إجابة صحيحة واحدة', two: 'إجابتان صحيحتان', few: '{n} إجاباتٍ صحيحةٍ', many: '{n} إجابةً صحيحةً', other: '{n} إجابةٍ صحيحةٍ' }, a_sniper: 'القناص', a_sniper_d: { one: 'تخمين دقيق واحد', two: 'تخمينان دقيقان', few: '{n} تخميناتٍ دقيقةٍ', many: '{n} تخميناً دقيقاً', other: '{n} تخمينٍ دقيقٍ' }, a_lightning: 'البرق', a_lightning_d: { one: 'الأسرع مرةً واحدةً', two: 'الأسرع مرتين', few: 'الأسرع {n} مراتٍ', many: 'الأسرع {n} مرةً', other: 'الأسرع {n} مرةٍ' }, a_gambler: 'المغامر', a_gambler_d: { one: 'راهن بقوة مرةً واحدةً', two: 'راهن بقوة مرتين', few: 'راهن بقوة {n} مراتٍ', many: 'راهن بقوة {n} مرةً', other: 'راهن بقوة {n} مرةٍ' }, a_fire: 'ولّعت', a_fire_d: 'سلسلة {n} 🔥', a_star: 'نجم الشلة', a_star_d: { one: 'اختاروه مرةً واحدةً', two: 'اختاروه مرتين', few: 'اختاروه {n} مراتٍ', many: 'اختاروه {n} مرةً', other: 'اختاروه {n} مرةٍ' },
       ann_first: 'صرت الأول! 👑', ann_combo: 'كومبو ×{n} 🔥', ann_unstoppable: 'ما ينوقف!! 🔥🔥', ann_legend: 'مقلب أسطوري! 😈', ann_perfect: 'مثالي! 3 من 3 ✨', ann_golden: 'الجولة الذهبية! 👑',
       achievements: 'إنجازاتي', achUnlocked: 'إنجاز جديد! 🏅',
-      ach_games50: 'مدمن فعلي', achd_games50: 'العب ٥٠ لعبة', ach_wins25: 'بطل', achd_wins25: 'افز بـ٢٥ لعبة',
-      ach_liar50: 'أبو الكذب', achd_liar50: 'اخدع ٥٠ لاعب', ach_bull10: 'قنّاص محترف', achd_bull10: '١٠ مرات في الصميم',
-      ach_streak8: 'ما ينوقف', achd_streak8: 'سلسلة ٨ ورا بعض', ach_speedy25: 'برق مضاعف', achd_speedy25: 'كن الأسرع ٢٥ مرة',
-      ach_spy_hunter: 'صائد الجواسيس', achd_spy_hunter: 'لقّط الجاسوس ٥ مرات', ach_spy_ghost: 'شبح', achd_spy_ghost: 'اهرب كجاسوس ٥ مرات',
-      ach_winstreak3: 'ثلاثية', achd_winstreak3: 'افز ٣ ألعاب ورا بعض', ach_winstreak10: 'أسطورة حية', achd_winstreak10: 'افز ١٠ ألعاب ورا بعض',
-      ach_score10k: 'عشرة آلاف', achd_score10k: 'اجمع ١٠٬٠٠٠ نقطة', ach_score100k: 'مليونير', achd_score100k: 'اجمع ١٠٠٬٠٠٠ نقطة',
-      ach_crowded: 'نجم الحفلة', achd_crowded: 'افز بلعبة فيها ٦ لاعبين أو أكثر', ach_sniper: 'عين الصقر', achd_sniper: '٢٠ تخمين دقيق',
+      ach_games50: 'مدمن فعلي', achd_games50: 'العب 50 لعبة', ach_wins25: 'بطل', achd_wins25: 'افز بـ25 لعبة',
+      ach_liar50: 'أبو الكذب', achd_liar50: 'اخدع 50 لاعب', ach_bull10: 'قنّاص محترف', achd_bull10: '10 مرات في الصميم',
+      ach_streak8: 'ما ينوقف', achd_streak8: 'سلسلة 8 ورا بعض', ach_speedy25: 'برق مضاعف', achd_speedy25: 'كن الأسرع 25 مرة',
+      ach_spy_hunter: 'صائد الجواسيس', achd_spy_hunter: 'لقّط الجاسوس 5 مرات', ach_spy_ghost: 'شبح', achd_spy_ghost: 'اهرب كجاسوس 5 مرات',
+      ach_winstreak3: 'ثلاثية', achd_winstreak3: 'افز 3 ألعاب ورا بعض', ach_winstreak10: 'أسطورة حية', achd_winstreak10: 'افز 10 ألعاب ورا بعض',
+      ach_score10k: 'عشرة آلاف', achd_score10k: 'اجمع 10,000 نقطة', ach_score100k: 'مليونير', achd_score100k: 'اجمع 100,000 نقطة',
+      ach_crowded: 'نجم الحفلة', achd_crowded: 'افز بلعبة فيها 6 لاعبين أو أكثر', ach_sniper: 'عين الصقر', achd_sniper: '20 تخمين دقيق',
       ach_first_game: 'أول لعبة', achd_first_game: 'خلّص أول لعبة', ach_first_win: 'أول فوز', achd_first_win: 'اطلع الأول في لعبة', ach_liar5: 'كذّاب محترف', achd_liar5: 'اخدع 5 لاعبين', ach_bull: 'قنّاص', achd_bull: 'جيب «في الصميم» 🎯', ach_streak4: 'نار', achd_streak4: 'سلسلة 4 ورا بعض', ach_allin: 'كل شي أو لا شي', achd_allin: 'اكسب رهان ×3', ach_famous: 'المشهور', achd_famous: 'الشلة تختارك في «مين فينا؟»', ach_speedy: 'برق', achd_speedy: 'كن الأسرع 3 مرات', ach_games10: 'مدمن', achd_games10: 'العب 10 ألعاب', ach_wins5: 'أسطورة', achd_wins5: 'افز بـ 5 ألعاب',
-      howSteps: ['أنشئ غرفة وشارك الكود أو الرابط مع الشلة.', 'كل جولة تبدأ بآلة الحظ: تحدد نوع الجولة ومضاعف النقاط.', '🤥 المقلب: اكتب كذبة مقنعة، بعدين اختار الصح وراهن عليه.', '🎯 أقرب رقم: خمّن، والأقرب ياخذ النقاط (والصميم +1000!).', '⚡ صح ولا خطأ و🔤 فكّ الإيموجي: جاوب بسرعة، كل ثانية تفرق.', '👥 مين فينا؟ صوّت على واحد من الشلة ووافق الأغلبية.', '🕵️ الجاسوس: واحد ما يعرف الكلمة، الكل يكتب تلميح، وبعدين صوتوا مين الجاسوس!', 'عندك قدرتين كل لعبة: 🔍 كشّاف يشيل خيارين غلط، و💎 دبل يضاعف نقاط جولة.', 'اجمع سلاسل 🔥 واكسب الألقاب والإنجازات وارفع مستواك!'],
+      howSteps: ['أنشئ غرفة وشارك الكود أو الرابط مع الشلة.', 'كل جولة تبدأ بآلة الحظ: تحدد نوع الجولة ومضاعف النقاط.', '🤥 المقلب: اكتب كذبة مقنعة، بعدين اختار الصح وراهن عليه.', '🎯 أقرب رقم: خمّن، والأقرب ياخذ النقاط (والصميم +1000!).', '⚡ صح ولا خطأ و🔤 فكّ الإيموجي: جاوب بسرعة، كل ثانية تفرق.', '🧩 الدخيل و📊 رتّبها: لقّط اللي ما له دخل بينهم، أو رتّب أربعة أشياء من الأكبر للأصغر.', '👥 مين فينا؟ صوّت على واحد من الشلة ووافق الأغلبية.', '🕵️ الجاسوس: واحد ما يعرف الكلمة، الكل يكتب تلميح، وبعدين صوتوا مين الجاسوس!', 'عندك قدرتين كل لعبة: 🔍 كشّاف يشيل خيارين غلط، و💎 دبل يضاعف نقاط جولة.', 'اجمع سلاسل 🔥 واكسب الألقاب والإنجازات وارفع مستواك!'],
       bullseye: 'في الصميم! 🎯', streakToast: 'سلسلة {n}! 🔥',
       teams: 'وضع الفرق', teamsOff: 'كل واحد لحاله', teamsOn: 'فريقين ⚔️', team_A: 'الجمر 🔥', team_B: 'الموج 🌊', joinTeam: 'انضم', teamWins: 'فاز فريق {n}! 🏆', teamTie: 'تعادل الفريقين! 🤝',
       ready: 'جاهز ✋', notReady: 'مو جاهز بعد', readyN: '{n}/{m} جاهزين',
@@ -77,7 +77,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
       rank: 'الترتيب', games: { one: 'لعبة', two: 'لعبتان', few: 'ألعابٍ', many: 'لعبةً', other: 'لعبةٍ' }, wins: { one: 'فوز', two: 'فوزان', few: 'فوزاتٍ', many: 'فوزاً', other: 'فوزٍ' }, winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
       curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: { one: 'متابِع', two: 'متابِعان', few: 'متابِعين', many: 'متابِعاً', other: 'متابِعٍ' }, followingN: 'يتابع', memberSince: 'عضو منذ',
-      whichOdd: 'مين الدخيل بينهم؟', type_order: 'رتّبها', desc_order: 'رتّب ٤ أشياء… كل جارَين بالترتيب الصح لك نقاط', clear: 'امسح', lockIn: 'ثبّت الترتيب ✅', pickAll: 'باقي {n}', youSaid: 'حطيتها {n}', perfectOrder: 'ترتيب مثالي! 🎯', pairsRight: '{n} من ٣ صح', g_orderPairs: 'ترتيب صحيح', g_orderPerfect: 'ترتيب مثالي 🎯', addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', tryAgain: 'جرّب مرة ثانية', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
+      whichOdd: 'مين الدخيل بينهم؟', type_order: 'رتّبها', desc_order: 'رتّب 4 أشياء… كل جارَين بالترتيب الصح لك نقاط', clear: 'امسح', lockIn: 'ثبّت الترتيب ✅', pickAll: 'باقي {n}', youSaid: 'حطيتها {n}', perfectOrder: 'ترتيب مثالي! 🎯', pairsRight: '{n} من 3 صح', g_orderPairs: 'ترتيب صحيح', g_orderPerfect: 'ترتيب مثالي 🎯', addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', tryAgain: 'جرّب مرة ثانية', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
       repRounds: 'جولات المباراة', repTruth: 'الإجابة الصحيحة', repHouse: 'خيار من اللعبة', repAnswer: 'الجواب',
       repNobody: 'ما أحد', repMostVotes: 'أكثر واحد صوّتوا له', repCaught: 'انكشف 🎯', repEscaped: 'نجا بجلده 😎',
       repSpyGuess: 'تخمين الجاسوس', repRoundPts: 'نقاط الجولة', repCorrect: 'الترتيب الصحيح',
@@ -92,7 +92,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ban: 'حظر', unban: 'فك الحظر', resetProfile: 'تصفير البروفايل', markDone: 'تم', banWhy: 'سبب الحظر',
       confirmReset: 'تصفير كل تقدم {n}؟ ما يمكن التراجع.', nothingHere: 'ما فيه شي هنا 👌', searchPlayers: 'ابحث باسم لاعب',
       youAreBanned: 'حسابك محظور: {r}', achLocked: 'مقفل',
-      aboutBody: ['مقلب لعبة حفلات جماعية عربية/إنجليزية، تنلعب من الجوال مع الشلة في نفس الوقت.', '٦ أنواع جولات، آلة حظ تحدد المضاعف، وقدرات تستخدمها مرة وحدة باللعبة.', 'كل شي فيها أصلي: الأسئلة، الشخصيات، والأصوات تتولّد بالمتصفح بدون أي ملفات.'],
+      aboutBody: ['مقلب لعبة حفلات جماعية عربية/إنجليزية، تنلعب من الجوال مع الشلة في نفس الوقت.', '8 أنواع جولات، آلة حظ تحدد المضاعف، وقدرات تستخدمها مرة وحدة باللعبة.', 'كل شي فيها أصلي: الأسئلة، الشخصيات، والأصوات تتولّد بالمتصفح بدون أي ملفات.'],
       aboutMade: 'صُنعت بـ ❤️', version: 'الإصدار', terms: 'شروط الاستخدام', privacy: 'سياسة الخصوصية',
     },
     en: {
@@ -136,7 +136,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ach_score10k: 'Ten Thousand', achd_score10k: 'Earn 10,000 points', ach_score100k: 'Point Millionaire', achd_score100k: 'Earn 100,000 points',
       ach_crowded: 'Life of the Party', achd_crowded: 'Win a game with 6+ players', ach_sniper: 'Hawk Eye', achd_sniper: '20 spot-on guesses',
       ach_first_game: 'First Game', achd_first_game: 'Finish your first game', ach_first_win: 'First Win', achd_first_win: 'Finish 1st in a game', ach_liar5: 'Pro Liar', achd_liar5: 'Fool 5 players', ach_bull: 'Sharpshooter', achd_bull: 'Hit a bullseye 🎯', ach_streak4: 'On Fire', achd_streak4: 'Get a 4 streak', ach_allin: 'All In', achd_allin: 'Win a ×3 bet', ach_famous: 'Famous', achd_famous: "Be the crowd's pick", ach_speedy: 'Lightning', achd_speedy: 'Be fastest 3 times', ach_games10: 'Regular', achd_games10: 'Play 10 games', ach_wins5: 'Legend', achd_wins5: 'Win 5 games',
-      howSteps: ['Create a room and share the code or link with friends.', 'Every round starts with a slot machine: round type + point multiplier.', '🤥 The Bluff: write a convincing lie, then find the truth and bet on it.', '🎯 Closest Number: guess — closest wins (bullseye = +1000!).', '⚡ True or False & 🔤 Emoji Decode: answer fast, every second counts.', "👥 Who's Most Likely: vote for a friend and side with the crowd.", "🕵️ The Spy: one player doesn't know the word — everyone drops a clue, then vote who's the spy!", 'Two power-ups per game: 🔍 Peek removes two wrong options, 💎 Double doubles one round.', 'Build 🔥 streaks, win awards & achievements and level up!'],
+      howSteps: ['Create a room and share the code or link with friends.', 'Every round starts with a slot machine: round type + point multiplier.', '🤥 The Bluff: write a convincing lie, then find the truth and bet on it.', '🎯 Closest Number: guess — closest wins (bullseye = +1000!).', '⚡ True or False & 🔤 Emoji Decode: answer fast, every second counts.', '🧩 Odd One Out & 📊 Line Them Up: spot the one that does not belong, or put four things in order.', "👥 Who's Most Likely: vote for a friend and side with the crowd.", "🕵️ The Spy: one player doesn't know the word — everyone drops a clue, then vote who's the spy!", 'Two power-ups per game: 🔍 Peek removes two wrong options, 💎 Double doubles one round.', 'Build 🔥 streaks, win awards & achievements and level up!'],
       bullseye: 'BULLSEYE! 🎯', streakToast: '{n} streak! 🔥',
       teams: 'Team mode', teamsOff: 'Solo', teamsOn: 'Two teams ⚔️', team_A: 'Ember 🔥', team_B: 'Wave 🌊', joinTeam: 'Join', teamWins: 'Team {n} wins! 🏆', teamTie: "It's a tie! 🤝",
       ready: 'Ready ✋', notReady: 'Not ready', readyN: '{n}/{m} ready',
@@ -163,7 +163,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ban: 'Ban', unban: 'Unban', resetProfile: 'Reset profile', markDone: 'Done', banWhy: 'Ban reason',
       confirmReset: "Reset all of {n}'s progress? This can't be undone.", nothingHere: 'Nothing here 👌', searchPlayers: 'Search by player name',
       youAreBanned: 'Your account is banned: {r}', achLocked: 'Locked',
-      aboutBody: ['MAQLAB is a bilingual Arabic/English party game, played together on your phones.', '6 round types, a slot machine that sets the multiplier, and one-use power-ups.', 'Everything in it is original: the questions, the characters, and sound synthesized in the browser with no audio files.'],
+      aboutBody: ['MAQLAB is a bilingual Arabic/English party game, played together on your phones.', '8 round types, a slot machine that sets the multiplier, and one-use power-ups.', 'Everything in it is original: the questions, the characters, and sound synthesized in the browser with no audio files.'],
       aboutMade: 'Made with ❤️', version: 'Version', terms: 'Terms of Service', privacy: 'Privacy Policy',
     },
   };
@@ -241,7 +241,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   const isHost = () => state.room && state.room.hostId === myId();
   const P = id => state.room && state.room.players.find(p => p.id === id);
   const me = () => P(myId());
-  const fmt = n => Number(n).toLocaleString(state.lang === 'ar' ? 'ar-EG' : 'en-US');
+  // Latin digits in both languages, always. A score is read at a glance, and
+  // the same number written two ways stops being the same number.
+  const fmt = n => Number(n).toLocaleString('en-US');
   const later = (ms, fn) => state.timeouts.push(setTimeout(fn, ms));
   function applyDir() { document.documentElement.lang = state.lang; document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr'; document.title = 'MAQLAB | مقلب'; }
 
@@ -1689,7 +1691,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   // Dates come back as ISO strings; only the day matters on a scoreboard.
   const shortDate = v => {
     const d = new Date(v);
-    return isNaN(d) ? '' : d.toLocaleDateString(state.lang === 'ar' ? 'ar-SA' : 'en-GB', { day: 'numeric', month: 'short' });
+    // ar-EG keeps the Gregorian calendar and Arabic month names; -u-nu-latn
+    // keeps the digits Latin, like everywhere else.
+    return isNaN(d) ? '' : d.toLocaleDateString(state.lang === 'ar' ? 'ar-EG-u-nu-latn' : 'en-GB', { day: 'numeric', month: 'short' });
   };
   const medal = n => (n === 1 ? '🥇' : n === 2 ? '🥈' : n === 3 ? '🥉' : '#' + n);
 
