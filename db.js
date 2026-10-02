@@ -67,6 +67,34 @@ const recentGames = (userId, limit = 10) =>
   q(`select match_id, score, place, players, won, rounds, finished_at from game_results
       where user_id = $1 order by finished_at desc limit $2`, [userId, limit]).then(r => r.rows);
 
+// This week's board, summed from the games rather than from the lifetime
+// totals. An all-time table is already settled by the time anyone new arrives,
+// and the game is now listed publicly — a newcomer who cannot place on it has
+// nothing to play for.
+const weeklyBoard = (limit = 50) =>
+  q(`select g.user_id, p.name, p.avatar,
+            sum(g.score)::bigint as total_score,
+            count(*)::int as games,
+            count(*) filter (where g.won)::int as wins
+       from game_results g join profiles p on p.user_id = g.user_id
+      where p.banned_at is null and g.finished_at > now() - interval '7 days'
+      group by g.user_id, p.name, p.avatar
+      order by total_score desc, wins desc, games asc
+      limit $1`, [Math.min(limit, 100)]).then(r => r.rows);
+
+// Where one person sits on that board, without sorting the whole thing.
+async function weeklyRank(userId) {
+  const r = await one(
+    `with week as (
+       select user_id, sum(score)::bigint total from game_results
+        where finished_at > now() - interval '7 days' group by user_id
+     )
+     select count(*)::int + 1 as rank from week w
+      where w.total > (select coalesce(total, 0) from week where user_id = $1)
+        and exists (select 1 from week where user_id = $1)`, [userId]);
+  return r ? r.rank : null;
+}
+
 const leaderboard = (limit = 50) =>
   q(`select user_id, name, avatar, xp, games, wins, total_score, best_score, best_win_streak
        from profiles where banned_at is null and games > 0
@@ -222,7 +250,7 @@ const searchProfiles = term =>
     [`%${term.replace(/[%_\\]/g, m => '\\' + m)}%`, term]).then(r => r.rows);
 
 module.exports = {
-  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, recordGame, addAchievements, getMatch, saveMatch, getReplay, saveRoom, dropRoom, liveRooms,
+  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, weeklyBoard, weeklyRank, recordGame, addAchievements, getMatch, saveMatch, getReplay, saveRoom, dropRoom, liveRooms,
   follow, unfollow, following, followCounts, isFollowing,
   createReport, createSuggestion,
   isBanned, setBan, unban, resetProfile,

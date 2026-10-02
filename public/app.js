@@ -75,7 +75,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       phrases: ['ما راح تعرفها 😏', 'أنا الفايز 🏆', 'يا ساتر 😂', 'ركّز يا بطل!', 'كذّاب! 🤥', 'يلا بسرعة ⏰', 'حظ أوفر 😅', 'الله عليك 👏', 'مستحيل! 😱', 'صدقني هذي الصح 😇', 'خلاص تعبت 😴', 'انتقامي قادم 😈'],
       signIn: 'دخول بديسكورد', signInToPlay: 'سجّل دخولك بديسكورد عشان تلعب — اسمك وصورتك يجونك منه', signOut: 'تسجيل خروج', guestNote: 'ما أنت مسجّل دخول — سجّل عشان تفتح الإنجازات', signedInAs: 'مسجّل باسم',
       profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
-      rank: 'الترتيب', games: { one: 'لعبة', two: 'لعبتان', few: 'ألعابٍ', many: 'لعبةً', other: 'لعبةٍ' }, wins: { one: 'فوز', two: 'فوزان', few: 'فوزاتٍ', many: 'فوزاً', other: 'فوزٍ' }, winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
+      boardWeek: 'هذا الأسبوع', boardAll: 'منذ البداية', boardEmptyWeek: 'ما لعب أحد هالأسبوع بعد — كن أول واحد', rank: 'الترتيب', games: { one: 'لعبة', two: 'لعبتان', few: 'ألعابٍ', many: 'لعبةً', other: 'لعبةٍ' }, wins: { one: 'فوز', two: 'فوزان', few: 'فوزاتٍ', many: 'فوزاً', other: 'فوزٍ' }, winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
       curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: { one: 'متابِع', two: 'متابِعان', few: 'متابِعين', many: 'متابِعاً', other: 'متابِعٍ' }, followingN: 'يتابع', memberSince: 'عضو منذ',
       type_name: 'اذكر شيئاً', desc_name: 'اكتب أول شي يجيك — نقاطك على كل واحد كتب مثلك', nameWritePh: 'اكتب إجابتك…', nameAlone: 'ما وافقك أحد', nameWith: 'وافقك {n}', nameTip: 'الفكرة تكتب اللي الكل بيكتبه، مو اللي ما أحد يفكر فيه', type_many: 'كم واحد فينا؟', desc_many: 'جاوب عن نفسك، ثم خمّن كم واحد قال نعم', manyYes: 'نعم 🙋', manyNo: 'لا 🙅', manyAsked: 'جاوب عن نفسك — أحد ما يشوف جوابك', manyGuessQ: 'كم واحد قال نعم؟', manyYouSaid: 'جوابك: {n}', manyWere: '{n} قالوا نعم', manyExactMsg: 'بالضبط! 🎯 +500', manyNearMsg: 'قريب — فرق واحد · +250', manyOffMsg: 'بعيد هالمرة', manyNobody: 'ولا واحد', manyGuessedN: 'خمّن {n}', whichOdd: 'مين الدخيل بينهم؟', type_order: 'رتّبها', desc_order: 'رتّب 4 أشياء… كل جارَين بالترتيب الصح لك نقاط', clear: 'امسح', lockIn: 'ثبّت الترتيب ✅', pickAll: 'باقي {n}', youSaid: 'حطيتها {n}', perfectOrder: 'ترتيب مثالي! 🎯', pairsRight: '{n} من 3 صح', g_orderPairs: 'ترتيب صحيح', g_orderPerfect: 'ترتيب مثالي 🎯', addBot: 'ضيف بوت', soloHint: 'لحالك؟ اضغط «ضيف بوت»، أو ابدأ وبنجيب لك ربع 🤖', discordSignInBusy: 'قاعدين نسجّل دخولك من ديسكورد…', discordFailed: 'ما قدرنا نسجّل دخولك من ديسكورد: {e}', tryAgain: 'جرّب مرة ثانية', follow: 'متابعة', unfollow: 'إلغاء المتابعة', lastGames: 'آخر الألعاب', noGames: 'ما لعب أي لعبة بعد',
       repRounds: 'جولات المباراة', repTruth: 'الإجابة الصحيحة', repHouse: 'خيار من اللعبة', repAnswer: 'الجواب',
@@ -146,7 +146,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       phrases: ["You'll never get it 😏", "I'm winning 🏆", 'LOL 😂', 'Focus!', 'Liar! 🤥', 'Hurry up ⏰', 'Better luck next time 😅', 'Nice one 👏', 'No way! 😱', "Trust me, that's it 😇", "I'm tired 😴", 'Revenge is coming 😈'],
       signIn: 'Sign in with Discord', signInToPlay: 'Sign in with Discord to play — your name comes from there', signOut: 'Sign out', guestNote: "You're not signed in — sign in to start earning these", signedInAs: 'Signed in as',
       profile: 'Profile', leaderboard: 'Leaderboard', suggestBtn: 'Send a suggestion', about: 'About', adminPanel: 'Admin',
-      rank: 'Rank', games: { one: 'Game', other: 'Games' }, wins: { one: 'Win', other: 'Wins' }, winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
+      boardWeek: 'This week', boardAll: 'All time', boardEmptyWeek: 'Nobody has played this week yet — be the first', rank: 'Rank', games: { one: 'Game', other: 'Games' }, wins: { one: 'Win', other: 'Wins' }, winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
       curStreak: 'Win streak', bestStreak: 'Longest streak', followers: { one: 'Follower', other: 'Followers' }, followingN: 'Following', memberSince: 'Member since',
       type_name: 'Name Something', desc_name: 'Write the first thing you think of — you score for everyone who wrote the same', nameWritePh: 'Type your answer…', nameAlone: 'Nobody matched you', nameWith: '{n} matched you', nameTip: 'The trick is writing what everyone writes, not what nobody thinks of', type_many: 'How Many of Us?', desc_many: 'Answer about yourself, then guess how many said yes', manyYes: 'Yes 🙋', manyNo: 'No 🙅', manyAsked: 'Answer about yourself — nobody sees your answer', manyGuessQ: 'How many said yes?', manyYouSaid: 'You said: {n}', manyWere: '{n} said yes', manyExactMsg: 'Exactly right! 🎯 +500', manyNearMsg: 'One off — +250', manyOffMsg: 'Not this time', manyNobody: 'Nobody', manyGuessedN: 'guessed {n}', whichOdd: "Which one doesn't belong?", type_order: 'Line Them Up', desc_order: 'Put 4 things in order — every neighbouring pair you get right scores', clear: 'Clear', lockIn: 'Lock it in ✅', pickAll: '{n} to go', youSaid: 'you said {n}', perfectOrder: 'Perfect order! 🎯', pairsRight: '{n} of 3 right', g_orderPairs: 'Right order', g_orderPerfect: 'Perfect order 🎯', addBot: 'Add bot', soloHint: 'On your own? Add a bot, or just start — we will sit some down for you 🤖', discordSignInBusy: 'Signing you in through Discord…', discordFailed: 'Could not sign you in through Discord: {e}', tryAgain: 'Try again', follow: 'Follow', unfollow: 'Unfollow', lastGames: 'Recent games', noGames: 'No games played yet',
       repRounds: 'Round by round', repTruth: 'the true answer', repHouse: 'filler option', repAnswer: 'Answer',
@@ -194,6 +194,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     // the session has to ride along as a bearer token instead.
     bearer: null, inDiscord: IN_DISCORD, discordDone: false, discordStage: '', discordError: null,
     lastKey: '', phaseTotal: 1, timeouts: [], editor: null,
+    // The week is shown first: an all-time table is already decided.
+    boardRange: 'week',
     // Down since when, so a blink can be told from the free instance
     // having gone to sleep. null means connected.
     offlineSince: null,
@@ -2057,9 +2059,12 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   }
 
   // ---------- leaderboard ----------
-  async function openLeaderboard() {
+  async function openLeaderboard(range) {
+    // Only the two known ranges count; anything else falls back to the default.
+    range = range === 'week' || range === 'all' ? range : state.boardRange;
+    state.boardRange = range;
     modal(`<div class="center" style="padding:40px"><div class="spinner"></div></div>`);
-    const d = await api('/api/leaderboard');
+    const d = await api('/api/leaderboard' + (range === 'week' ? '?range=week' : ''));
     if (d.error || d.status) { closeModal(); toast(t('err_bad'), 'err'); return; }
     const rows = d.entries.length ? d.entries.map((e, i) => `
       <div class="brow ${e.user_id === d.meId ? 'me' : ''}">
@@ -2067,12 +2072,18 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         <span class="nm" data-act="profile" data-uid="${esc(e.user_id)}">${esc(e.name)}</span>
         <span class="sc">${fmt(e.total_score)}</span>
         ${e.user_id === d.meId ? '' : `<button class="flag" data-lb-report="${esc(e.user_id)}" data-lb-name="${esc(e.name)}">🚩</button>`}
-      </div>`).join('') : `<div class="center muted" style="padding:20px">${t('nothingHere')}</div>`;
+      </div>`).join('') : `<div class="center muted" style="padding:20px">${t(range === 'week' ? 'boardEmptyWeek' : 'nothingHere')}</div>`;
     modal(`<h3>🏆 ${t('leaderboard')}</h3>
+      <div class="seg" style="margin-bottom:10px">
+        <button data-range="week" class="${range === 'week' ? 'on' : ''}">${t('boardWeek')}</button>
+        <button data-range="all" class="${range === 'week' ? '' : 'on'}">${t('boardAll')}</button>
+      </div>
       ${d.myRank ? `<div class="center muted" style="font-size:13px;margin-bottom:8px">${t('rank')}: #${fmt(d.myRank)}</div>` : ''}
       <div class="board" data-scroll="lb" style="max-height:58vh;overflow-y:auto">${rows}</div>
       <button class="btn block ghost" data-close style="margin-top:14px">${t('close')}</button>`,
     m => m.addEventListener('click', e => {
+      const r = e.target.closest('[data-range]');
+      if (r) { openLeaderboard(r.dataset.range); return; }
       const f = e.target.closest('[data-lb-report]');
       if (f) { closeModal(); openReport({ user_id: f.dataset.lbReport, name: f.dataset.lbName }); return; }
       const n = e.target.closest('[data-act="profile"]');
@@ -2219,7 +2230,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     },
     async signout() { await post('/api/auth/logout'); state.me = null; state.isAdmin = false; state.lastKey = ''; render(); },
     profile: el => openProfile(el.dataset.uid),
-    leaderboard: openLeaderboard,
+    // Wrapped: actions are called with the clicked element, which would arrive
+    // as the range argument and silently select the wrong board.
+    leaderboard: () => openLeaderboard(),
     suggest: openSuggest,
     about: openAbout,
     admin: () => openAdmin(),

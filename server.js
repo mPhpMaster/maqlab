@@ -1636,13 +1636,37 @@ app.get('/room/:code', (req, res) => {
     `🎈 ادخل غرفة ${code} · MAQLAB`,
     n ? `${n} of your friends are in this room right now — tap to join. · ${n} من ربعك ينتظرونك بالغرفة الحين، اضغط وادخل على طول.` : SITE_DESC));
 });
+// A shared match link is the only thing this game produces that leaves the
+// room, and it was arriving in a Discord channel as a bare URL with a generic
+// blurb. The card now carries the actual podium, so everyone in the channel
+// reads the result without opening anything.
+const num = n => Number(n).toLocaleString('en-US');
+
+function matchCard(players, rounds) {
+  const top = players.slice(0, 3).map(p => `${p.name} ${num(p.score)}`).join(' · ');
+  const rest = players.length > 3 ? ` +${players.length - 3}` : '';
+  const en = `${top}${rest} — ${rounds} rounds, ${players.length} players.`;
+  const ar = `${rounds} جولة بين ${players.length} لاعبين — افتحها تشوف كل جولة: مين كتب وش، ومين وقع في وش.`;
+  return `${en} · ${ar}`;
+}
+
 app.get('/match/:id', async (req, res) => {
   let title = SITE_TITLE, desc = SITE_DESC;
   if (db.on() && UUID.test(req.params.id)) {
-    const rows = await db.getMatch(req.params.id).catch(() => []);
-    const win = rows.find(r => r.won) || rows[0];
-    if (win) title = `🏆 ${win.name} — ${win.score} pts · MAQLAB`;
-    if (rows.length) desc = `Final scores from a ${rows.length}-player match. · نتيجة مباراة بين ${rows.length} لاعبين، تقدر تشوف الترتيب كامل.`;
+    // The replay knows everyone who played; game_results only has the rows for
+    // signed-in players, so a guest would be missing from the card.
+    const [rows, rep] = await Promise.all([
+      db.getMatch(req.params.id).catch(() => []),
+      db.getReplay(req.params.id).catch(() => null),
+    ]);
+    const players = rep && rep.data && rep.data.players && rep.data.players.length
+      ? rep.data.players.map(p => ({ name: p.name, score: p.score }))
+      : rows.map(r => ({ name: r.name, score: r.score }));
+    if (players.length) {
+      const win = players[0];
+      title = `🏆 ${win.name} — ${num(win.score)} · MAQLAB`;
+      desc = matchCard(players, rep ? rep.rounds : (rows[0] && rows[0].rounds) || players.length);
+    }
   }
   res.type('html').send(page(req, title, desc));
 });
@@ -1819,10 +1843,12 @@ app.get('/api/achievements', (_, res) => res.json({ list: achievements.LIST.map(
 app.get('/api/leaderboard', async (req, res) => {
   if (needsDb(res)) return;
   const me = auth.sessionFrom(req.headers);
+  const week = req.query.range === 'week';
   res.json({
-    entries: await db.leaderboard(50),
+    range: week ? 'week' : 'all',
+    entries: week ? await db.weeklyBoard(50) : await db.leaderboard(50),
     meId: me ? me.id : null,
-    myRank: me ? await db.rankOf(me.id) : null,
+    myRank: me ? (week ? await db.weeklyRank(me.id) : await db.rankOf(me.id)) : null,
     isAdmin: auth.isAdmin(me && me.id),
   });
 });
