@@ -1445,7 +1445,10 @@ async function recordResults(room) {
     await db.saveMatch({
       id: matchId, roomCode: room.code, gameNo: room.gameNo,
       lang: room.settings.lang, rounds: room.settings.rounds,
-      data: { v: 1, players: replay.roster(ranked), log: room.log },
+      // The pace is part of the result, not a setting that happened to be on:
+      // without it a slow answer cannot be told from a tight clock, which is
+      // the one question the round timings were added to answer.
+      data: { v: 1, pace: room.settings.pace, players: replay.roster(ranked), log: room.log },
     });
   } catch (e) {
     console.error('could not save match replay', e.message);
