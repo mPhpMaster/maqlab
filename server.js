@@ -1509,7 +1509,15 @@ io.on('connection', socket => {
   const limits = {};
   const limited = (k, ms) => { const n = Date.now(); if (n - (limits[k] || 0) < ms) return true; limits[k] = n; return false; };
 
-  socket.on('create', (_, cb) => reply(cb, { code: createRoom().code }));
+  socket.on('create', (opts, cb) => {
+    const room = createRoom();
+    // The room opens in the language the person creating it is reading. They
+    // can still change it; it is a starting point, not a decision taken for
+    // them — and it beats an Arabic interface asking English questions.
+    const want = opts && opts.lang;
+    if (['ar', 'en'].includes(want)) room.settings.lang = want;
+    reply(cb, { code: room.code });
+  });
 
   socket.on('join', async ({ code, token, name, avatar } = {}, cb) => {
     const ip = socket.handshake.address;

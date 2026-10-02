@@ -861,7 +861,6 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         <div class="section-title"><span>${t('players')}</span><span class="chip">${online.length}/12</span></div>
         ${st.teams ? teamColumns(online, mid) : `<div class="players">${players}${invite}${addBot}</div>`}
         ${online.filter(p => !p.bot).length > 1 ? `<div class="center muted" style="font-size:12px;margin-top:8px">${t('pokeHint')}</div>` : ''}
-        ${online.length === 1 && host ? `<div class="center muted" style="font-size:12px;margin-top:8px">${t('soloHint')}</div>` : ''}
         ${balloonCard()}
         <div class="section-title"><span>${t('settings')}</span>${host ? '' : '<span class="chip">🔒</span>'}</div>
         <div class="glass settings">
@@ -1596,7 +1595,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       const pr = s.prevRank[p.id];
       const mv = pr == null ? '' : pr > i ? `<span class="mv up">▲${pr - i}</span>` : pr < i ? `<span class="mv down">▼${i - pr}</span>` : '<span class="mv"></span>';
       return `<div class="brow ${p.id === mid ? 'me' : ''} ${p.team ? 'team-' + p.team : ''}" data-from="${pr == null ? i : pr}" data-to="${i}" data-old="${p.score - d}" data-new="${p.score}">
-        <span class="rk">${i === 0 ? '👑' : i + 1}</span>${J(p.avatar)}<span class="nm" ${p.userId ? `data-act="profile" data-uid="${esc(p.userId)}"` : ''}>${esc(p.name)}${p.streak >= 2 ? `<span class="streak">🔥${p.streak}</span>` : ''}</span>
+        <span class="rk">${i === 0 ? '👑' : i + 1}</span>${J(p.avatar)}<span class="nm" ${p.userId ? `data-act="profile" data-uid="${esc(p.userId)}"` : ''}>${esc(p.name)}</span>${p.streak >= 2 ? `<span class="streak">🔥${p.streak}</span>` : ''}
         <span class="delta ${d < 0 ? 'neg' : ''}">${d ? (d > 0 ? '+' : '') + fmt(d) : ''}</span><span class="sc">${fmt(p.score - d)}</span>${mv}
       </div>`;
     }).join('');
@@ -2417,7 +2416,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     async create() {
       if (!needName()) return;
       sfx.send();
-      const r = await emit('create');
+      const r = await emit('create', { lang: state.lang });
       if (r.code) { history.pushState(null, '', `/room/${r.code}`); state.route = parseRoute(); join(r.code); }
     },
     'join-code'() {

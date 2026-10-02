@@ -835,3 +835,22 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
   background: var(--card2); color: var(--muted); font-size: 13px; font-weight: 700;
 }
 .chipb:active { transform: scale(.95); border-color: var(--lemon); color: var(--ink2, #fff); }
+
+/* Text written by players, and questions from the bank, are not always in the
+   language the interface is in — an English answer in an Arabic room, an Arabic
+   name on an English scoreboard. Without this the paragraph takes the page's
+   direction and the punctuation moves: measured, "…intestine?" rendered its
+   question mark 287px to the left of the first letter, i.e. before the
+   sentence. `plaintext` lets each string pick its own direction from its own
+   first letter, which is the only thing that can be right for both. */
+.q, .q-card h1, .sub, .opt, .nm, .my-answer, .ansrow .nm, .ansrow .said, .repo .txt,
+.rq, .best-lie .txt, .mrow .nm, .ord .nm, .qlist .ansrow .nm, .clue, .repp, .pod .nm,
+.flag, b {
+  unicode-bidi: plaintext;
+}
+
+/* The name is the point of a scoreboard row; the points chip is not. Without a
+   floor the name was the first thing flex took space from — a row with a gain
+   and a streak squeezed "Nova" into 25px and drew it as "...va". */
+.brow .nm { min-width: 4.5em; }
+.brow .streak { flex: 0 0 auto; }
