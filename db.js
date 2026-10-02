@@ -127,6 +127,9 @@ async function recordGame({ userId, roomCode, gameNo, matchId, score, place, pla
          bullseyes = bullseyes + $10, fastest = fastest + $11, high_bets = high_bets + $12,
          best_streak = greatest(best_streak, $13), famous = famous + $14,
          spy_caught = spy_caught + $15, spy_evaded = spy_evaded + $16,
+         perfect_orders = perfect_orders + $18, name_crowd = name_crowd + $19,
+         many_exact = many_exact + $20, two_fool_all = two_fool_all + $21,
+         odd_sweeps = odd_sweeps + $22,
          achievements = (
            select coalesce(jsonb_agg(distinct a), '[]'::jsonb)
              from jsonb_array_elements(profiles.achievements || $17::jsonb) a
@@ -136,7 +139,9 @@ async function recordGame({ userId, roomCode, gameNo, matchId, score, place, pla
       [userId, won ? 1 : 0, rounds, score, xp, won,
         s.fooled || 0, s.correct || 0, s.snipes || 0, s.bullseyes || 0, s.fastest || 0,
         s.highBets || 0, s.bestStreak || 0, s.famous || 0, s.spyCaught || 0, s.spyEvaded || 0,
-        JSON.stringify(achievements || [])]
+        JSON.stringify(achievements || []),
+        s.perfectOrders || 0, s.nameCrowd || 0, s.manyExact || 0, s.twoFoolAll || 0,
+        s.oddSweeps || 0]
     );
     await client.query('commit');
     return true;

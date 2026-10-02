@@ -64,6 +64,14 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ach_winstreak3: 'ثلاثية', achd_winstreak3: 'افز 3 ألعاب ورا بعض', ach_winstreak10: 'أسطورة حية', achd_winstreak10: 'افز 10 ألعاب ورا بعض',
       ach_score10k: 'عشرة آلاف', achd_score10k: 'اجمع 10,000 نقطة', ach_score100k: 'مليونير', achd_score100k: 'اجمع 100,000 نقطة',
       ach_crowded: 'نجم الحفلة', achd_crowded: 'افز بلعبة فيها 6 لاعبين أو أكثر', ach_sniper: 'عين الصقر', achd_sniper: '20 تخمين دقيق',
+      ach_order_perfect: 'ترتيب مثالي', achd_order_perfect: 'رتّب الأربعة صح في جولة',
+      ach_order_ace: 'سيد الترتيب', achd_order_ace: '10 ترتيبات مثالية',
+      ach_name_crowd: 'لسان الشلة', achd_name_crowd: 'وافقك 3 أو أكثر، 5 مرات',
+      ach_many_exact: 'عدّاد الشلة', achd_many_exact: 'خمّن العدد بالضبط 5 مرات',
+      ach_two_fooler: 'وجه بريء', achd_two_fooler: 'ما أحد لقى كذبتك في جولة',
+      ach_two_master: 'ما يرفّ له جفن', achd_two_master: 'خدعت الكل 5 مرات',
+      ach_odd_sweep: 'عين الدخيل', achd_odd_sweep: 'اكشف الدخيل في الثلاثة كلها',
+      ach_odd_eye: 'مجهر', achd_odd_eye: '10 جولات كاملة في «الدخيل»',
       ach_first_game: 'أول لعبة', achd_first_game: 'خلّص أول لعبة', ach_first_win: 'أول فوز', achd_first_win: 'اطلع الأول في لعبة', ach_liar5: 'كذّاب محترف', achd_liar5: 'اخدع 5 لاعبين', ach_bull: 'قنّاص', achd_bull: 'جيب «في الصميم» 🎯', ach_streak4: 'نار', achd_streak4: 'سلسلة 4 ورا بعض', ach_allin: 'كل شي أو لا شي', achd_allin: 'اكسب رهان ×3', ach_famous: 'المشهور', achd_famous: 'الشلة تختارك في «مين فينا؟»', ach_speedy: 'برق', achd_speedy: 'كن الأسرع 3 مرات', ach_games10: 'مدمن', achd_games10: 'العب 10 ألعاب', ach_wins5: 'أسطورة', achd_wins5: 'افز بـ 5 ألعاب',
       howSteps: ['أنشئ غرفة وشارك الكود أو الرابط مع الشلة.', 'كل جولة تبدأ بآلة الحظ: تحدد نوع الجولة ومضاعف النقاط.', '🤥 المقلب: اكتب كذبة مقنعة، بعدين اختار الصح وراهن عليه.', '🎯 أقرب رقم: خمّن، والأقرب ياخذ النقاط (والصميم +1000!).', '⚡ صح ولا خطأ و🔤 فكّ الإيموجي: جاوب بسرعة، كل ثانية تفرق.', '🧩 الدخيل و📊 رتّبها: لقّط اللي ما له دخل بينهم، أو رتّب أربعة أشياء من الأكبر للأصغر.', '👥 مين فينا؟ صوّت على واحد من الشلة ووافق الأغلبية.', '🕵️ الجاسوس: واحد ما يعرف الكلمة، الكل يكتب تلميح، وبعدين صوتوا مين الجاسوس!', 'عندك قدرتين كل لعبة: 🔍 كشّاف يشيل خيارين غلط، و💎 دبل يضاعف نقاط جولة.', 'اجمع سلاسل 🔥 واكسب الألقاب والإنجازات وارفع مستواك!'],
       bullseye: 'في الصميم! 🎯', streakToast: 'سلسلة {n}! 🔥',
@@ -158,6 +166,14 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ach_winstreak3: 'Hat Trick', achd_winstreak3: 'Win 3 games in a row', ach_winstreak10: 'Living Legend', achd_winstreak10: 'Win 10 games in a row',
       ach_score10k: 'Ten Thousand', achd_score10k: 'Earn 10,000 points', ach_score100k: 'Point Millionaire', achd_score100k: 'Earn 100,000 points',
       ach_crowded: 'Life of the Party', achd_crowded: 'Win a game with 6+ players', ach_sniper: 'Hawk Eye', achd_sniper: '20 spot-on guesses',
+      ach_order_perfect: 'Perfect Order', achd_order_perfect: 'Get all four in the right order',
+      ach_order_ace: 'Order Ace', achd_order_ace: '10 perfect orders',
+      ach_name_crowd: 'Voice of the Room', achd_name_crowd: 'Match 3+ people, 5 times',
+      ach_many_exact: 'Head Counter', achd_many_exact: 'Guess the exact count 5 times',
+      ach_two_fooler: 'Straight Face', achd_two_fooler: 'Nobody finds your lie',
+      ach_two_master: 'Career Liar', achd_two_master: 'Fool the whole table 5 times',
+      ach_odd_sweep: 'Odd Spotter', achd_odd_sweep: 'Spot the odd one in all three',
+      ach_odd_eye: 'Microscope', achd_odd_eye: '10 clean sweeps of Odd One Out',
       ach_first_game: 'First Game', achd_first_game: 'Finish your first game', ach_first_win: 'First Win', achd_first_win: 'Finish 1st in a game', ach_liar5: 'Pro Liar', achd_liar5: 'Fool 5 players', ach_bull: 'Sharpshooter', achd_bull: 'Hit a bullseye 🎯', ach_streak4: 'On Fire', achd_streak4: 'Get a 4 streak', ach_allin: 'All In', achd_allin: 'Win a ×3 bet', ach_famous: 'Famous', achd_famous: "Be the crowd's pick", ach_speedy: 'Lightning', achd_speedy: 'Be fastest 3 times', ach_games10: 'Regular', achd_games10: 'Play 10 games', ach_wins5: 'Legend', achd_wins5: 'Win 5 games',
       howSteps: ['Create a room and share the code or link with friends.', 'Every round starts with a slot machine: round type + point multiplier.', '🤥 The Bluff: write a convincing lie, then find the truth and bet on it.', '🎯 Closest Number: guess — closest wins (bullseye = +1000!).', '⚡ True or False & 🔤 Emoji Decode: answer fast, every second counts.', '🧩 Odd One Out & 📊 Line Them Up: spot the one that does not belong, or put four things in order.', "👥 Who's Most Likely: vote for a friend and side with the crowd.", "🕵️ The Spy: one player doesn't know the word — everyone drops a clue, then vote who's the spy!", 'Two power-ups per game: 🔍 Peek removes two wrong options, 💎 Double doubles one round.', 'Build 🔥 streaks, win awards & achievements and level up!'],
       bullseye: 'BULLSEYE! 🎯', streakToast: '{n} streak! 🔥',
@@ -298,7 +314,6 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', order: '📊', spy: '🕵️', many: '🙋', name: '🗣️', two: '🎭' };
   const MODS = { normal: '✨', double: '💎', speed: '⏱️', jackpot: '🎁', golden: '👑' };
   const AWARD_E = { liar: '🤥', detective: '🕵️', sniper: '🎯', lightning: '⚡', gambler: '🎲', fire: '🔥', star: '🌟' };
-  const ACH = [['first_game', '🎮'], ['first_win', '🏆'], ['liar5', '🤥'], ['bull', '🎯'], ['streak4', '🔥'], ['allin', '🎲'], ['famous', '🌟'], ['speedy', '⚡'], ['games10', '🏅'], ['wins5', '👑']];
   // hats that unlock with level (index -> level)
   const HAT_LOCK = { 7: 2, 8: 3, 9: 4, 11: 5, 1: 6 };
 
@@ -420,7 +435,10 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   function unlock(id) {
     if (state.ach.unlocked.includes(id)) return;
     state.ach.unlocked.push(id); store.set('ach', state.ach);
-    const e = (ACH.find(a => a[0] === id) || [])[1] || '🏅';
+    // The emoji comes from the server's own list, which is the list that
+    // decides what exists. A copy kept here held ten of the thirty and gave
+    // every other unlock a generic medal.
+    const e = ((state.achList || []).find(a => a.id === id) || {}).e || '🏅';
     setTimeout(() => {
       const el = document.createElement('div'); el.className = 'ach-pop';
       el.innerHTML = `<span class="e">${e}</span><div><small>${t('achUnlocked')}</small><b>${esc(t('ach_' + id))}</b></div>`;
@@ -1910,6 +1928,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     // Discord is the source of truth for who you are; keep the local copy in step
     if (state.me) { state.profile.name = state.me.name; store.set('profile', state.profile); }
     if (r.banned) toast(t('youAreBanned', { r: r.banned }), 'err');
+    // Pulled once, in the background: the unlock popup needs it the moment an
+    // achievement lands, which is long before anyone opens the list.
+    if (!state.achList) api('/api/achievements').then(d => { state.achList = d.list || []; }).catch(() => {});
   }
 
   const signedIn = () => !!state.me;

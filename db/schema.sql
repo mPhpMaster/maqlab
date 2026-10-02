@@ -146,3 +146,11 @@ create table if not exists seen_content (
   primary key (user_id, item_key)
 );
 create index if not exists seen_content_user on seen_content (user_id);
+
+-- Lifetime counters for the round types that shipped after the first set of
+-- achievements, so each type has something of its own to earn.
+alter table profiles add column if not exists perfect_orders integer not null default 0;
+alter table profiles add column if not exists name_crowd     integer not null default 0;
+alter table profiles add column if not exists many_exact     integer not null default 0;
+alter table profiles add column if not exists two_fool_all   integer not null default 0;
+alter table profiles add column if not exists odd_sweeps integer not null default 0;

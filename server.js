@@ -135,7 +135,13 @@ function cleanAvatar(a) {
 // Discord display name mid-emoji splits a surrogate pair and leaves mojibake.
 const cleanName = s => [...String(s == null ? '' : s).replace(/\s+/g, ' ').trim()].slice(0, 14).join('').trim() || 'Player';
 const connected = room => [...room.players.values()].filter(p => p.connected);
-const freshStats = () => ({ fooled: 0, correct: 0, snipes: 0, bullseyes: 0, fastest: 0, highBets: 0, bestStreak: 0, famous: 0, spyCaught: 0, spyEvaded: 0 });
+const freshStats = () => ({
+  fooled: 0, correct: 0, snipes: 0, bullseyes: 0, fastest: 0, highBets: 0, bestStreak: 0,
+  famous: 0, spyCaught: 0, spyEvaded: 0,
+  // One per round type that had nothing to earn. Each counts the moment
+  // that type is actually about, not just taking part in it.
+  perfectOrders: 0, nameCrowd: 0, manyExact: 0, twoFoolAll: 0, oddSweeps: 0,
+});
 const freshPowers = () => ({ peek: 1, double: 1 });
 
 // ---------------- snapshots ----------------
@@ -1056,7 +1062,13 @@ function revealTwo(room) {
   if (fooled) {
     gain(room, whose, 'twoFooled', fooled * TWO_FOOL_POINTS);
     const a = room.players.get(whose);
-    if (a) a.stats.fooled += fooled;
+    if (a) {
+      a.stats.fooled += fooled;
+      // Everyone who guessed, got it wrong — and with enough of them for that
+      // to mean something rather than be one person's coin toss.
+      const guesses = Object.keys(picks).length;
+      if (guesses >= 2 && fooled === guesses) a.stats.twoFoolAll += 1;
+    }
   }
   for (const p of connected(room)) {
     if (p.id === whose) continue;
@@ -1124,7 +1136,12 @@ function revealName(room) {
     for (const pid of g.ids) {
       gain(room, pid, 'nameMatch', others * NAME_MATCH_POINTS);
       const p = room.players.get(pid);
-      if (p) p.stats.correct += 1;
+      if (p) {
+        p.stats.correct += 1;
+        // Not merely matching someone: reaching for the same word as most of
+        // the room at once, which is what this round rewards.
+        if (others >= 3) p.stats.nameCrowd += 1;
+      }
     }
   }
   for (const p of connected(room)) {
@@ -1181,7 +1198,7 @@ function revealMany(room) {
     const g = c.guesses[p.id];
     if (g == null) { streakResult(room, p.id, false); continue; }
     const off = Math.abs(g - count);
-    if (off === 0) { gain(room, p.id, 'manyExact', MANY_EXACT); p.stats.correct += 1; p.stats.snipes += 1; }
+    if (off === 0) { gain(room, p.id, 'manyExact', MANY_EXACT); p.stats.correct += 1; p.stats.snipes += 1; p.stats.manyExact += 1; }
     else if (off === 1) gain(room, p.id, 'manyNear', MANY_NEAR);
     streakResult(room, p.id, off === 0);
   }
@@ -1265,6 +1282,9 @@ function advanceQuick(room) {
   for (const p of connected(room)) {
     const n = c.correctCount[p.id] || 0;
     p.stats.correct += n;
+    // Odd One Out never had anything of its own either. A clean sweep of the
+    // round is the thing it rewards: three groups read correctly in a row.
+    if (c.type === 'odd' && n === c.items.length) p.stats.oddSweeps += 1;
     streakResult(room, p.id, n >= 2);
   }
   finishRound(room);
@@ -1309,7 +1329,7 @@ function revealOrder(room) {
     if (!seq) continue;
     const n = correctPairs(seq, c.truth);
     if (n) gain(room, p.id, 'orderPairs', n * PAIR_POINTS);
-    if (n === c.truth.length - 1) { gain(room, p.id, 'orderPerfect', PERFECT_BONUS); p.stats.correct += 1; }
+    if (n === c.truth.length - 1) { gain(room, p.id, 'orderPerfect', PERFECT_BONUS); p.stats.correct += 1; p.stats.perfectOrders += 1; }
     streakResult(room, p.id, n === c.truth.length - 1);
   }
   room.phase = 'orderResult';

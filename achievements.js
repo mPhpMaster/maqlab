@@ -26,6 +26,18 @@ const LIST = [
   { id: 'score100k', e: '💎', test: p => Number(p.total_score) >= 100000 },
   { id: 'crowded', e: '🎪', test: (p, g) => g.won && g.players >= 6 },
   { id: 'sniper', e: '🎳', test: p => p.snipes >= 20 },
+
+  // Four round types shipped after the list above and had nothing of their own
+  // to earn — four of eleven. Each of these counts the moment its type is
+  // actually about, not merely taking part in it.
+  { id: 'order_perfect', e: '📊', test: p => p.perfect_orders >= 1 },
+  { id: 'order_ace', e: '🧮', test: p => p.perfect_orders >= 10 },
+  { id: 'name_crowd', e: '🗣️', test: p => p.name_crowd >= 5 },
+  { id: 'many_exact', e: '🙋', test: p => p.many_exact >= 5 },
+  { id: 'two_fooler', e: '🃏', test: p => p.two_fool_all >= 1 },
+  { id: 'two_master', e: '🎩', test: p => p.two_fool_all >= 5 },
+  { id: 'odd_sweep', e: '🧩', test: p => p.odd_sweeps >= 1 },
+  { id: 'odd_eye', e: '🔬', test: p => p.odd_sweeps >= 10 },
 ];
 
 const IDS = LIST.map(a => a.id);
