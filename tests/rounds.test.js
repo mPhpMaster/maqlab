@@ -48,6 +48,21 @@ test('every reason the server pays points for has a label, in both languages', (
   }
 });
 
+// Same shape as the gain labels, found the same way: a player tapped a button
+// once too often and the screen said "err_enough". emit() toasts t('err_' + code)
+// for every refusal the server sends, and t() falls back to the key, so a code
+// with no string is a raw key shown to a player — in both languages at once.
+test('every refusal the server can send has a message, in both languages', () => {
+  const hostqSrc = fs.readFileSync(path.join(__dirname, '..', 'hostq.js'), 'utf8');
+  const codes = [...(server + hostqSrc).matchAll(/error: '([a-z_]+)'/g)].map(m => m[1]);
+  const app = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
+  for (const c of new Set(codes)) {
+    const n = (app.match(new RegExp(`err_${c}:`, 'g')) || []).length;
+    assert.equal(n, 2, `error "${c}" has ${n} messages, expected one per language — ` +
+      `the player would be shown "err_${c}"`);
+  }
+});
+
 test('every round type has a reveal phase, or it freezes the game', () => {
   const table = server.match(/const REVEAL_PHASE = \{[\s\S]*?\n\};/)[0];
   // the quick rounds are spread in from QUICK, the rest are named

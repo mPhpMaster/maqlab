@@ -43,6 +43,11 @@ function roundEntry(room, L) {
   if (!c) return null;
   const e = { n: room.round, type: c.type, mod: c.mod, pts: {} };
   for (const [pid, g] of Object.entries(room.gains || {})) if (g && g.total) e.pts[pid] = g.total;
+  // How long each player took to answer, where the round records it. The quick
+  // rounds keep their own per-item timings; this is the single figure for the
+  // rounds you type in, and it is the only way to tell a round people did not
+  // understand from one they did not have time for.
+  if (c.ms && Object.keys(c.ms).length) e.ms = { ...c.ms };
 
   if (c.type === 'bluff') {
     e.q = say(c.q.q, L);

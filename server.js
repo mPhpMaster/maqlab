@@ -12,6 +12,7 @@ const achievements = require('./achievements');
 const { matchAnswerCase } = require('./text');
 const hostq = require('./hostq');
 const card = require('./card');
+const seen = require('./seen');
 const bots = require('./bots');
 const replay = require('./replay');
 const persist = require('./persist');
@@ -164,6 +165,14 @@ function addBot(room) {
 // standing, or the room would keep itself alive with nobody in it.
 function dropBots(room) {
   for (const [id, p] of room.players) if (p.bot) room.players.delete(id);
+}
+
+// How long this player took, from the moment the phase opened. Stored on the
+// round rather than the player: it is a fact about the round they were in.
+function tookMs(room, pid) {
+  const c = room.current;
+  if (!c || !room.phaseStart) return;
+  (c.ms || (c.ms = {}))[pid] = Math.max(0, Date.now() - room.phaseStart);
 }
 
 // One name for "this item, in this round", used both where a peek is stored
@@ -460,6 +469,12 @@ function broadcast(room) {
 function clearTimer(room) { if (room.timer) clearTimeout(room.timer); room.timer = null; }
 function setTimer(room, sec, fn) {
   clearTimer(room);
+  // When this phase began. The quick rounds have always timed their answers;
+  // the rounds you type in had no clock at all, so a player who skipped one
+  // was indistinguishable from a player who ran out of time — which is the
+  // difference between a round nobody understands and a round nobody can
+  // finish, and they want opposite fixes.
+  room.phaseStart = Date.now();
   room.deadline = Date.now() + sec * 1000;
   room.timer = setTimeout(fn, sec * 1000);
   // Every phase change comes through here, which makes it the one checkpoint
@@ -577,9 +592,15 @@ function pickFrom(room, type, count = 1) {
   const used = room.used[type] || (room.used[type] = new Set());
   let idx = bank.map((_, i) => i).filter(i => !used.has(i));
   if (idx.length < count) { used.clear(); idx = bank.map((_, i) => i); }
-  const chosen = shuffle(idx).slice(0, count);
+  // Within what this room has not used, prefer what the people in it have not
+  // met in an earlier game. room.used alone made the regulars — the players
+  // who come back most — the players most likely to see a question twice.
+  const pool = seen.fresh(idx, bank, type, room.seenBefore);
+  const chosen = shuffle(pool.length >= count ? pool : idx).slice(0, count);
   chosen.forEach(i => used.add(i));
-  return chosen.map(i => bank[i]);
+  const picked = chosen.map(i => bank[i]);
+  seen.note(room, type, picked);
+  return picked;
 }
 
 // Alone, four of the six round types work and two do not: "who's most
@@ -602,6 +623,14 @@ function startGame(room) {
   room.pairs = {}; room.rivals = {};
   for (const p of room.players.values()) p.ready = false;
   if (room.settings.teams) balanceTeams(room); else for (const p of room.players.values()) p.team = null;
+  // Read once, at kickoff, for everyone signed in at the table. A player who
+  // joins later plays the plan that was already drawn.
+  room.seenThisGame = new Set();
+  room.seenBefore = null;
+  if (db.on()) {
+    const who = seen.owners([...room.players.values()]);
+    db.seenBy(who).then(set => { room.seenBefore = set; }).catch(() => {});
+  }
   room.plan = planTypes(room);
   nextRound(room);
 }
@@ -706,8 +735,53 @@ function submitLie(room, p, text) {
   if (isTruth(text, room.current.q)) return { error: 'truth' };
   text = matchAnswerCase(text, room.settings.lang);
   room.current.lies[p.id] = text;
+  tookMs(room, p.id);
   if (connected(room).every(x => room.current.lies[x.id])) startVote(room); else broadcast(room);
   return { ok: true };
+}
+
+// Measured over 301 recorded rounds: 22% of players never submit a lie, the
+// worst rate of any round type, and the rounds people skip are the rounds they
+// have to type in. A blank box under a clock is the whole problem.
+//
+// The suggestion is a real answer from a different question, because that is
+// what a good lie looks like: an ordinary, plausible thing. The house decoys
+// are jokes on purpose ("a penguin") and would read as the game writing a bad
+// one in your name.
+//
+// It fills the box, it does not send. Editing the suggestion is the point —
+// a player who changes one word has written a lie, and has stayed in the round.
+const STUCK_MAX = 5; // re-rolls per player per round; enough to find one you like
+
+function stuckSuggestion(room, p) {
+  const c = room.current;
+  if (!c || c.type !== 'bluff' || room.phase !== 'write') return { error: 'late' };
+  if (c.lies[p.id]) return { error: 'dup' };
+  const used = c.stuck || (c.stuck = {});
+  if ((used[p.id] || 0) >= STUCK_MAX) return { error: 'enough' };
+  used[p.id] = (used[p.id] || 0) + 1;
+
+  const L = room.settings.lang;
+  // Never the real answer, never one of its accepted spellings, and never a
+  // lie already in play — any of those would be a cruel suggestion.
+  const taken = new Set([
+    normalize(c.q.a[L]),
+    ...(c.q.alt || []).map(normalize),
+    ...Object.values(c.lies).map(normalize),
+  ]);
+  const pool = content.bluff
+    .map(e => e.a[L])
+    .filter(x => x && !taken.has(normalize(x)));
+  if (!pool.length) return { error: 'none' };
+  // Any real answer is plausible in the abstract; one shaped like *this*
+  // question's answer is plausible here. A two-word answer suggested against a
+  // two-word truth reads as a guess somebody made, which is the point — the
+  // reveal puts the player's name next to it.
+  const shape = x => String(x).trim().split(/\s+/).length;
+  const want = shape(c.q.a[L]);
+  const near = pool.slice().sort((x, y) => Math.abs(shape(x) - want) - Math.abs(shape(y) - want));
+  const band = near.slice(0, Math.max(12, Math.ceil(near.length / 3)));
+  return { ok: true, text: band[rnd(band.length)] };
 }
 
 function startVote(room) {
@@ -776,6 +850,7 @@ function submitGuess(room, p, val) {
   const n = Number(String(val).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[,\s]/g, ''));
   if (!Number.isFinite(n) || n < 0 || n > 1e12) return { error: 'nan' };
   room.current.guesses[p.id] = n;
+  tookMs(room, p.id);
   if (connected(room).every(x => room.current.guesses[x.id] != null)) revealNumber(room); else broadcast(room);
   return { ok: true };
 }
@@ -809,6 +884,7 @@ function submitLikely(room, p, target) {
   if (room.phase !== 'likelyVote') return { error: 'late' };
   if (!room.players.get(target)?.connected) return { error: 'bad' };
   room.current.lvotes[p.id] = target;
+  tookMs(room, p.id);
   if (connected(room).every(x => room.current.lvotes[x.id])) revealLikely(room); else broadcast(room);
   return { ok: true };
 }
@@ -840,6 +916,7 @@ function submitSpyClue(room, p, text) {
   text = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 24);
   if (!text) return { error: 'empty' };
   room.current.clues[p.id] = text;
+  tookMs(room, p.id);
   if (connected(room).every(x => room.current.clues[x.id])) startSpyVote(room); else broadcast(room);
   return { ok: true };
 }
@@ -928,6 +1005,7 @@ function submitTwo(room, p, lines, lie) {
     lines: clean.map(x => matchAnswerCase(x, room.settings.lang)),
     lie: idx,
   };
+  tookMs(room, p.id);
   if (connected(room).every(x => room.current.sets[x.id])) startTwoGuess(room);
   else broadcast(room);
   return { ok: true };
@@ -1016,6 +1094,7 @@ function submitName(room, p, text) {
   text = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 30);
   if (!text) return { error: 'empty' };
   room.current.said[p.id] = matchAnswerCase(text, room.settings.lang);
+  tookMs(room, p.id);
   if (connected(room).every(x => room.current.said[x.id])) revealName(room);
   else broadcast(room);
   return { ok: true };
@@ -1217,6 +1296,7 @@ function submitOrder(room, p, ids) {
   const got = new Set(ids.map(String));
   if (got.size !== want.size || [...got].some(id => !want.has(id))) return { error: 'bad' };
   c.orders[p.id] = ids.map(String);
+  tookMs(room, p.id);
   if (connected(room).every(x => c.orders[x.id])) revealOrder(room); else broadcast(room);
   return { ok: true };
 }
@@ -1350,6 +1430,9 @@ async function recordResults(room) {
   } catch (e) {
     console.error('could not save match replay', e.message);
   }
+  // Written once, now that the game is over: a question seen in a game that
+  // was abandoned halfway was not really spent.
+  db.markSeen(seen.owners(ranked), [...(room.seenThisGame || [])]);
   for (let i = 0; i < ranked.length; i++) {
     const p = ranked[i];
     if (!p.userId) continue;
@@ -1460,6 +1543,8 @@ io.on('connection', socket => {
     reply(cb, { ok: true, token: p.id, code: r.code });
     broadcast(r);
   });
+
+  socket.on('stuck', (_, cb) => room && reply(cb, stuckSuggestion(room, player)));
 
   socket.on('askQ', (payload, cb) => {
     if (!host()) return reply(cb, { error: 'host' });

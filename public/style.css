@@ -823,3 +823,15 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 .qlist .ansrow .said { color: var(--muted); font-size: 13px; }
 .qx { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 9px; border: 1px solid var(--line); background: var(--card2); color: var(--muted); font-weight: 800; }
 .qx:active { transform: scale(.92); }
+
+/* A way out of a blank box, kept deliberately quieter than the send button:
+   the point is to rescue a player who would otherwise sit the round out, not
+   to offer an easier option than writing something. */
+.btn.quiet { opacity: .62; font-size: 14px; min-height: 40px; font-weight: 700; }
+.btn.quiet:active { opacity: 1; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+.chipb {
+  padding: 6px 12px; border-radius: 99px; border: 1px solid var(--line);
+  background: var(--card2); color: var(--muted); font-size: 13px; font-weight: 700;
+}
+.chipb:active { transform: scale(.95); border-color: var(--lemon); color: var(--ink2, #fff); }

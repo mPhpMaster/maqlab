@@ -134,3 +134,15 @@ create table if not exists live_rooms (
   updated_at timestamptz not null default now()
 );
 create index if not exists live_rooms_updated_idx on live_rooms (updated_at desc);
+
+-- What a signed-in player has already been shown, so the people who play most
+-- are not the people who see the same question most. Keyed by a hash of the
+-- entry's own text rather than its position in the bank: an index is only
+-- stable until a question is inserted above it.
+create table if not exists seen_content (
+  user_id  text not null references profiles(user_id) on delete cascade,
+  item_key text not null,
+  seen_at  timestamptz not null default now(),
+  primary key (user_id, item_key)
+);
+create index if not exists seen_content_user on seen_content (user_id);

@@ -170,6 +170,24 @@ const saveMatch = ({ id, roomCode, gameNo, lang, rounds, data }) =>
 
 const getReplay = id => one('select * from matches where id = $1', [id]);
 
+// ---------------- what players have already been shown ----------------
+// One query per game rather than per round: the set is read when a game starts
+// and written when it ends.
+async function seenBy(userIds) {
+  if (!userIds.length) return new Set();
+  const res = await q('select distinct item_key from seen_content where user_id = any($1)', [userIds]);
+  return new Set(res.rows.map(r => r.item_key));
+}
+
+// Nothing here is worth failing a game over, so a write that does not land is
+// a player who sees a question again, not an error anyone sees.
+function markSeen(userIds, keys) {
+  if (!userIds.length || !keys.length) return Promise.resolve();
+  return q(`insert into seen_content (user_id, item_key)
+            select u, k from unnest($1::text[]) u cross join unnest($2::text[]) k
+            on conflict do nothing`, [userIds, keys]).catch(() => {});
+}
+
 // ---------------- rooms in progress ----------------
 // Upsert rather than insert: a room is written many times over its life, and
 // only the latest state is ever read back.
@@ -250,7 +268,7 @@ const searchProfiles = term =>
     [`%${term.replace(/[%_\\]/g, m => '\\' + m)}%`, term]).then(r => r.rows);
 
 module.exports = {
-  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, weeklyBoard, weeklyRank, recordGame, addAchievements, getMatch, saveMatch, getReplay, saveRoom, dropRoom, liveRooms,
+  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, weeklyBoard, weeklyRank, recordGame, addAchievements, getMatch, saveMatch, getReplay, saveRoom, dropRoom, liveRooms, seenBy, markSeen,
   follow, unfollow, following, followCounts, isFollowing,
   createReport, createSuggestion,
   isBanned, setBan, unban, resetProfile,

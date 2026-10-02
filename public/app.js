@@ -95,7 +95,15 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       myQsWarn: 'لو رجّعت الغرفة «معلنة» تنحذف أسئلتك.', myQsQ: 'السؤال', myQsA: 'الجواب الصحيح',
       myQsAdd: 'أضف', myQsCount: '{n} من {m}', myQsPlayed: 'انلعب', myQsNone: 'ما أضفت أسئلة بعد',
       myQsQueued: 'المضيف ضايف {n} من أسئلته 🤫',
-      e_private_only: 'الغرف المعلنة ما تقبل أسئلة خاصة', e_full: 'وصلت الحد الأقصى', e_same: 'الجواب ما ينفع يكون نفس السؤال',
+      stuck: 'ما جاني شي 🎲', stuckAgain: 'غيّرها 🎲', stuckHint: 'عدّل عليها وخلّها لك',
+      err_enough: 'جرّب تكتب وحدة من عندك 😉', err_none: 'ما لقينا اقتراح هالمرة',
+      err_banned: 'حسابك موقوف', err_sign_in: 'سجّل دخولك أول', err_no_db: 'الخدمة هذي مو شغالة حالياً',
+      err_not_found: 'ما لقيناه', err_slow_down: 'على مهلك شوي', err_too_short: 'اكتب شوي أكثر',
+      err_bad_target: 'ما ينفع', err_cannot_ban_admin: 'ما ينفع على مشرف', err_unknown_action: 'أمر غير معروف',
+      err_unavailable: 'الخدمة مشغولة، جرّب بعد شوي', err_not_configured: 'الربط مع ديسكورد مو مجهّز',
+      err_exchange_failed: 'ما قدرنا نكمّل تسجيل الدخول', err_missing_code: 'ناقص رمز', err_missing_instance: 'ناقصة بيانات الجلسة',
+      twoStarters: ['ما عمري…', 'مرة…', 'أقدر…', 'أكره…', 'عندي…'],
+      err_private_only: 'الغرف المعلنة ما تقبل أسئلة خاصة', err_same: 'الجواب ما ينفع يكون نفس السؤال',
       matchResult: 'نتيجة المباراة', shareMatch: 'انسخ رابط المباراة', matchGone: 'المباراة هذي ما عادت موجودة', place1: 'الأول', placeN: 'المركز {n}', roundsN: { one: 'جولة واحدة', two: 'جولتان', few: '{n} جولاتٍ', many: '{n} جولةً', other: '{n} جولةٍ' }, openMatch: 'افتح',
       report: 'بلاغ', reportTitle: 'بلاغ عن {n}', reportWhy: 'وش المشكلة؟', r_cheat: 'غش', r_name: 'اسم مسيء', r_chat: 'إساءة بالدردشة', r_other: 'غير ذلك',
       reportDetails: 'تفاصيل (اختياري)', reportSent: 'وصلنا البلاغ، شكراً 🙏', suggestPlaceholder: 'وش تبي نضيف أو نغيّر؟',
@@ -181,7 +189,15 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       myQsWarn: 'Listing the room publicly deletes your questions.', myQsQ: 'Question', myQsA: 'True answer',
       myQsAdd: 'Add', myQsCount: '{n} of {m}', myQsPlayed: 'played', myQsNone: 'No questions yet',
       myQsQueued: 'The host has added {n} of their own 🤫',
-      e_private_only: 'Listed rooms cannot take your own questions', e_full: 'That is the limit', e_same: 'The answer cannot repeat the question',
+      stuck: 'Stuck? 🎲', stuckAgain: 'Another 🎲', stuckHint: 'Edit it and make it yours',
+      err_enough: 'Try one of your own 😉', err_none: 'No suggestion this time',
+      err_banned: 'Your account is suspended', err_sign_in: 'Sign in first', err_no_db: 'That part is offline right now',
+      err_not_found: 'Not found', err_slow_down: 'Give it a moment', err_too_short: 'A little more, please',
+      err_bad_target: 'That will not work', err_cannot_ban_admin: 'Not on a moderator', err_unknown_action: 'Unknown action',
+      err_unavailable: 'Busy right now — try again shortly', err_not_configured: 'Discord sign-in is not set up',
+      err_exchange_failed: 'Could not finish signing you in', err_missing_code: 'Missing code', err_missing_instance: 'Missing session details',
+      twoStarters: ['I have never…', 'I once…', 'I can…', 'I cannot stand…', 'I own…'],
+      err_private_only: 'Listed rooms cannot take your own questions', err_same: 'The answer cannot repeat the question',
       matchResult: 'Match result', shareMatch: 'Copy match link', matchGone: 'That match is no longer around', place1: '1st', placeN: 'Place {n}', roundsN: { one: '1 round', other: '{n} rounds' }, openMatch: 'Open',
       report: 'Report', reportTitle: 'Report {n}', reportWhy: "What's wrong?", r_cheat: 'Cheating', r_name: 'Offensive name', r_chat: 'Abusive chat', r_other: 'Something else',
       reportDetails: 'Details (optional)', reportSent: 'Report received, thank you 🙏', suggestPlaceholder: 'What should we add or change?',
@@ -213,7 +229,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     ach: store.get('ach', { unlocked: [], games: 0, wins: 0, fooled: 0, fastest: 0 }),
     route: { name: 'home' },
     room: null, code: null, joining: false,
-    draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '', order: [], nameAns: '', two: ['', '', ''], twoLie: null, askQ: '', askA: '' },
+    draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '', order: [], nameAns: '', two: ['', '', ''], twoLie: null, askQ: '', askA: '', stuck: false },
     bet: 1, showQR: false, reactOpen: false,
     me: null, isAdmin: false, lobbies: null, achList: null,
     // meKnown stays false until /api/auth/me answers. Rendering a sign-in
@@ -542,7 +558,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
 
   function onPhase(prev, s) {
     state.phaseTotal = s.deadline ? Math.max(1000, s.deadline - s.now) : 1;
-    if (s.phase === 'write') state.draft.lie = '';
+    if (s.phase === 'write') { state.draft.lie = ''; state.draft.stuck = false; }
+    // The three boxes and the marked lie belong to one round only.
+    if (s.phase === 'twoWrite') { state.draft.two = ['', '', '']; state.draft.twoLie = null; }
     if (s.phase === 'guess') state.draft.guess = '';
     if (s.phase === 'vote') state.bet = 1;
     if (s.phase === 'spyClue') state.draft.spyClue = '';
@@ -983,7 +1001,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       <div class="answer-box">
         ${c.myLie
           ? `<div class="my-answer"><small>${t('yourLie')}</small>${esc(c.myLie)}</div><div class="center muted"><span class="dots">${t('waitOthers')}</span></div>`
-          : `<form data-form="lie" class="col"><input id="lie" class="input" maxlength="50" placeholder="${t('writeLie')}" value="${esc(state.draft.lie)}" autocomplete="off" data-autofocus><button class="btn coral block" type="submit">${t('send')}</button></form>`}
+          : `<form data-form="lie" class="col"><input id="lie" class="input" maxlength="50" placeholder="${t('writeLie')}" value="${esc(state.draft.lie)}" autocomplete="off" data-autofocus><button class="btn coral block" type="submit">${t('send')}</button>
+              <button type="button" class="btn ghost sm quiet" data-act="stuck">${t(state.draft.stuck ? 'stuckAgain' : 'stuck')}</button>
+              ${state.draft.stuck ? `<div class="center muted" style="font-size:12px">${t('stuckHint')}</div>` : ''}</form>`}
       </div>
       ${powerBar()}
     </div></div></div></div>`;
@@ -1285,7 +1305,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         ? `<div class="col">${c.mine.lines.map((l, i) => `<div class="ansrow ${i === c.mine.lie ? 'no' : 'ok'}">
             <span class="nm">${esc(l)}</span>${i === c.mine.lie ? `<span class="said">${t('twoMine')}</span>` : ''}</div>`).join('')}
            <div class="center muted"><span class="dots">${t('waitOthers')}</span></div></div>`
-        : `<form data-form="two" class="col">${rows}<button class="btn coral block" type="submit">${t('send')}</button></form>`}</div>
+        : `<form data-form="two" class="col">
+            <div class="chips">${(t('twoStarters') || []).map(x => `<button type="button" class="chipb" data-act="twostart" data-s="${esc(x.replace(/…$/, ''))}">${esc(x)}</button>`).join('')}</div>
+            ${rows}<button class="btn coral block" type="submit">${t('send')}</button></form>`}</div>
       ${whoRow(c.submitted)}
     </div></div></div></div>`;
   }
@@ -2436,6 +2458,30 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     async emoji(el) { sfx.send(); buzz(20); await emit('emoji', el.dataset.id); },
     async odd(el) { sfx.send(); buzz(20); await emit('odd', el.dataset.id); },
     async many(el) { sfx.send(); buzz(20); await emit('many', el.dataset.v === '1'); },
+    // Fills the box and hands it back. Sending it would make the round the
+    // game's answer rather than the player's, and a player who edits one word
+    // has written a lie.
+    async stuck() {
+      buzz(10);
+      const r = await emit('stuck');   // emit() reports the error itself
+      if (!r.ok) return;
+      state.draft.lie = r.text;
+      state.draft.stuck = true;
+      render();
+      const el = document.getElementById('lie');
+      if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+    },
+    // Puts the opening words in the first empty line. The blank page is the
+    // problem here, not the writing — nothing about you can be suggested.
+    twostart(el) {
+      buzz(10);
+      const i = state.draft.two.findIndex(x => !x.trim());
+      if (i < 0) return;
+      state.draft.two[i] = el.dataset.s + ' ';
+      render();
+      const box = document.getElementById('two' + i);
+      if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); }
+    },
     twolie(el) { state.draft.twoLie = Number(el.dataset.i); buzz(10); render(); },
     async unaskq(el) { buzz(10); await emit('unaskQ', Number(el.dataset.i)); },
     async twoguess(el) { sfx.send(); buzz(20); await emit('twoGuess', Number(el.dataset.i)); },
@@ -2491,9 +2537,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     } else if (f === 'askq') {
       const q = state.draft.askQ.trim(), a = state.draft.askA.trim();
       if (!q || !a) return toast(t('err_empty'), 'err');
-      const r = await emit('askQ', { q, a });
+      const r = await emit('askQ', { q, a });   // emit() reports the error itself
       if (r.ok) { buzz(20); state.draft.askQ = ''; state.draft.askA = ''; render(); }
-      else toast(t('e_' + r.error) !== 'e_' + r.error ? t('e_' + r.error) : t('err_empty'), 'err');
     } else if (f === 'two') {
       const lines = state.draft.two.map(x => x.trim());
       if (lines.some(x => !x)) return toast(t('twoNeedAll'), 'err');
