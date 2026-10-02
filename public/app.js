@@ -90,6 +90,12 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       twoFooledN: 'خدع {n}', twoFooledNone: 'ما خدع أحد', twoSetN: '{a} من {b}',
       g_twoSpot: 'لقى الكذبة 🎯', g_twoFooled: 'خدعهم 🤥',
       g_nameMatch: 'وافقوك', g_manyExact: 'بالضبط 🎯', g_manyNear: 'قريب',
+      myQs: '✍️ أسئلتك أنت', myQsHint: 'اكتب سؤالاً وجوابه الصحيح — يجي بدل سؤال «البلف» من بنك اللعبة، والباقون يكتبون كذبهم عليه',
+      myQsPrivate: 'أسئلتك الخاصة تشتغل في الغرف المقفلة بس. حوّل الغرفة إلى «بالرمز فقط» تقدر تضيفها.',
+      myQsWarn: 'لو رجّعت الغرفة «معلنة» تنحذف أسئلتك.', myQsQ: 'السؤال', myQsA: 'الجواب الصحيح',
+      myQsAdd: 'أضف', myQsCount: '{n} من {m}', myQsPlayed: 'انلعب', myQsNone: 'ما أضفت أسئلة بعد',
+      myQsQueued: 'المضيف ضايف {n} من أسئلته 🤫',
+      e_private_only: 'الغرف المعلنة ما تقبل أسئلة خاصة', e_full: 'وصلت الحد الأقصى', e_same: 'الجواب ما ينفع يكون نفس السؤال',
       matchResult: 'نتيجة المباراة', shareMatch: 'انسخ رابط المباراة', matchGone: 'المباراة هذي ما عادت موجودة', place1: 'الأول', placeN: 'المركز {n}', roundsN: { one: 'جولة واحدة', two: 'جولتان', few: '{n} جولاتٍ', many: '{n} جولةً', other: '{n} جولةٍ' }, openMatch: 'افتح',
       report: 'بلاغ', reportTitle: 'بلاغ عن {n}', reportWhy: 'وش المشكلة؟', r_cheat: 'غش', r_name: 'اسم مسيء', r_chat: 'إساءة بالدردشة', r_other: 'غير ذلك',
       reportDetails: 'تفاصيل (اختياري)', reportSent: 'وصلنا البلاغ، شكراً 🙏', suggestPlaceholder: 'وش تبي نضيف أو نغيّر؟',
@@ -170,6 +176,12 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       twoFooledN: 'fooled {n}', twoFooledNone: 'fooled nobody', twoSetN: '{a} of {b}',
       g_twoSpot: 'Spotted the lie 🎯', g_twoFooled: 'Fooled them 🤥',
       g_nameMatch: 'Matched you', g_manyExact: 'Exactly right 🎯', g_manyNear: 'One off',
+      myQs: '✍️ Your own questions', myQsHint: 'Write a question and its true answer — it replaces a Bluff question from the bank, and everyone else writes lies against it',
+      myQsPrivate: 'Your own questions work in code-only rooms. Switch the room to code only to add them.',
+      myQsWarn: 'Listing the room publicly deletes your questions.', myQsQ: 'Question', myQsA: 'True answer',
+      myQsAdd: 'Add', myQsCount: '{n} of {m}', myQsPlayed: 'played', myQsNone: 'No questions yet',
+      myQsQueued: 'The host has added {n} of their own 🤫',
+      e_private_only: 'Listed rooms cannot take your own questions', e_full: 'That is the limit', e_same: 'The answer cannot repeat the question',
       matchResult: 'Match result', shareMatch: 'Copy match link', matchGone: 'That match is no longer around', place1: '1st', placeN: 'Place {n}', roundsN: { one: '1 round', other: '{n} rounds' }, openMatch: 'Open',
       report: 'Report', reportTitle: 'Report {n}', reportWhy: "What's wrong?", r_cheat: 'Cheating', r_name: 'Offensive name', r_chat: 'Abusive chat', r_other: 'Something else',
       reportDetails: 'Details (optional)', reportSent: 'Report received, thank you 🙏', suggestPlaceholder: 'What should we add or change?',
@@ -201,7 +213,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     ach: store.get('ach', { unlocked: [], games: 0, wins: 0, fooled: 0, fastest: 0 }),
     route: { name: 'home' },
     room: null, code: null, joining: false,
-    draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '', order: [], nameAns: '', two: ['', '', ''], twoLie: null },
+    draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '', order: [], nameAns: '', two: ['', '', ''], twoLie: null, askQ: '', askA: '' },
     bet: 1, showQR: false, reactOpen: false,
     me: null, isAdmin: false, lobbies: null, achList: null,
     // meKnown stays false until /api/auth/me answers. Rendering a sign-in
@@ -802,6 +814,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     const s = state.room, st = s.settings, host = isHost(), mid = myId();
     const online = s.players.filter(p => p.connected);
     const dis = host ? '' : 'disabled';
+    const hq = s.hostQ || { count: 0, max: 10 };
     const seg = (key, vals, lab) => `<div class="seg">${vals.map(v => `<button class="${st[key] === v ? 'on' : ''}" data-act="set" data-k="${key}" data-v="${v}" ${dis}>${lab(v)}</button>`).join('')}</div>`;
     const players = online.map(p => `
       <div class="pcard ${p.id === mid ? 'me' : ''} ${p.bot ? 'is-bot' : ''} ${p.team ? 'team-' + p.team : ''}" data-pid="${esc(p.id)}" ${p.id !== mid && !p.bot ? `data-act="poke" data-id="${esc(p.id)}"` : ''}>
@@ -842,6 +855,23 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
           <div class="set-row"><div class="lbl">${t('pace')}</div>${seg('pace', ['chill', 'normal', 'fast'], v => t(v))}</div>
           <div class="set-row"><div class="lbl">${t('teams')}</div><div class="seg">${[false, true].map(v => `<button class="${st.teams === v ? 'on' : ''}" data-act="teams" data-v="${v}" ${dis}>${v ? t('teamsOn') : t('teamsOff')}</button>`).join('')}</div></div>
           <div class="set-row"><div class="lbl">${t('publicRoom')}</div><div class="seg">${[true, false].map(v => `<button class="${st.public === v ? 'on' : ''}" data-act="public" data-v="${v}" ${dis}>${v ? t('roomPublic') : t('roomPrivate')}</button>`).join('')}</div></div>
+        </div>
+        <div class="section-title"><span>${t('myQs')}</span>${hq.count ? `<span class="chip">${t('myQsCount', { n: fmt(hq.count), m: fmt(hq.max) })}</span>` : ''}</div>
+        <div class="glass settings">
+          ${!host ? `<div class="muted" style="font-size:13px">${hq.count ? t('myQsQueued', { n: fmt(hq.count) }) : t('myQsNone')}</div>`
+            : st.public ? `<div class="muted" style="font-size:13px">${t('myQsPrivate')}</div>`
+            : `<div class="muted" style="font-size:13px;margin-bottom:10px">${t('myQsHint')}</div>
+              <div class="qlist">${(hq.list || []).map((e, i) => `<div class="ansrow ${e.played ? 'no' : 'ok'}">
+                <span class="nm">${esc(e.q)}</span>
+                <span class="said">${e.played ? t('myQsPlayed') : esc(e.a)}</span>
+                ${e.played ? '' : `<button class="qx" data-act="unaskq" data-i="${i}" aria-label="remove">✕</button>`}
+              </div>`).join('') || `<div class="muted" style="font-size:13px">${t('myQsNone')}</div>`}</div>
+              ${(hq.list || []).length < hq.max ? `<form data-form="askq" class="col" style="margin-top:10px">
+                <input id="askq" class="input" maxlength="120" placeholder="${t('myQsQ')}" value="${esc(state.draft.askQ)}" autocomplete="off">
+                <input id="aska" class="input" maxlength="60" placeholder="${t('myQsA')}" value="${esc(state.draft.askA)}" autocomplete="off">
+                <button class="btn mint block" type="submit">${t('myQsAdd')}</button>
+              </form>` : ''}
+              <div class="muted" style="font-size:12px;margin-top:10px">${t('myQsWarn')}</div>`}
         </div>
       </div></div>
       ${dock(host
@@ -2407,6 +2437,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     async odd(el) { sfx.send(); buzz(20); await emit('odd', el.dataset.id); },
     async many(el) { sfx.send(); buzz(20); await emit('many', el.dataset.v === '1'); },
     twolie(el) { state.draft.twoLie = Number(el.dataset.i); buzz(10); render(); },
+    async unaskq(el) { buzz(10); await emit('unaskQ', Number(el.dataset.i)); },
     async twoguess(el) { sfx.send(); buzz(20); await emit('twoGuess', Number(el.dataset.i)); },
     async manyguess(el) { sfx.send(); buzz(20); await emit('manyGuess', Number(el.dataset.n)); },
     ordpick(el) {
@@ -2457,6 +2488,12 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       const inp = document.getElementById('nameans');
       const r = await emit('name', state.draft.nameAns);
       if (r.ok) { flyFrom(inp); buzz(20); state.draft.nameAns = ''; } else document.getElementById('nameans')?.classList.add('shake');
+    } else if (f === 'askq') {
+      const q = state.draft.askQ.trim(), a = state.draft.askA.trim();
+      if (!q || !a) return toast(t('err_empty'), 'err');
+      const r = await emit('askQ', { q, a });
+      if (r.ok) { buzz(20); state.draft.askQ = ''; state.draft.askA = ''; render(); }
+      else toast(t('e_' + r.error) !== 'e_' + r.error ? t('e_' + r.error) : t('err_empty'), 'err');
     } else if (f === 'two') {
       const lines = state.draft.two.map(x => x.trim());
       if (lines.some(x => !x)) return toast(t('twoNeedAll'), 'err');
@@ -2481,6 +2518,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     else if (id === 'lie') { state.draft.lie = e.target.value; sendTyping(); }
     else if (id === 'guess') { state.draft.guess = e.target.value; sendTyping(); }
     else if (id === 'nameans') { state.draft.nameAns = e.target.value; sendTyping(); }
+    else if (id === 'askq') { state.draft.askQ = e.target.value; }
+    else if (id === 'aska') { state.draft.askA = e.target.value; }
     else if (/^two[012]$/.test(id)) { state.draft.two[Number(id[3])] = e.target.value; sendTyping(); }
     else if (id === 'spyclue') { state.draft.spyClue = e.target.value; sendTyping(); }
     else if (id === 'spyguess') { state.draft.spyGuess = e.target.value; }

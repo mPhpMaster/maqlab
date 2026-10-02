@@ -816,3 +816,10 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
    what it did here on first play. */
 .q .qwho { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .q .qwho .jelly { width: 34px; height: 34px; flex: 0 0 auto; }
+
+/* The host's own questions, listed in the lobby. */
+.qlist { display: flex; flex-direction: column; gap: 6px; }
+.qlist .ansrow .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qlist .ansrow .said { color: var(--muted); font-size: 13px; }
+.qx { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 9px; border: 1px solid var(--line); background: var(--card2); color: var(--muted); font-weight: 800; }
+.qx:active { transform: scale(.92); }

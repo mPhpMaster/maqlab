@@ -10,6 +10,7 @@ const db = require('./db');
 const auth = require('./auth');
 const achievements = require('./achievements');
 const { matchAnswerCase } = require('./text');
+const hostq = require('./hostq');
 const bots = require('./bots');
 const replay = require('./replay');
 const persist = require('./persist');
@@ -178,6 +179,11 @@ function snapshot(room, pid) {
     round: room.round, gameNo: room.gameNo, deadline: room.deadline, now: Date.now(),
     teamScores: teamScores(room), balloon: { size: room.balloon.size, pops: room.balloon.pops },
   };
+  // The host's own questions go only to the host: everyone else would be
+  // reading the answers to rounds they have not played yet. The rest of the
+  // room sees how many are queued, which is all they need to know.
+  s.hostQ = { count: hostq.pending(room), max: hostq.MAX_QUESTIONS };
+  if (pid === room.hostId) s.hostQ.list = (room.customQ || []).map(e => ({ q: e.q.en, a: e.a.en, played: !!e.played }));
   if (!c) return s;
   const L = room.settings.lang, ph = room.phase;
   s.current = { type: c.type, mod: c.mod, doubled: Object.keys(c.doubled || {}) };
@@ -521,7 +527,7 @@ function createRoom() {
     // player meeting four of them.
     settings: { lang: 'en', rounds: 12, types: Object.fromEntries(TYPES.map(t => [t, true])), pace: 'normal', teams: false, public: true },
     players: new Map(), round: 0, gameNo: 0, current: null, deadline: null, timer: null,
-    used: {}, plan: [], gains: {}, prevRank: {}, awards: [], bestLie: null, pairs: {}, rivals: {}, log: [], touched: Date.now(),
+    used: {}, customQ: [], plan: [], gains: {}, prevRank: {}, awards: [], bestLie: null, pairs: {}, rivals: {}, log: [], touched: Date.now(),
     balloon: { size: 0, target: 20 + rnd(20), pops: {} },
   };
   rooms.set(room.code, room);
@@ -620,7 +626,7 @@ function nextRound(room) {
 function beginRound(room) {
   const c = room.current;
   if (c.type === 'bluff') {
-    Object.assign(c, { q: pickFrom(room, 'bluff')[0], lies: {}, votes: {}, options: [] });
+    Object.assign(c, { q: hostq.takeQuestion(room) || pickFrom(room, 'bluff')[0], lies: {}, votes: {}, options: [] });
     room.phase = 'write';
     setTimer(room, pace(room, 'write'), () => startVote(room));
   } else if (c.type === 'number') {
@@ -1454,6 +1460,20 @@ io.on('connection', socket => {
     broadcast(r);
   });
 
+  socket.on('askQ', (payload, cb) => {
+    if (!host()) return reply(cb, { error: 'host' });
+    const r = hostq.addQuestion(room, payload);
+    if (r.ok) broadcast(room);
+    reply(cb, r);
+  });
+
+  socket.on('unaskQ', (i, cb) => {
+    if (!host()) return reply(cb, { error: 'host' });
+    const r = hostq.removeQuestion(room, i);
+    if (r.ok) broadcast(room);
+    reply(cb, r);
+  });
+
   socket.on('settings', (patch = {}, cb) => {
     if (!host() || room.phase !== 'lobby') return reply(cb, { error: 'host' });
     const s = room.settings;
@@ -1461,7 +1481,11 @@ io.on('connection', socket => {
     if ([3, 5, 8, 12].includes(patch.rounds)) s.rounds = patch.rounds;
     if (['chill', 'normal', 'fast'].includes(patch.pace)) s.pace = patch.pace;
     if (typeof patch.teams === 'boolean') { s.teams = patch.teams; if (s.teams) balanceTeams(room); }
-    if (typeof patch.public === 'boolean') s.public = patch.public;
+    if (typeof patch.public === 'boolean') {
+      s.public = patch.public;
+      // Listing the room publicly takes the host's own questions with it.
+      hostq.clearIfPublic(room);
+    }
     // Toggling flips against the server's own copy. The client used to send the
     // whole map computed from its local state, so two quick taps raced: the
     // second was built from state the first had already changed, and undid it.
