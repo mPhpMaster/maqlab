@@ -11,6 +11,7 @@ const auth = require('./auth');
 const achievements = require('./achievements');
 const { matchAnswerCase } = require('./text');
 const hostq = require('./hostq');
+const card = require('./card');
 const bots = require('./bots');
 const replay = require('./replay');
 const persist = require('./persist');
@@ -1767,8 +1768,9 @@ const attr = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;'
 const SITE_TITLE = 'MAQLAB | مقلب';
 const SITE_DESC = 'A party game for your whole crew: lie well, catch the liars, guess faster than your friends. · لعبة حفلات جماعية: اكذب بذكاء، اكشف الكذابين، وخمّن أسرع من ربعك.';
 
-function page(req, title, desc) {
+function page(req, title, desc, image) {
   const base = `${req.protocol}://${req.get('host')}`;
+  const og = image ? `${base}${image}` : `${base}/og.jpg`;
   return INDEX_HTML
     .replace('src="/app.js"', `src="/app.js?v=${ASSET_V}"`)
     .replace('src="/avatar.js"', `src="/avatar.js?v=${ASSET_V}"`)
@@ -1782,10 +1784,12 @@ function page(req, title, desc) {
     '<meta property="og:site_name" content="MAQLAB">',
     `<meta property="og:title" content="${attr(title)}">`,
     `<meta property="og:description" content="${attr(desc)}">`,
-    `<meta property="og:image" content="${base}/og.jpg">`,
+    `<meta property="og:image" content="${og}">`,
+    `<meta property="og:image:width" content="${card.W}">`,
+    `<meta property="og:image:height" content="${card.H}">`,
     `<meta property="og:url" content="${base}${req.originalUrl}">`,
     '<meta name="twitter:card" content="summary_large_image">',
-    `<meta name="twitter:image" content="${base}/og.jpg">`,
+    `<meta name="twitter:image" content="${og}">`,
   ].join('\n  '));
 }
 
@@ -1819,8 +1823,24 @@ function matchCard(players, rounds) {
   return `${en} · ${ar}`;
 }
 
+// The podium as an image, for the places that show a picture and not much
+// else. Rendered on demand and kept: a finished match cannot change.
+app.get('/match/:id/card.png', async (req, res) => {
+  if (!card.available() || !db.on() || !UUID.test(req.params.id)) return res.status(404).end();
+  const rep = await db.getReplay(req.params.id).catch(() => null);
+  const players = rep && rep.data && rep.data.players ? rep.data.players : [];
+  if (!players.length) return res.status(404).end();
+  const png = card.cardFor(req.params.id, {
+    players: players.map(p => ({ name: p.name, score: p.score })),
+    rounds: rep.rounds,
+    lang: rep.lang,
+  });
+  if (!png) return res.status(404).end();
+  res.type('png').setHeader('Cache-Control', 'public, max-age=86400, immutable').send(png);
+});
+
 app.get('/match/:id', async (req, res) => {
-  let title = SITE_TITLE, desc = SITE_DESC;
+  let title = SITE_TITLE, desc = SITE_DESC, image = null;
   if (db.on() && UUID.test(req.params.id)) {
     // The replay knows everyone who played; game_results only has the rows for
     // signed-in players, so a guest would be missing from the card.
@@ -1835,9 +1855,12 @@ app.get('/match/:id', async (req, res) => {
       const win = players[0];
       title = `🏆 ${win.name} — ${num(win.score)} · MAQLAB`;
       desc = matchCard(players, rep ? rep.rounds : (rows[0] && rows[0].rounds) || players.length);
+      // Only when the replay is there: the card is drawn from it, and a link
+      // promising an image that 404s is worse than the static one.
+      if (rep && card.available()) image = `/match/${req.params.id}/card.png`;
     }
   }
-  res.type('html').send(page(req, title, desc));
+  res.type('html').send(page(req, title, desc, image));
 });
 app.get('/profile', (req, res) => res.type('html').send(page(req, SITE_TITLE, SITE_DESC)));
 
