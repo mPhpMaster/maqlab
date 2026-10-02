@@ -52,9 +52,23 @@ test('a very long name is cut rather than run off the card', () => {
   assert.ok(drawn && drawn[1].length <= 22, `name was drawn at ${drawn && drawn[1].length} characters`);
 });
 
-test('a name that was nothing but emoji still leaves a row to read', () => {
+// The font covers Latin and Arabic. Anything else — Cyrillic, CJK, emoji —
+// draws as a box, which is how a real winner reached a production card as
+// "! -> " followed by six of them.
+test('the font is asked what it can draw, not guessed at', () => {
+  assert.equal(card.drawable('Comet 🤖'), 'Comet');
+  assert.equal(card.drawable('بدر'), 'بدر');
+  assert.equal(card.drawable('عبدالله ١٢٣'), 'عبدالله ١٢٣');
+  assert.equal(card.drawable('Ñoño'), 'Ñoño', 'a Latin name with diacritics was thrown away');
+  assert.equal(card.drawable('Дмитрий'), '', 'Cyrillic is not in the font and must not reach the card');
+});
+
+test('a name the font mostly cannot draw is replaced, not shown in pieces', () => {
+  assert.equal(card.displayName('! -> 日本語テスト', 'en'), 'Player');
+  assert.equal(card.displayName('🤖🔥', 'ar'), 'لاعب');
+  assert.equal(card.displayName('Ahmed 日', 'en'), 'Ahmed', 'a name that survives mostly intact was thrown away');
   const svg = card.cardSvg(sample({ players: [{ name: '🤖🔥', score: 10 }] }));
-  assert.match(svg, /—</, 'an all-emoji name left an empty row');
+  assert.ok(!/>\s*</.test(svg.match(/fill="#ffd65c">[^<]*</)[0]), 'an undrawable name left an empty row');
 });
 
 test('the podium is three rows, and the rest are counted', () => {

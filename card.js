@@ -21,14 +21,90 @@ try { ({ Resvg } = require('@resvg/resvg-js')); } catch { /* card route stays of
 const available = () => !!Resvg && fs.existsSync(FONT);
 
 const num = n => Number(n || 0).toLocaleString('en-US');
-// The card is drawn with one font, and that font has no emoji in it. An emoji
-// left in a name does not degrade, it renders as an empty box — so anything
-// the font cannot draw comes out before it is drawn. Checked by rendering, not
-// assumed: the first card had three tofu boxes down the medal column.
-const noEmoji = s => String(s == null ? '' : s)
-  .replace(/\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}\u{FE0F}\u{200D}\u{20E3}]/gu, '')
-  .replace(/\s+/g, ' ')
-  .trim();
+// The card is drawn with one font, and a character that font lacks does not
+// degrade — resvg draws an empty box. Stripping emoji was the first attempt
+// and it was not enough: the first card served from production had a real
+// player whose name came out as "! -> " and six boxes, because Cairo covers
+// Latin and Arabic and nothing else.
+//
+// So the font is asked what it can draw, rather than guessed at. Its cmap is
+// read once at startup and anything outside it is dropped.
+let COVERED = null;
+
+function readCoverage(file) {
+  const b = fs.readFileSync(file);
+  const set = new Set();
+  const numTables = b.readUInt16BE(4);
+  let cmapAt = 0;
+  for (let i = 0; i < numTables; i++) {
+    const rec = 12 + i * 16;
+    if (b.toString('latin1', rec, rec + 4) === 'cmap') cmapAt = b.readUInt32BE(rec + 8);
+  }
+  if (!cmapAt) return set;
+  // Prefer a full Unicode subtable; fall back to the BMP one.
+  let best = 0, bestFormat = -1;
+  const n = b.readUInt16BE(cmapAt + 2);
+  for (let i = 0; i < n; i++) {
+    const rec = cmapAt + 4 + i * 8;
+    const off = cmapAt + b.readUInt32BE(rec + 4);
+    const format = b.readUInt16BE(off);
+    if ((format === 12 || format === 4) && format > bestFormat) { best = off; bestFormat = format; }
+  }
+  if (!best) return set;
+
+  if (bestFormat === 12) {
+    const groups = b.readUInt32BE(best + 12);
+    for (let i = 0; i < groups; i++) {
+      const g = best + 16 + i * 12;
+      const start = b.readUInt32BE(g), end = b.readUInt32BE(g + 4), glyph = b.readUInt32BE(g + 8);
+      if (!glyph && start === 0) continue;
+      for (let cp = start; cp <= end && cp - start < 0x10000; cp++) set.add(cp);
+    }
+    return set;
+  }
+
+  const segX2 = b.readUInt16BE(best + 6), seg = segX2 / 2;
+  const endAt = best + 14, startAt = endAt + segX2 + 2;
+  const deltaAt = startAt + segX2, rangeAt = deltaAt + segX2;
+  for (let i = 0; i < seg; i++) {
+    const end = b.readUInt16BE(endAt + i * 2), start = b.readUInt16BE(startAt + i * 2);
+    const delta = b.readInt16BE(deltaAt + i * 2), rangeOff = b.readUInt16BE(rangeAt + i * 2);
+    if (start === 0xFFFF) continue;
+    for (let cp = start; cp <= end; cp++) {
+      let glyph;
+      if (!rangeOff) glyph = (cp + delta) & 0xFFFF;
+      else {
+        const at = rangeAt + i * 2 + rangeOff + (cp - start) * 2;
+        if (at + 1 >= b.length) continue;
+        glyph = b.readUInt16BE(at);
+        if (glyph) glyph = (glyph + delta) & 0xFFFF;
+      }
+      if (glyph) set.add(cp);
+    }
+  }
+  return set;
+}
+
+function covered() {
+  if (COVERED) return COVERED;
+  try { COVERED = readCoverage(FONT); } catch { COVERED = new Set(); }
+  return COVERED;
+}
+
+// Keeps only what the font can actually draw. An empty coverage set means the
+// font could not be read at all, and then nothing is stripped — a card with
+// boxes beats no card, and available() has already decided whether to draw one.
+function drawable(s) {
+  const cov = covered();
+  const text = String(s == null ? '' : s);
+  if (!cov.size) return text.replace(/\s+/g, ' ').trim();
+  let out = '';
+  for (const ch of text) {
+    const cp = ch.codePointAt(0);
+    if (cp === 32 || cov.has(cp)) out += ch;
+  }
+  return out.replace(/\s+/g, ' ').trim();
+}
 // Arabic mixed with digits comes out in the wrong order: left to right, the
 // numbers bind to the word on the wrong side, so "12 rounds, 5 players" reads
 // as "5 rounds, 12 players". resvg ignores direction="rtl"; an explicit
@@ -42,6 +118,18 @@ const esc = s => String(s == null ? '' : s)
 const trim = (s, n) => { const t = String(s || '').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
 
 const ROW_COLOR = ['#ffd65c', '#cfd4e8', '#e9a178'];
+
+// A name half of which the font cannot draw comes out as wreckage: the first
+// production card had a winner rendered as "! ->" once the rest was stripped.
+// Below half kept, the name is replaced outright rather than shown in pieces —
+// the rank disc beside it already says who this row is.
+function displayName(raw, lang) {
+  const kept = drawable(raw);
+  const all = [...String(raw == null ? '' : raw)].filter(c => c.trim()).length;
+  const left = [...kept].filter(c => c.trim()).length;
+  if (left && left * 2 >= all) return kept;
+  return lang === 'ar' ? 'لاعب' : 'Player';
+}
 
 function cardSvg({ players = [], rounds = 0, lang = 'en' } = {}) {
   const top = players.slice(0, 3);
@@ -58,7 +146,7 @@ function cardSvg({ players = [], rounds = 0, lang = 'en' } = {}) {
       <rect x="110" y="${y - 46}" width="980" height="78" rx="22" fill="#241f47" opacity="${i === 0 ? 0.95 : 0.6}"/>
       <circle cx="166" cy="${y - 7}" r="26" fill="${ROW_COLOR[i]}" opacity="${i === 0 ? 1 : 0.85}"/>
       <text x="166" y="${y + 5}" font-size="30" fill="#1b1733" text-anchor="middle">${i + 1}</text>
-      <text x="214" y="${y + 8}" font-size="${i === 0 ? 44 : 38}" fill="${ROW_COLOR[i]}">${esc(trim(noEmoji(p.name) || '—', 22))}</text>
+      <text x="214" y="${y + 8}" font-size="${i === 0 ? 44 : 38}" fill="${ROW_COLOR[i]}">${esc(trim(displayName(p.name, lang), 22))}</text>
       <text x="1056" y="${y + 8}" font-size="${i === 0 ? 44 : 38}" fill="#ffffff" text-anchor="end">${num(p.score)}</text>
     </g>`;
   }).join('');
@@ -115,4 +203,4 @@ function cardFor(id, data) {
   return png;
 }
 
-module.exports = { W, H, available, cardSvg, renderCard, cardFor, cacheSize: () => cache.size };
+module.exports = { W, H, available, cardSvg, renderCard, cardFor, drawable, displayName, cacheSize: () => cache.size };
