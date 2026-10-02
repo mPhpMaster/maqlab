@@ -15,6 +15,39 @@ test('the game knows about every round type it can plan', () => {
   assert.ok(types.length >= 9, `expected at least 9 types, found ${types.length}: ${types}`);
 });
 
+// Two Truths and a Lie is the only type whose content the players write, so it
+// has no bank to fall back on — and the match replay is the place that reads a
+// round's fields blind. Name Something and How Many of Us both shipped with no
+// branch in bodyFor and fell through to quick(), which reads r.items: one such
+// round in a finished match threw while rendering and took the whole page with
+// it. Every type that records something other than items needs its own branch.
+test('the match replay can render every round type', () => {
+  const app = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
+  const body = app.match(/const bodyFor = r =>[\s\S]*?quick\(r, r\.type\)\);/)[0];
+  const quickish = ['blitz', 'emoji', 'odd'];
+  for (const type of types) {
+    if (quickish.includes(type)) continue;
+    assert.match(body, new RegExp(`r\\.type === '${type}'`),
+      `a match containing a "${type}" round would fall through to quick() and throw on r.items`);
+  }
+});
+
+// Every point the server pays out is shown on the scoreboard as a chip reading
+// t('g_' + reason). t() falls back to the key itself when there is no string,
+// so a reason with no label does not error — it just puts "g_nameMatch +400"
+// on screen, in both languages, in every round of that type. Three of them
+// shipped that way. Counting both languages rather than one also catches the
+// half-translated case, which is how the legal pages drifted.
+test('every reason the server pays points for has a label, in both languages', () => {
+  const reasons = [...server.matchAll(/gain\(room, [^,]+, '([a-zA-Z]+)'/g)].map(m => m[1]);
+  const app = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
+  for (const r of new Set(reasons)) {
+    const n = (app.match(new RegExp(`g_${r}:`, 'g')) || []).length;
+    assert.equal(n, 2, `gain reason "${r}" has ${n} labels, expected one per language — ` +
+      `the scoreboard would show "g_${r}" to players`);
+  }
+});
+
 test('every round type has a reveal phase, or it freezes the game', () => {
   const table = server.match(/const REVEAL_PHASE = \{[\s\S]*?\n\};/)[0];
   // the quick rounds are spread in from QUICK, the rest are named
@@ -35,6 +68,7 @@ test('every round type can be resumed after a restart', () => {
     bluff: ['write', 'vote', 'bluffReveal'], number: ['guess', 'numReveal'],
     likely: ['likelyVote', 'likelyReveal'], spy: ['spyClue', 'spyVote', 'spyReveal'],
     order: ['order', 'orderResult'], many: ['manyAsk', 'manyGuess', 'manyReveal'],
+    name: ['nameWrite', 'nameReveal'], two: ['twoWrite', 'twoGuess', 'twoResult'],
   };
   for (const [type, phases] of Object.entries(phaseOf)) {
     if (!types.includes(type)) continue;
@@ -46,7 +80,7 @@ test('every round type can be resumed after a restart', () => {
 
 test('every round type has a pace entry for each of its phases', () => {
   const paces = server.match(/const T = \{[\s\S]*?\n\};/)[0];
-  for (const ph of ['manyAsk', 'manyGuess', 'manyReveal']) {
+  for (const ph of ['manyAsk', 'manyGuess', 'manyReveal', 'twoWrite', 'twoGuess', 'twoResult']) {
     assert.equal((paces.match(new RegExp(ph + ':', 'g')) || []).length, 3,
       `phase "${ph}" is missing from one of the three pace settings`);
   }

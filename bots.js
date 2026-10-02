@@ -29,10 +29,48 @@ const THINK = {
   order: [8000, 20000],
   spyClue: [6000, 14000],
   nameWrite: [5000, 13000],
+  twoWrite: [9000, 22000],
+  twoGuess: [3500, 9000],
   manyAsk: [3000, 8000],
   manyGuess: [4000, 10000],
   spyVote: [4000, 10000],
 };
+
+// Three things about yourself, one of them untrue. A bot has no life to draw
+// on, so it draws on a small bank of the flattest possible claims — which is
+// also what makes it beatable: a human writes something specific, and specific
+// is what gives a lie away.
+const TWO_LINES = {
+  ar: [
+    'ما شربت قهوة اليوم', 'أنا أصغر واحد في بيتنا', 'أعرف أطبخ شي واحد بس',
+    'ما سافرت برا البلد أبداً', 'نمت أقل من أربع ساعات أمس', 'عندي قطة',
+    'أكره الأناناس', 'كسرت يدي مرة', 'أقرأ كتاب حالياً', 'ما أعرف أسبح',
+    'أحفظ أرقام تلفونات أهلي كلها', 'ضيعت جوازي مرة في المطار',
+    'أشوف نفس الحلم كل شهر', 'ما شفت البحر إلا مرتين',
+  ],
+  en: [
+    'I have not had coffee today', 'I am the youngest at home', 'I can cook exactly one thing',
+    'I have never left the country', 'I slept under four hours last night', 'I own a cat',
+    'I cannot stand pineapple', 'I broke my arm once', 'I am halfway through a book',
+    'I never learned to swim', 'I know every family phone number by heart',
+    'I lost my passport in an airport once', 'I have the same dream every month',
+    'I have seen the sea twice',
+  ],
+};
+
+function twoLines({ lang }) {
+  const bank = TWO_LINES[lang] || TWO_LINES.en;
+  const picked = [];
+  while (picked.length < 3) {
+    const x = pick(bank);
+    if (!picked.includes(x)) picked.push(x);
+  }
+  return { lines: picked, lie: Math.floor(Math.random() * 3) };
+}
+
+// A bot guessing the lie is a coin toss with three sides, and that is honest:
+// there is nothing in a stranger's sentence for it to read.
+const twoGuess = () => Math.floor(Math.random() * 3);
 
 // How often a bot is right. Deliberately short of perfect: a bot that always
 // knows is not an opponent, it is a wall.
@@ -232,5 +270,5 @@ function manyGuess({ total }) {
 module.exports = {
   NAMES, freeName, thinkFor,
   lie, bluffVote, numberGuess, blitzAnswer, emojiAnswer, votePlayer, orderGuess, spyClue, spyGuess,
-  manyAnswer, manyGuess, nameAnswer,
+  manyAnswer, manyGuess, nameAnswer, twoLines, twoGuess,
 };

@@ -794,5 +794,25 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 
 /* ---- name something: clusters of the same answer ---- */
 .type-tag.name { background: rgba(255,130,196,.2); color: var(--pink); }
+.type-tag.two { background: rgba(185,160,255,.2); color: var(--lilac); }
+.type-tag small { opacity: .7; font-weight: 700; margin-inline-start: 5px; }
+
+/* Three lines to write, with the 🤥 that marks the lie attached to each one —
+   deciding which is the lie is part of writing it, not a second screen. */
+.tworow { display: flex; align-items: center; gap: 8px; }
+.tworow .input { flex: 1; min-width: 0; }
+.liepick {
+  flex: 0 0 auto; width: 44px; height: 44px; border-radius: 14px; font-size: 19px;
+  border: 2px solid var(--line); background: var(--card); opacity: .45;
+  transition: opacity .15s, border-color .15s, transform .1s;
+}
+.liepick:active { transform: scale(.94); }
+.liepick.on { opacity: 1; border-color: var(--coral); background: rgba(255,107,107,.16); }
 .ansrow.mineans { outline: 2px solid var(--lilac); outline-offset: -2px; }
 .ansrow .repw { margin-inline-start: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* The author's avatar beside a question. Jelly SVGs are width:100% by design,
+   so an unconstrained one swells to fill the whole card — which is exactly
+   what it did here on first play. */
+.q .qwho { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.q .qwho .jelly { width: 34px; height: 34px; flex: 0 0 auto; }

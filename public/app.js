@@ -81,6 +81,15 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       repRounds: 'جولات المباراة', repTruth: 'الإجابة الصحيحة', repHouse: 'خيار من اللعبة', repAnswer: 'الجواب',
       repNobody: 'ما أحد', repMostVotes: 'أكثر واحد صوّتوا له', repCaught: 'انكشف 🎯', repEscaped: 'نجا بجلده 😎',
       repSpyGuess: 'تخمين الجاسوس', repRoundPts: 'نقاط الجولة', repCorrect: 'الترتيب الصحيح',
+      repSaid: 'اللي كتبوه', repMatched: 'وافقوا بعض', repYesCount: 'قالوا نعم', repGuessed: 'خمّن',
+      type_two: 'صدقين وكذبة', desc_two: 'اكتب ثلاث أشياء عن نفسك — وحدة منها كذب',
+      twoTip: 'اكتب ثلاث أشياء عن نفسك، وحدد الكذبة', twoPh: 'شي عن نفسك…',
+      twoMark: 'اضغط 🤥 جانب الكذبة', twoNeedLie: 'حدد وحدة منهن كذبة', twoNeedAll: 'اكتب الثلاثة',
+      twoWhose: 'ثلاثة من {n}', twoPick: 'وين الكذبة؟', twoYours: 'قاعدين يخمّنون كذبتك 😈',
+      twoMine: 'كذبتك', twoWasLie: 'الكذبة 🤥', twoSpotted: 'لقيتها! 🎯 +300', twoMissed: 'ما لقيتها',
+      twoFooledN: 'خدع {n}', twoFooledNone: 'ما خدع أحد', twoSetN: '{a} من {b}',
+      g_twoSpot: 'لقى الكذبة 🎯', g_twoFooled: 'خدعهم 🤥',
+      g_nameMatch: 'وافقوك', g_manyExact: 'بالضبط 🎯', g_manyNear: 'قريب',
       matchResult: 'نتيجة المباراة', shareMatch: 'انسخ رابط المباراة', matchGone: 'المباراة هذي ما عادت موجودة', place1: 'الأول', placeN: 'المركز {n}', roundsN: { one: 'جولة واحدة', two: 'جولتان', few: '{n} جولاتٍ', many: '{n} جولةً', other: '{n} جولةٍ' }, openMatch: 'افتح',
       report: 'بلاغ', reportTitle: 'بلاغ عن {n}', reportWhy: 'وش المشكلة؟', r_cheat: 'غش', r_name: 'اسم مسيء', r_chat: 'إساءة بالدردشة', r_other: 'غير ذلك',
       reportDetails: 'تفاصيل (اختياري)', reportSent: 'وصلنا البلاغ، شكراً 🙏', suggestPlaceholder: 'وش تبي نضيف أو نغيّر؟',
@@ -152,6 +161,15 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       repRounds: 'Round by round', repTruth: 'the true answer', repHouse: 'filler option', repAnswer: 'Answer',
       repNobody: 'Nobody', repMostVotes: 'Most votes', repCaught: 'Caught 🎯', repEscaped: 'Got away 😎',
       repSpyGuess: "Spy's guess", repRoundPts: 'Round points', repCorrect: 'Correct order',
+      repSaid: 'What they wrote', repMatched: 'matched each other', repYesCount: 'said yes', repGuessed: 'guessed',
+      type_two: 'Two Truths and a Lie', desc_two: 'Write three things about yourself — one of them untrue',
+      twoTip: 'Write three things about yourself, then mark the lie', twoPh: 'Something about you…',
+      twoMark: 'Tap 🤥 next to the lie', twoNeedLie: 'Mark one of them as the lie', twoNeedAll: 'Fill in all three',
+      twoWhose: "{n}'s three", twoPick: 'Which one is the lie?', twoYours: 'They are guessing your lie 😈',
+      twoMine: 'your lie', twoWasLie: 'The lie 🤥', twoSpotted: 'You found it! 🎯 +300', twoMissed: 'You missed it',
+      twoFooledN: 'fooled {n}', twoFooledNone: 'fooled nobody', twoSetN: '{a} of {b}',
+      g_twoSpot: 'Spotted the lie 🎯', g_twoFooled: 'Fooled them 🤥',
+      g_nameMatch: 'Matched you', g_manyExact: 'Exactly right 🎯', g_manyNear: 'One off',
       matchResult: 'Match result', shareMatch: 'Copy match link', matchGone: 'That match is no longer around', place1: '1st', placeN: 'Place {n}', roundsN: { one: '1 round', other: '{n} rounds' }, openMatch: 'Open',
       report: 'Report', reportTitle: 'Report {n}', reportWhy: "What's wrong?", r_cheat: 'Cheating', r_name: 'Offensive name', r_chat: 'Abusive chat', r_other: 'Something else',
       reportDetails: 'Details (optional)', reportSent: 'Report received, thank you 🙏', suggestPlaceholder: 'What should we add or change?',
@@ -183,7 +201,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     ach: store.get('ach', { unlocked: [], games: 0, wins: 0, fooled: 0, fastest: 0 }),
     route: { name: 'home' },
     room: null, code: null, joining: false,
-    draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '', order: [], nameAns: '' },
+    draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '', order: [], nameAns: '', two: ['', '', ''], twoLie: null },
     bet: 1, showQR: false, reactOpen: false,
     me: null, isAdmin: false, lobbies: null, achList: null,
     // meKnown stays false until /api/auth/me answers. Rendering a sign-in
@@ -249,7 +267,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   const later = (ms, fn) => state.timeouts.push(setTimeout(fn, ms));
   function applyDir() { document.documentElement.lang = state.lang; document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr'; document.title = 'MAQLAB | مقلب'; }
 
-  const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', order: '📊', spy: '🕵️', many: '🙋', name: '🗣️' };
+  const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', order: '📊', spy: '🕵️', many: '🙋', name: '🗣️', two: '🎭' };
   const MODS = { normal: '✨', double: '💎', speed: '⏱️', jackpot: '🎁', golden: '👑' };
   const AWARD_E = { liar: '🤥', detective: '🕵️', sniper: '🎯', lightning: '⚡', gambler: '🎲', fire: '🔥', star: '🌟' };
   const ACH = [['first_game', '🎮'], ['first_win', '🏆'], ['liar5', '🤥'], ['bull', '🎯'], ['streak4', '🔥'], ['allin', '🎲'], ['famous', '🌟'], ['speedy', '⚡'], ['games10', '🏅'], ['wins5', '👑']];
@@ -629,6 +647,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       spyClue: spyClueView, spyVote: spyVoteView, spyReveal: spyRevealView,
       manyAsk: manyAskView, manyGuess: manyGuessView, manyReveal: manyRevealView,
       nameWrite: nameWriteView, nameReveal: nameRevealView,
+      twoWrite: twoWriteView, twoGuess: twoGuessView, twoResult: twoResultView,
       scores: scoresView, final: finalView,
     };
     return (views[state.room.phase] || (() => ''))();
@@ -1212,6 +1231,73 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       }).join('')}</div>
       ${mine ? `<div class="center" style="margin-top:14px;font-weight:800">${mine.pairs === c.truth.length - 1 ? t('perfectOrder') : t('pairsRight', { n: mine.pairs })}</div>` : ''}
       ${everyOrder(c)}
+    </div></div></div></div>`;
+  }
+
+  // ---------- two truths and a lie ----------
+  // Three boxes and a 🤥 beside each. Marking the lie is part of writing it,
+  // not a second screen: by the time you have typed the third line you have
+  // already decided which one you are getting away with.
+  function twoWriteView() {
+    const c = state.room.current;
+    const d = state.draft;
+    const rows = [0, 1, 2].map(i => `<div class="tworow">
+      <button type="button" class="liepick ${d.twoLie === i ? 'on' : ''}" data-act="twolie" data-i="${i}"
+        aria-label="${t('twoMark')}" aria-pressed="${d.twoLie === i}">🤥</button>
+      <input id="two${i}" class="input" maxlength="60" placeholder="${t('twoPh')}"
+        value="${esc(d.two[i])}" autocomplete="off" ${i === 0 ? 'data-autofocus' : ''}>
+    </div>`).join('');
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      <div class="q-card glass"><span class="type-tag two">${TYPES.two} ${t('type_two')}</span>
+        <div class="q">${t('twoTip')}</div><div class="sub">${t('twoMark')}</div></div>
+      <div class="timebar"><i data-bar="${state.room.deadline}"></i></div>
+      <div class="answer-box">${c.mine
+        ? `<div class="col">${c.mine.lines.map((l, i) => `<div class="ansrow ${i === c.mine.lie ? 'no' : 'ok'}">
+            <span class="nm">${esc(l)}</span>${i === c.mine.lie ? `<span class="said">${t('twoMine')}</span>` : ''}</div>`).join('')}
+           <div class="center muted"><span class="dots">${t('waitOthers')}</span></div></div>`
+        : `<form data-form="two" class="col">${rows}<button class="btn coral block" type="submit">${t('send')}</button></form>`}</div>
+      ${whoRow(c.submitted)}
+    </div></div></div></div>`;
+  }
+
+  function twoGuessView() {
+    const c = state.room.current, mid = myId();
+    const author = P(c.whose);
+    const mine = c.whose === mid;
+    const rows = (c.lines || []).map((l, i) => `<button class="opt ${c.myPick === i ? 'picked' : ''}"
+      style="animation-delay:${i * 60}ms" data-act="twoguess" data-i="${i}"
+      ${mine || c.myPick != null ? 'disabled' : ''}>${mine && c.lie === i ? `<span class="tag">🤥</span>` : ''}${esc(l)}</button>`).join('');
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      <div class="q-card glass"><span class="type-tag two">${TYPES.two} ${t('type_two')}
+          <small>${t('twoSetN', { a: fmt((c.idx || 0) + 1), b: fmt(c.total || 1) })}</small></span>
+        <div class="q">${author ? `<span class="qwho">${J(author.avatar)}${esc(t('twoWhose', { n: author.name }))}</span>` : t('twoPick')}</div>
+        <div class="sub">${mine ? t('twoYours') : t('twoPick')}</div></div>
+      <div class="timebar"><i data-bar="${state.room.deadline}"></i></div>
+      <div class="options">${rows}</div>
+      ${whoRow(c.picked)}
+    </div></div></div></div>`;
+  }
+
+  function twoResultView() {
+    const c = state.room.current, mid = myId();
+    const author = P(c.whose);
+    const picks = c.picks || {};
+    const fooled = Object.values(picks).filter(v => v !== c.lie).length;
+    const rows = (c.lines || []).map((l, i) => {
+      const voters = Object.entries(picks).filter(([, v]) => v === i)
+        .map(([pid]) => { const p = P(pid); return p ? `<span class="repp">${J(p.avatar)}${esc(p.name)}</span>` : ''; }).join('');
+      return `<div class="ansrow ${i === c.lie ? 'no' : 'ok'} ${picks[mid] === i ? 'mineans' : ''}">
+        <span class="nm">${esc(l)}</span><span class="repw">${voters}</span>
+        <span class="said">${i === c.lie ? t('twoWasLie') : ''}</span></div>`;
+    }).join('');
+    const verdict = c.whose === mid
+      ? (fooled ? t('twoFooledN', { n: fmt(fooled) }) : t('twoFooledNone'))
+      : (picks[mid] === c.lie ? t('twoSpotted') : t('twoMissed'));
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      <div class="q-card glass"><span class="type-tag two">${TYPES.two} ${t('type_two')}</span>
+        <div class="q">${author ? `<span class="qwho">${J(author.avatar)}${esc(t('twoWhose', { n: author.name }))}</span>` : ''}</div></div>
+      <div class="center" style="margin-top:10px;font-weight:800">${verdict}</div>
+      <div class="answers">${rows}</div>
     </div></div></div></div>`;
   }
 
@@ -1913,6 +1999,25 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         Object.entries(r.orders || {}).map(([pid, s]) => line(chip(pid), '', `<b>${seq(s)}</b>`)).join('');
     };
 
+    // Name Something and How Many of Us shipped without a branch here and
+    // fell through to quick(), which reads r.items — a field neither of them
+    // records. One such round in a match broke the whole page.
+    const name = r => (r.groups || []).map(g =>
+      line(esc(g.text), g.ids.length > 1 ? t('repMatched') : '', chips(g.ids, g.ids.length > 1 ? 'ok' : 'no'),
+        g.ids.length > 1 ? 'ok' : '')).join('');
+
+    const many = r => line(`${fmt(r.count)} ${t('repYesCount')}`, '', chips(r.yesIds || [], 'ok'), 'ok') +
+      Object.entries(r.guesses || {}).sort((a, b) => Math.abs(a[1] - r.count) - Math.abs(b[1] - r.count))
+        .map(([pid, g]) => line(chip(pid, g === r.count ? 'ok' : ''), t('repGuessed'), `<b>${fmt(g)}</b>${g === r.count ? ' 🎯' : ''}`)).join('');
+
+    // Each set that was played, the lie marked, and who fell for what.
+    const two = r => (r.sets || []).map(set => `<div class="repi">
+      ${line(chip(set.pid), t('repSaid'), '')}
+      ${set.lines.map((l, i) => line(esc(l), i === set.lie ? t('twoWasLie') : '',
+        Object.entries(set.picks || {}).filter(([, v]) => v === i)
+          .map(([pid]) => chip(pid, i === set.lie ? 'ok' : 'no')).join(''),
+        i === set.lie ? 'no' : '')).join('')}</div>`).join('');
+
     // The question is the summary line, so it is not repeated in the body.
     const bodyFor = r =>
       (r.type === 'spy' ? `<div class="repq">${esc(r.word)} <span class="by">· ${esc(r.cat)}</span></div>` : '') +
@@ -1921,6 +2026,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         : r.type === 'likely' ? likely(r)
         : r.type === 'spy' ? spy(r)
         : r.type === 'order' ? order(r)
+        : r.type === 'name' ? name(r)
+        : r.type === 'many' ? many(r)
+        : r.type === 'two' ? two(r)
         : quick(r, r.type));
 
     const rounds = d.log.map(r => {
@@ -2298,6 +2406,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     async emoji(el) { sfx.send(); buzz(20); await emit('emoji', el.dataset.id); },
     async odd(el) { sfx.send(); buzz(20); await emit('odd', el.dataset.id); },
     async many(el) { sfx.send(); buzz(20); await emit('many', el.dataset.v === '1'); },
+    twolie(el) { state.draft.twoLie = Number(el.dataset.i); buzz(10); render(); },
+    async twoguess(el) { sfx.send(); buzz(20); await emit('twoGuess', Number(el.dataset.i)); },
     async manyguess(el) { sfx.send(); buzz(20); await emit('manyGuess', Number(el.dataset.n)); },
     ordpick(el) {
       const id = el.dataset.id, cur = state.draft.order;
@@ -2347,6 +2457,12 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       const inp = document.getElementById('nameans');
       const r = await emit('name', state.draft.nameAns);
       if (r.ok) { flyFrom(inp); buzz(20); state.draft.nameAns = ''; } else document.getElementById('nameans')?.classList.add('shake');
+    } else if (f === 'two') {
+      const lines = state.draft.two.map(x => x.trim());
+      if (lines.some(x => !x)) return toast(t('twoNeedAll'), 'err');
+      if (state.draft.twoLie == null) return toast(t('twoNeedLie'), 'err');
+      const r = await emit('two', { lines, lie: state.draft.twoLie });
+      if (r.ok) { buzz(20); state.draft.two = ['', '', '']; state.draft.twoLie = null; }
     } else if (f === 'spyClue') {
       if (!state.draft.spyClue.trim()) return toast(t('err_empty'), 'err');
       const inp = document.getElementById('spyclue');
@@ -2365,6 +2481,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     else if (id === 'lie') { state.draft.lie = e.target.value; sendTyping(); }
     else if (id === 'guess') { state.draft.guess = e.target.value; sendTyping(); }
     else if (id === 'nameans') { state.draft.nameAns = e.target.value; sendTyping(); }
+    else if (/^two[012]$/.test(id)) { state.draft.two[Number(id[3])] = e.target.value; sendTyping(); }
     else if (id === 'spyclue') { state.draft.spyClue = e.target.value; sendTyping(); }
     else if (id === 'spyguess') { state.draft.spyGuess = e.target.value; }
   });

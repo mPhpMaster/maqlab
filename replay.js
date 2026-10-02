@@ -64,6 +64,13 @@ function roundEntry(room, L) {
     e.q = say(c.q.q, L);
     e.said = { ...c.said };
     e.groups = (c.groups || []).map(g => ({ text: g.text, ids: g.ids.slice() }));
+  } else if (c.type === 'two') {
+    // Every set that was played this round, with what each person picked.
+    // Nothing here was private: each one was on the result screen already.
+    e.sets = (c.order || []).map((pid, i) => {
+      const set = c.sets[pid] || { lines: [], lie: 0 };
+      return { pid, lines: set.lines.slice(), lie: set.lie, picks: { ...(c.picks[i] || {}) } };
+    });
   } else if (c.type === 'many') {
     e.q = say(c.prompt, L);
     e.count = c.count;
