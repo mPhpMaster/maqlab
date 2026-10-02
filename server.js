@@ -490,7 +490,10 @@ function createRoom() {
     // Every type on, derived from TYPES rather than listed. Spelling them out
     // meant a new round type was off in every new room, so nobody would ever
     // meet it — they would have to know it existed and go and switch it on.
-    settings: { lang: 'en', rounds: 8, types: Object.fromEntries(TYPES.map(t => [t, true])), pace: 'normal', teams: false, public: true },
+    // Twelve, not eight: there are ten round types now, and a plan shorter than
+    // the list cannot fit them all in — a whole game could go by without a
+    // player meeting four of them.
+    settings: { lang: 'en', rounds: 12, types: Object.fromEntries(TYPES.map(t => [t, true])), pace: 'normal', teams: false, public: true },
     players: new Map(), round: 0, gameNo: 0, current: null, deadline: null, timer: null,
     used: {}, plan: [], gains: {}, prevRank: {}, awards: [], bestLie: null, pairs: {}, rivals: {}, log: [], touched: Date.now(),
     balloon: { size: 0, target: 20 + rnd(20), pops: {} },
