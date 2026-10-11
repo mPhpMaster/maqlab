@@ -74,6 +74,11 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       supportTitle: '☕ ادعم اللعبة', supportBody: 'مقلب تشتغل على خادم مجاني — لهذا تاخذ ٢٠ ثانية تقريباً تصحى أول مرة. لو حبيت تساعد في تكاليف التشغيل، هذا رابط للتبرع.',
       supportNothing: 'ما تحصل مقابلها شي داخل اللعبة — اللعبة كاملة مجانية للكل، والتبرع اختياري تماماً.',
       supportBtn: 'تبرّع', supportSmall: 'عجبتك اللعبة؟ ادعم تكاليف الخادم ☕',
+      type_minor: 'الأقلية', desc_minor: 'اختر الخيار اللي تتوقع أقل ناس بتختاره — الأقلية هي اللي تكسب',
+      minorPickQ: 'وش تختار؟', minorTip: 'تكسب لو كنت مع الأقل — فكّر وش بيختار الباقون',
+      minorWon: 'كنت مع الأقلية! 🎯 +400', minorLost: 'كنت مع الأغلبية', minorTie: 'تعادل — ما في أقلية',
+      minorAll: 'كلكم اخترتم نفس الشي!', minorSide: '{n}', g_minority: 'مع الأقلية 🧭',
+      ach_minority5: 'عكس التيار', achd_minority5: '5 مرات مع الأقلية', ach_minority20: 'الذئب المنفرد', achd_minority20: '20 مرة مع الأقلية',
       ach_odd_eye: 'مجهر', achd_odd_eye: '10 جولات كاملة في «الدخيل»',
       ach_first_game: 'أول لعبة', achd_first_game: 'خلّص أول لعبة', ach_first_win: 'أول فوز', achd_first_win: 'اطلع الأول في لعبة', ach_liar5: 'كذّاب محترف', achd_liar5: 'اخدع 5 لاعبين', ach_bull: 'قنّاص', achd_bull: 'جيب «في الصميم» 🎯', ach_streak4: 'نار', achd_streak4: 'سلسلة 4 ورا بعض', ach_allin: 'كل شي أو لا شي', achd_allin: 'اكسب رهان ×3', ach_famous: 'المشهور', achd_famous: 'الشلة تختارك في «مين فينا؟»', ach_speedy: 'برق', achd_speedy: 'كن الأسرع 3 مرات', ach_games10: 'مدمن', achd_games10: 'العب 10 ألعاب', ach_wins5: 'أسطورة', achd_wins5: 'افز بـ 5 ألعاب',
       howSteps: ['أنشئ غرفة وشارك الكود أو الرابط مع الشلة.', 'كل جولة تبدأ بآلة الحظ: تحدد نوع الجولة ومضاعف النقاط.', '🤥 المقلب: اكتب كذبة مقنعة، بعدين اختار الصح وراهن عليه.', '🎯 أقرب رقم: خمّن، والأقرب ياخذ النقاط (والصميم +1000!).', '⚡ صح ولا خطأ و🔤 فكّ الإيموجي: جاوب بسرعة، كل ثانية تفرق.', '🧩 الدخيل و📊 رتّبها: لقّط اللي ما له دخل بينهم، أو رتّب أربعة أشياء من الأكبر للأصغر.', '👥 مين فينا؟ صوّت على واحد من الشلة ووافق الأغلبية.', '🕵️ الجاسوس: واحد ما يعرف الكلمة، الكل يكتب تلميح، وبعدين صوتوا مين الجاسوس!', 'عندك قدرتين كل لعبة: 🔍 كشّاف يشيل خيارين غلط، و💎 دبل يضاعف نقاط جولة.', 'اجمع سلاسل 🔥 واكسب الألقاب والإنجازات وارفع مستواك!'],
@@ -179,6 +184,11 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       supportTitle: '☕ Support the game', supportBody: 'MAQLAB runs on a free server — that is why it takes about 20 seconds to wake up the first time. If you would like to help with the running costs, here is a link.',
       supportNothing: 'It buys you nothing in the game — all of it is free for everyone, and this is entirely optional.',
       supportBtn: 'Donate', supportSmall: 'Enjoying MAQLAB? Help with the server bill ☕',
+      type_minor: 'The Minority', desc_minor: 'Pick the option you think fewest will choose — the smaller side wins',
+      minorPickQ: 'Which one?', minorTip: 'You score for being on the smaller side — think about what everyone else will pick',
+      minorWon: 'You were in the minority! 🎯 +400', minorLost: 'You went with the crowd', minorTie: 'Dead even — no minority',
+      minorAll: 'Everyone picked the same!', minorSide: '{n}', g_minority: 'In the minority 🧭',
+      ach_minority5: 'Against the Grain', achd_minority5: '5 times in the minority', ach_minority20: 'Lone Wolf', achd_minority20: '20 times in the minority',
       ach_odd_eye: 'Microscope', achd_odd_eye: '10 clean sweeps of Odd One Out',
       ach_first_game: 'First Game', achd_first_game: 'Finish your first game', ach_first_win: 'First Win', achd_first_win: 'Finish 1st in a game', ach_liar5: 'Pro Liar', achd_liar5: 'Fool 5 players', ach_bull: 'Sharpshooter', achd_bull: 'Hit a bullseye 🎯', ach_streak4: 'On Fire', achd_streak4: 'Get a 4 streak', ach_allin: 'All In', achd_allin: 'Win a ×3 bet', ach_famous: 'Famous', achd_famous: "Be the crowd's pick", ach_speedy: 'Lightning', achd_speedy: 'Be fastest 3 times', ach_games10: 'Regular', achd_games10: 'Play 10 games', ach_wins5: 'Legend', achd_wins5: 'Win 5 games',
       howSteps: ['Create a room and share the code or link with friends.', 'Every round starts with a slot machine: round type + point multiplier.', '🤥 The Bluff: write a convincing lie, then find the truth and bet on it.', '🎯 Closest Number: guess — closest wins (bullseye = +1000!).', '⚡ True or False & 🔤 Emoji Decode: answer fast, every second counts.', '🧩 Odd One Out & 📊 Line Them Up: spot the one that does not belong, or put four things in order.', "👥 Who's Most Likely: vote for a friend and side with the crowd.", "🕵️ The Spy: one player doesn't know the word — everyone drops a clue, then vote who's the spy!", 'Two power-ups per game: 🔍 Peek removes two wrong options, 💎 Double doubles one round.', 'Build 🔥 streaks, win awards & achievements and level up!'],
@@ -331,7 +341,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   // becomes a paid feature sold outside it.
   const DONATE_URL = 'https://paypal.me/mfsafadi';
 
-  const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', order: '📊', spy: '🕵️', many: '🙋', name: '🗣️', two: '🎭' };
+  const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', order: '📊', spy: '🕵️', many: '🙋', name: '🗣️', two: '🎭', minor: '🧭' };
   const MODS = { normal: '✨', double: '💎', speed: '⏱️', jackpot: '🎁', golden: '👑' };
   const AWARD_E = { liar: '🤥', detective: '🕵️', sniper: '🎯', lightning: '⚡', gambler: '🎲', fire: '🔥', star: '🌟' };
   // hats that unlock with level (index -> level)
@@ -716,6 +726,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       manyAsk: manyAskView, manyGuess: manyGuessView, manyReveal: manyRevealView,
       nameWrite: nameWriteView, nameReveal: nameRevealView,
       twoWrite: twoWriteView, twoGuess: twoGuessView, twoResult: twoResultView,
+      minorPick: minorPickView, minorReveal: minorRevealView,
       scores: scoresView, final: finalView,
     };
     return (views[state.room.phase] || (() => ''))();
@@ -1318,6 +1329,47 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       }).join('')}</div>
       ${mine ? `<div class="center" style="margin-top:14px;font-weight:800">${mine.pairs === c.truth.length - 1 ? t('perfectOrder') : t('pairsRight', { n: mine.pairs })}</div>` : ''}
       ${everyOrder(c)}
+    </div></div></div></div>`;
+  }
+
+  // ---------- the minority ----------
+  // Two buttons and nothing else on screen: what the rest of the room is
+  // choosing is the whole puzzle, so the only thing shown before the reveal is
+  // how many have answered — never which side they took.
+  function minorPickView() {
+    const c = state.room.current, mine = c.myPick;
+    const side = (k, label) => `<button class="opt big ${mine === k ? 'picked' : ''}"
+      data-act="minor" data-v="${k}" ${mine ? 'disabled' : ''}>${esc(label)}</button>`;
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      <div class="q-card glass"><span class="type-tag minor">${TYPES.minor} ${t('type_minor')}</span>
+        <div class="q">${t('minorPickQ')}</div><div class="sub">${t('minorTip')}</div></div>
+      <div class="timebar"><i data-bar="${state.room.deadline}"></i></div>
+      <div class="two-up">${side('a', c.a)}${side('b', c.b)}</div>
+      ${mine ? `<div class="center muted" style="margin-top:14px"><span class="dots">${t('waitOthers')}</span></div>` : ''}
+      ${whoRow(c.picked)}
+    </div></div></div></div>`;
+  }
+
+  function minorRevealView() {
+    const c = state.room.current, mid = myId();
+    const won = (c.winners || []).includes(mid);
+    const faces = k => Object.entries(c.picks || {}).filter(([, v]) => v === k)
+      .map(([pid]) => { const p = P(pid); return p ? `<span class="repp">${J(p.avatar)}${esc(p.name)}</span>` : ''; }).join('');
+    const col = (k, label) => {
+      const n = (c.counts || {})[k] || 0;
+      const isMinority = (c.winners || []).length && c.picks[(c.winners || [])[0]] === k;
+      return `<div class="side ${isMinority ? 'ok' : ''}">
+        <div class="side-head"><b>${esc(label)}</b><span class="cnt">${fmt(n)}</span></div>
+        <div class="repw">${faces(k) || `<span class="by">${t('repNobody')}</span>`}</div></div>`;
+    };
+    const verdict = !(c.winners || []).length
+      ? (c.counts && c.counts.a && c.counts.b ? t('minorTie') : t('minorAll'))
+      : won ? t('minorWon') : t('minorLost');
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      <div class="q-card glass"><span class="type-tag minor">${TYPES.minor} ${t('type_minor')}</span>
+        <div class="q">${t('minorPickQ')}</div></div>
+      <div class="center" style="margin-top:10px;font-weight:800">${verdict}</div>
+      <div class="sides">${col('a', c.a)}${col('b', c.b)}</div>
     </div></div></div></div>`;
   }
 
@@ -2106,6 +2158,14 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         .map(([pid, g]) => line(chip(pid, g === r.count ? 'ok' : ''), t('repGuessed'), `<b>${fmt(g)}</b>${g === r.count ? ' 🎯' : ''}`)).join('');
 
     // Each set that was played, the lie marked, and who fell for what.
+    // two sides, and the smaller one took the round
+    const minor = r => (r.pair || []).map((label, i) => {
+      const k = i === 0 ? 'a' : 'b';
+      const ids = Object.entries(r.picks || {}).filter(([, v]) => v === k).map(([pid]) => pid);
+      const won = ids.length && ids.every(id => (r.winners || []).includes(id));
+      return line(esc(label), `${ids.length}`, chips(ids, won ? 'ok' : 'no'), won ? 'ok' : '');
+    }).join('');
+
     const two = r => (r.sets || []).map(set => `<div class="repi">
       ${line(chip(set.pid), t('repSaid'), '')}
       ${set.lines.map((l, i) => line(esc(l), i === set.lie ? t('twoWasLie') : '',
@@ -2124,6 +2184,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         : r.type === 'name' ? name(r)
         : r.type === 'many' ? many(r)
         : r.type === 'two' ? two(r)
+        : r.type === 'minor' ? minor(r)
         : quick(r, r.type));
 
     const rounds = d.log.map(r => {
@@ -2512,6 +2573,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     async emoji(el) { sfx.send(); buzz(20); await emit('emoji', el.dataset.id); },
     async odd(el) { sfx.send(); buzz(20); await emit('odd', el.dataset.id); },
     async many(el) { sfx.send(); buzz(20); await emit('many', el.dataset.v === '1'); },
+    async minor(el) { sfx.send(); buzz(20); await emit('minor', el.dataset.v); },
     // Fills the box and hands it back. Sending it would make the round the
     // game's answer rather than the player's, and a player who edits one word
     // has written a lie.

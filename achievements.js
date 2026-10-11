@@ -38,6 +38,8 @@ const LIST = [
   { id: 'two_master', e: '🎩', test: p => p.two_fool_all >= 5 },
   { id: 'odd_sweep', e: '🧩', test: p => p.odd_sweeps >= 1 },
   { id: 'odd_eye', e: '🔬', test: p => p.odd_sweeps >= 10 },
+  { id: 'minority5', e: '🧭', test: p => p.minority_wins >= 5 },
+  { id: 'minority20', e: '🐺', test: p => p.minority_wins >= 20 },
 ];
 
 const IDS = LIST.map(a => a.id);

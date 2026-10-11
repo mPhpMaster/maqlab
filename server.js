@@ -31,14 +31,14 @@ const GHOST_MS = 25 * 1000; // grace for a lobby refresh before the seat is free
 const ROOM_TTL_MS = 30 * 60 * 1000;
 const ITEMS_PER_QUICK_ROUND = 3; // blitz & emoji rounds have 3 quick items
 const REACTIONS = ['😂', '🔥', '😱', '👏', '🤡', '💀', '😈', '❤️'];
-const TYPES = ['bluff', 'number', 'blitz', 'likely', 'emoji', 'odd', 'order', 'spy', 'many', 'name', 'two'];
-const ACTIVE = ['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'order', 'spyClue', 'spyVote', 'manyAsk', 'manyGuess', 'nameWrite', 'twoWrite', 'twoGuess'];
+const TYPES = ['bluff', 'number', 'blitz', 'likely', 'emoji', 'odd', 'order', 'spy', 'many', 'name', 'two', 'minor'];
+const ACTIVE = ['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'order', 'spyClue', 'spyVote', 'manyAsk', 'manyGuess', 'nameWrite', 'twoWrite', 'twoGuess', 'minorPick'];
 const PHRASES = 12; // number of preset taunts the client knows
 
 const T = {
-  chill: { spin: 6, write: 70, vote: 35, guess: 35, blitz: 10, blitzResult: 3.5, numReveal: 9, scores: 12, likelyVote: 30, likelyReveal: 9, emoji: 15, emojiResult: 3.5, odd: 18, oddResult: 4.5, order: 50, orderResult: 11, spyClue: 50, spyVote: 30, spyReveal: 10, manyAsk: 22, manyGuess: 26, manyReveal: 11, nameWrite: 45, nameReveal: 12, twoWrite: 75, twoGuess: 24, twoResult: 7 },
-  normal: { spin: 6, write: 45, vote: 25, guess: 25, blitz: 8, blitzResult: 3, numReveal: 8, scores: 10, likelyVote: 20, likelyReveal: 8, emoji: 10, emojiResult: 3, odd: 13, oddResult: 4, order: 38, orderResult: 10, spyClue: 35, spyVote: 20, spyReveal: 9, manyAsk: 16, manyGuess: 20, manyReveal: 9, nameWrite: 32, nameReveal: 10, twoWrite: 60, twoGuess: 18, twoResult: 6 },
-  fast: { spin: 5.5, write: 30, vote: 15, guess: 15, blitz: 5, blitzResult: 2.5, numReveal: 7, scores: 8, likelyVote: 14, likelyReveal: 7, emoji: 7, emojiResult: 2.5, odd: 9, oddResult: 3, order: 24, orderResult: 8, spyClue: 22, spyVote: 13, spyReveal: 7, manyAsk: 11, manyGuess: 14, manyReveal: 7, nameWrite: 22, nameReveal: 8, twoWrite: 45, twoGuess: 13, twoResult: 5 },
+  chill: { spin: 6, write: 70, vote: 35, guess: 35, blitz: 10, blitzResult: 3.5, numReveal: 9, scores: 12, likelyVote: 30, likelyReveal: 9, emoji: 15, emojiResult: 3.5, odd: 18, oddResult: 4.5, order: 50, orderResult: 11, spyClue: 50, spyVote: 30, spyReveal: 10, manyAsk: 22, manyGuess: 26, manyReveal: 11, nameWrite: 45, nameReveal: 12, twoWrite: 95, twoGuess: 24, twoResult: 7, minorPick: 22, minorReveal: 10 },
+  normal: { spin: 6, write: 45, vote: 25, guess: 25, blitz: 8, blitzResult: 3, numReveal: 8, scores: 10, likelyVote: 20, likelyReveal: 8, emoji: 10, emojiResult: 3, odd: 13, oddResult: 4, order: 38, orderResult: 10, spyClue: 35, spyVote: 20, spyReveal: 9, manyAsk: 16, manyGuess: 20, manyReveal: 9, nameWrite: 32, nameReveal: 10, twoWrite: 80, twoGuess: 18, twoResult: 6, minorPick: 16, minorReveal: 9 },
+  fast: { spin: 5.5, write: 30, vote: 15, guess: 15, blitz: 5, blitzResult: 2.5, numReveal: 7, scores: 8, likelyVote: 14, likelyReveal: 7, emoji: 7, emojiResult: 2.5, odd: 9, oddResult: 3, order: 24, orderResult: 8, spyClue: 22, spyVote: 13, spyReveal: 7, manyAsk: 11, manyGuess: 14, manyReveal: 7, nameWrite: 22, nameReveal: 8, twoWrite: 60, twoGuess: 13, twoResult: 5, minorPick: 11, minorReveal: 7 },
 };
 const MODS = [
   { id: 'normal', w: 50, mult: 1 },
@@ -59,7 +59,9 @@ const MODS = [
 // obvious answers, which real players do not. At four it drops to 10%.
 // Two Truths needs a writer plus people to fool; at two it is one person
 // guessing one person, with no crowd to hide the lie in.
-const MIN_PLAYERS = { likely: 3, spy: 4, many: 3, name: 4, two: 3 };
+// The minority needs a crowd to be a minority of: with two players every
+// split is even, and an even split pays nobody.
+const MIN_PLAYERS = { likely: 3, spy: 4, many: 3, name: 4, two: 3, minor: 3 };
 // The plan is drawn once at kickoff, but people leave mid-game. Before a round
 // starts, swap out a mode the room has shrunk below.
 function supportedType(room, wanted) {
@@ -140,7 +142,7 @@ const freshStats = () => ({
   famous: 0, spyCaught: 0, spyEvaded: 0,
   // One per round type that had nothing to earn. Each counts the moment
   // that type is actually about, not just taking part in it.
-  perfectOrders: 0, nameCrowd: 0, manyExact: 0, twoFoolAll: 0, oddSweeps: 0,
+  perfectOrders: 0, nameCrowd: 0, manyExact: 0, twoFoolAll: 0, oddSweeps: 0, minorityWins: 0,
 });
 const freshPowers = () => ({ peek: 1, double: 1 });
 
@@ -279,6 +281,16 @@ function snapshot(room, pid) {
     s.current.voted = Object.keys(c.lvotes);
     s.current.myVote = c.lvotes[pid] || null;
     if (ph === 'likelyReveal') Object.assign(s.current, { votes: c.lvotes, tally: c.tally, winners: c.winners });
+  }
+  if (c.type === 'minor' && ['minorPick', 'minorReveal'].includes(ph)) {
+    Object.assign(s.current, { a: c.pair.a[L], b: c.pair.b[L] });
+    s.current.myPick = c.picks[pid] || null;
+    // Only how many have answered, never which side they took: knowing the
+    // split before you choose is the entire game, handed over.
+    s.current.picked = Object.keys(c.picks);
+    if (ph === 'minorReveal') {
+      Object.assign(s.current, { picks: c.picks, winners: c.winners, counts: c.counts });
+    }
   }
   if (c.type === 'two' && ['twoWrite', 'twoGuess', 'twoResult'].includes(ph)) {
     s.current.submitted = Object.keys(c.sets);
@@ -424,6 +436,9 @@ function botAction(room, b) {
   if (ph === 'order' && !c.orders[b.id]) {
     const seq = bots.orderGuess({ correctIds: c.truth });
     return seq && (() => submitOrder(room, b, seq));
+  }
+  if (ph === 'minorPick' && !c.picks[b.id]) {
+    return () => submitMinor(room, b, bots.minorPick());
   }
   if (ph === 'twoWrite' && !c.sets[b.id]) {
     const set = bots.twoLines({ lang: room.settings.lang });
@@ -694,6 +709,10 @@ function beginRound(room) {
     Object.assign(c, { q: entry.q, items, truth, orders: {} });
     room.phase = 'order';
     setTimer(room, pace(room, 'order'), () => revealOrder(room));
+  } else if (c.type === 'minor') {
+    Object.assign(c, { pair: pickFrom(room, 'minor')[0], picks: {} });
+    room.phase = 'minorPick';
+    setTimer(room, pace(room, 'minorPick'), () => revealMinor(room));
   } else if (c.type === 'two') {
     // The only round with no content bank: the players write it, about
     // themselves, while the clock runs.
@@ -741,6 +760,11 @@ function submitLie(room, p, text) {
   if (isTruth(text, room.current.q)) return { error: 'truth' };
   text = matchAnswerCase(text, room.settings.lang);
   room.current.lies[p.id] = text;
+  const offered = (room.current.offered || {})[p.id];
+  if (offered) {
+    room.current.stuckUsed = room.current.stuckUsed || {};
+    room.current.stuckUsed[p.id] = normalize(offered) === normalize(text) ? 'asis' : 'edited';
+  }
   tookMs(room, p.id);
   if (connected(room).every(x => room.current.lies[x.id])) startVote(room); else broadcast(room);
   return { ok: true };
@@ -787,7 +811,13 @@ function stuckSuggestion(room, p) {
   const want = shape(c.q.a[L]);
   const near = pool.slice().sort((x, y) => Math.abs(shape(x) - want) - Math.abs(shape(y) - want));
   const band = near.slice(0, Math.max(12, Math.ceil(near.length / 3)));
-  return { ok: true, text: band[rnd(band.length)] };
+  const text = band[rnd(band.length)];
+  // Remembered so the round can tell afterwards whether the suggestion was
+  // sent as-is, edited first, or thrown away. Guessing at this from the text
+  // alone did not work: a fifth of lies already matched some bank answer by
+  // coincidence before the button existed.
+  (c.offered || (c.offered = {}))[p.id] = text;
+  return { ok: true, text };
 }
 
 function startVote(room) {
@@ -984,6 +1014,52 @@ function revealSpy(room) {
   broadcast(room);
 }
 
+// ----- the minority -----
+// Two options, and the smaller side wins. Every other round in the game pays
+// you for being right or for agreeing; this one pays for reading the room and
+// going the other way, which makes the obvious answer the trap.
+//
+// It is also the only new round in a while that is a single tap. That is not
+// a style choice: across 1,900 recorded player-rounds the rounds you tap are
+// skipped 1-5% of the time and the rounds you type in 18-37%.
+const MINORITY_POINTS = 400;
+
+function submitMinor(room, p, side) {
+  const c = room.current;
+  if (!c || room.phase !== 'minorPick') return { error: 'late' };
+  if (c.picks[p.id]) return { error: 'dup' };
+  if (side !== 'a' && side !== 'b') return { error: 'bad' };
+  c.picks[p.id] = side;
+  tookMs(room, p.id);
+  if (connected(room).every(x => c.picks[x.id])) revealMinor(room);
+  else broadcast(room);
+  return { ok: true };
+}
+
+function revealMinor(room) {
+  if (room.phase !== 'minorPick') return;
+  const c = room.current;
+  const sides = { a: [], b: [] };
+  for (const [pid, v] of Object.entries(c.picks)) if (sides[v]) sides[v].push(pid);
+  // A tie pays nobody, and so does everyone choosing the same thing: in both
+  // cases there is no minority to have been in.
+  const winners = sides.a.length && sides.b.length
+    ? (sides.a.length < sides.b.length ? sides.a : sides.b.length < sides.a.length ? sides.b : [])
+    : [];
+  for (const pid of winners) {
+    gain(room, pid, 'minority', MINORITY_POINTS);
+    const p = room.players.get(pid);
+    if (p) { p.stats.correct += 1; p.stats.minorityWins += 1; }
+  }
+  for (const p of connected(room)) streakResult(room, p.id, winners.includes(p.id));
+  c.winners = winners;
+  c.counts = { a: sides.a.length, b: sides.b.length };
+  finishRound(room);
+  room.phase = 'minorReveal';
+  setTimer(room, pace(room, 'minorReveal'), () => showScores(room));
+  broadcast(room);
+}
+
 // ----- two truths and a lie -----
 // Everybody writes at the same time and then a few of the sets are played one
 // after another. Letting one player write while the rest watch a clock would
@@ -996,6 +1072,11 @@ function revealSpy(room) {
 // they got past.
 const TWO_SETS_PER_ROUND = 3;
 const TWO_LINE_MAX = 60;
+// The write clock is a ceiling, not a duration: the round moves on the moment
+// everyone has submitted, so a longer ceiling costs a quick table nothing and
+// only buys time for the people who were being cut off. It does make a round
+// with a missing player drag, which is the price, and the next report will
+// say whether it was worth paying.
 const TWO_SPOT_POINTS = 300; // for picking the lie out
 const TWO_FOOL_POINTS = 150; // to the author, per person fooled
 
@@ -1399,6 +1480,7 @@ const REVEAL_PHASE = {
   many: 'manyReveal',
   name: 'nameReveal',
   two: 'twoResult',
+  minor: 'minorReveal',
   ...Object.fromEntries(Object.entries(QUICK).map(([type, q]) => [type, q.result])),
 };
 const REVEAL_PHASES = new Set(Object.values(REVEAL_PHASE));
@@ -1654,6 +1736,8 @@ io.on('connection', socket => {
   socket.on('spyClue', (text, cb) => room && reply(cb, submitSpyClue(room, player, text)));
   socket.on('spyVote', (id, cb) => room && reply(cb, submitSpyVote(room, player, id)));
   socket.on('spyGuess', (text, cb) => room && reply(cb, submitSpyGuess(room, player, text)));
+  socket.on('minor', (side, cb) => room && reply(cb, submitMinor(room, player, side)));
+
   socket.on('two', ({ lines, lie } = {}, cb) => room && reply(cb, submitTwo(room, player, lines, lie)));
   socket.on('twoGuess', (i, cb) => room && reply(cb, submitTwoGuess(room, player, i)));
   socket.on('name', (text, cb) => room && reply(cb, submitName(room, player, text)));
@@ -1801,6 +1885,8 @@ const RESUME = {
   scores: nextRound,
   nameWrite: revealName,
   nameReveal: showScores,
+  minorPick: revealMinor,
+  minorReveal: showScores,
   twoWrite: startTwoGuess,
   twoGuess: revealTwo,
   twoResult: advanceTwo,

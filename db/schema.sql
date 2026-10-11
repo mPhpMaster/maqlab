@@ -154,3 +154,4 @@ alter table profiles add column if not exists name_crowd     integer not null de
 alter table profiles add column if not exists many_exact     integer not null default 0;
 alter table profiles add column if not exists two_fool_all   integer not null default 0;
 alter table profiles add column if not exists odd_sweeps integer not null default 0;
+alter table profiles add column if not exists minority_wins integer not null default 0;

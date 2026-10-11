@@ -866,3 +866,14 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 .support-card b { display: block; margin-bottom: 6px; font-size: 15px; }
 .support-card p { margin: 0 0 8px; font-size: 13px; line-height: 1.6; }
 .support-card .btn { margin-top: 4px; }
+
+/* The minority round: two choices, nothing else competing for the eye. */
+.type-tag.minor { background: rgba(120,220,200,.18); color: #7fe0d0; }
+.two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+.two-up .opt.big { min-height: 110px; font-size: 19px; }
+.sides { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+.side { padding: 10px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+.side.ok { border-color: var(--mint); background: rgba(120,220,180,.12); }
+.side-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.side-head .cnt { font-weight: 800; color: var(--muted); }
+.side .repw { display: flex; flex-wrap: wrap; gap: 6px; }

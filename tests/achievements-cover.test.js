@@ -18,7 +18,7 @@ const types = server.match(/const TYPES = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(
 const COUNTER_FOR = {
   bluff: 'fooled', number: 'bullseyes', likely: 'famous', spy: 'spy_caught',
   odd: 'odd_sweeps', order: 'perfect_orders', many: 'many_exact',
-  name: 'name_crowd', two: 'two_fool_all',
+  name: 'name_crowd', two: 'two_fool_all', minor: 'minority_wins',
   // Blitz and Emoji Decode are both won by answering first, and that is what
   // "fastest" counts — they share it honestly rather than each getting a
   // near-identical badge.
@@ -42,7 +42,7 @@ test('each new counter is carried from the game all the way to the profile', () 
   const db = read('db.js');
   for (const [game, column] of [
     ['perfectOrders', 'perfect_orders'], ['nameCrowd', 'name_crowd'],
-    ['manyExact', 'many_exact'], ['twoFoolAll', 'two_fool_all'], ['oddSweeps', 'odd_sweeps'],
+    ['manyExact', 'many_exact'], ['twoFoolAll', 'two_fool_all'], ['oddSweeps', 'odd_sweeps'], ['minorityWins', 'minority_wins'],
   ]) {
     assert.ok(server.includes(`stats.${game}`), `the game never counts ${game}`);
     assert.ok(schema.includes(column), `the profile has nowhere to keep ${column}`);

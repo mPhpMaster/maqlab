@@ -128,6 +128,9 @@ const KEYS = {
   spy: x => [norm(x.w && x.w.ar), norm(x.w && x.w.en)],
   many: x => [norm(x.ar), norm(x.en)],
   name: x => [norm(x.q && x.q.ar), norm(x.q && x.q.en)],
+  // a pair is identified by both sides together: "coffee or tea" and
+  // "tea or coffee" are the same round, and so is reusing one side.
+  minor: x => [norm((x.a && x.a.ar) + '|' + (x.b && x.b.ar)), norm((x.a && x.a.en) + '|' + (x.b && x.b.en))],
 };
 
 function loadHead() {

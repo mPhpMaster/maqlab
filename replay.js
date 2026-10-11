@@ -48,6 +48,10 @@ function roundEntry(room, L) {
   // rounds you type in, and it is the only way to tell a round people did not
   // understand from one they did not have time for.
   if (c.ms && Object.keys(c.ms).length) e.ms = { ...c.ms };
+  // Whether a player took the offered lie as it came, edited it, or wrote
+  // their own after asking. The only way to tell whether the way out of a
+  // blank box is being used at all.
+  if (c.stuckUsed && Object.keys(c.stuckUsed).length) e.stuck = { ...c.stuckUsed };
 
   if (c.type === 'bluff') {
     e.q = say(c.q.q, L);
@@ -69,6 +73,10 @@ function roundEntry(room, L) {
     e.q = say(c.q.q, L);
     e.said = { ...c.said };
     e.groups = (c.groups || []).map(g => ({ text: g.text, ids: g.ids.slice() }));
+  } else if (c.type === 'minor') {
+    e.pair = [say(c.pair.a, L), say(c.pair.b, L)];
+    e.picks = { ...c.picks };
+    e.winners = (c.winners || []).slice();
   } else if (c.type === 'two') {
     // Every set that was played this round, with what each person picked.
     // Nothing here was private: each one was on the result screen already.

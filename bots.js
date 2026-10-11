@@ -30,6 +30,7 @@ const THINK = {
   spyClue: [6000, 14000],
   nameWrite: [5000, 13000],
   twoWrite: [9000, 22000],
+  minorPick: [3000, 9000],
   twoGuess: [3500, 9000],
   manyAsk: [3000, 8000],
   manyGuess: [4000, 10000],
@@ -71,6 +72,10 @@ function twoLines({ lang }) {
 // A bot guessing the lie is a coin toss with three sides, and that is honest:
 // there is nothing in a stranger's sentence for it to read.
 const twoGuess = () => Math.floor(Math.random() * 3);
+
+// A bot cannot read a room it is not really in, so it flips a coin. That
+// also keeps it from being a reliable minority to hide behind.
+const minorPick = () => (Math.random() < 0.5 ? 'a' : 'b');
 
 // How often a bot is right. Deliberately short of perfect: a bot that always
 // knows is not an opponent, it is a wall.
@@ -270,5 +275,5 @@ function manyGuess({ total }) {
 module.exports = {
   NAMES, freeName, thinkFor,
   lie, bluffVote, numberGuess, blitzAnswer, emojiAnswer, votePlayer, orderGuess, spyClue, spyGuess,
-  manyAnswer, manyGuess, nameAnswer, twoLines, twoGuess,
+  manyAnswer, manyGuess, nameAnswer, twoLines, twoGuess, minorPick,
 };
