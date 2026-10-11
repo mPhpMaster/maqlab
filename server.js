@@ -6,6 +6,9 @@ const express = require('express');
 const QRCode = require('qrcode');
 const { Server } = require('socket.io');
 const content = require('./content');
+// Totalled once at boot: it is the one number that moves when the banks
+// change, and nothing else a deploy of pure content would reveal.
+const contentCount = Object.values(content).reduce((n, b) => n + (Array.isArray(b) ? b.length : 0), 0);
 const db = require('./db');
 const auth = require('./auth');
 const achievements = require('./achievements');
@@ -2347,6 +2350,11 @@ app.get('/health', (_, res) => {
   }
   res.json({
     ok: true,
+    // Which build is actually serving. Without it, "is the deploy live?" is
+    // answered by watching the uptime reset and inferring — and a change that
+    // only touches content leaves no other trace at all.
+    commit: (process.env.RENDER_GIT_COMMIT || '').slice(0, 7) || 'local',
+    content: contentCount,
     uptimeSeconds: Math.round(process.uptime()),
     rooms: rooms.size,
     activeRooms: active,
