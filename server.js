@@ -16,6 +16,7 @@ const { matchAnswerCase } = require('./text');
 const hostq = require('./hostq');
 const card = require('./card');
 const seen = require('./seen');
+const plan = require('./plan');
 const bots = require('./bots');
 const replay = require('./replay');
 const persist = require('./persist');
@@ -574,8 +575,8 @@ function createRoom() {
   return room;
 }
 
-// Plan the whole game up front: no back-to-back repeats, bluff weighted
-// double, and every enabled type shows up at least once.
+// Plan the whole game up front. The dealing rule lives in plan.js; what
+// belongs here is which types the room can actually play.
 //
 // Round one used to be pinned to bluff, on the theory that it is the type
 // everyone understands without being told. The cost was that every single
@@ -588,18 +589,7 @@ function planTypes(room) {
   if (crowd < MIN_PLAYERS.likely && enabled.length > 1) enabled = enabled.filter(t => t !== 'likely');
   // spy needs a spy + a few civilians to be worth playing
   if (crowd < MIN_PLAYERS.spy && enabled.length > 1) enabled = enabled.filter(t => t !== 'spy');
-  const n = room.settings.rounds, plan = [];
-  for (let i = 0; i < n; i++) {
-    const pool = enabled.filter(t => enabled.length === 1 || t !== plan[i - 1]);
-    const weighted = pool.flatMap(t => (t === 'bluff' ? [t, t] : [t]));
-    plan.push(weighted[rnd(weighted.length)]);
-  }
-  for (const t of enabled) {
-    if (plan.includes(t)) continue;
-    const spots = plan.map((_, i) => i).filter(i => i > 0 && plan.filter(y => y === plan[i]).length > 1 && plan[i - 1] !== t && plan[i + 1] !== t);
-    if (spots.length) plan[spots[rnd(spots.length)]] = t;
-  }
-  return plan;
+  return plan.drawPlan(enabled, room.settings.rounds);
 }
 
 function chooseMod(room) {
