@@ -73,6 +73,15 @@ function roundEntry(room, L) {
     e.q = say(c.q.q, L);
     e.said = { ...c.said };
     e.groups = (c.groups || []).map(g => ({ text: g.text, ids: g.ids.slice() }));
+  } else if (c.type === 'higher') {
+    e.q = say(c.q, L);
+    e.pair = [say(c.left, L), say(c.right, L)];
+    e.correct = c.correct;
+    e.picks = { ...c.picks };
+  } else if (c.type === 'missing') {
+    e.items = (c.items || []).map(it => ({ id: it.id, text: say(it, L) }));
+    e.goneId = c.goneId;
+    e.picks = { ...c.picks };
   } else if (c.type === 'minor') {
     e.pair = [say(c.pair.a, L), say(c.pair.b, L)];
     e.picks = { ...c.picks };

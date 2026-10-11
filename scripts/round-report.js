@@ -54,6 +54,8 @@ const TOOK_PART = {
   many: r => Object.keys(r.guesses || {}),
   two: r => (r.sets || []).map(s => s.pid),
   minor: r => Object.keys(r.picks || {}),
+  higher: r => Object.keys(r.picks || {}),
+  missing: r => Object.keys(r.picks || {}),
   // the quick rounds all answer per item
   blitz: r => quickAnswerers(r),
   emoji: r => quickAnswerers(r),
@@ -70,7 +72,7 @@ const quickAnswerers = r => {
 // pace change does not quietly make this report wrong.
 const PHASE_FOR = {
   bluff: 'write', number: 'guess', likely: 'likelyVote', spy: 'spyClue',
-  order: 'order', name: 'nameWrite', many: 'manyAsk', two: 'twoWrite', minor: 'minorPick',
+  order: 'order', name: 'nameWrite', many: 'manyAsk', two: 'twoWrite', minor: 'minorPick', higher: 'higherPick', missing: 'missPick',
   blitz: 'blitz', emoji: 'emoji', odd: 'odd',
 };
 

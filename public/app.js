@@ -79,6 +79,14 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       minorWon: 'كنت مع الأقلية! 🎯 +400', minorLost: 'كنت مع الأغلبية', minorTie: 'تعادل — ما في أقلية',
       minorAll: 'كلكم اخترتم نفس الشي!', minorSide: '{n}', g_minority: 'مع الأقلية 🧭',
       ach_minority5: 'عكس التيار', achd_minority5: '5 مرات مع الأقلية', ach_minority20: 'الذئب المنفرد', achd_minority20: '20 مرة مع الأقلية',
+      type_higher: 'أيّهما أكبر؟', desc_higher: 'شيئان وسؤال واحد — اختر الأكبر، والأسرع ياخذ زيادة',
+      type_missing: 'وش اختفى؟', desc_missing: 'احفظ الأربعة، وبعدين قل لنا أي واحد راح',
+      higherRight: 'صح! 🎯', higherWrong: 'الثاني كان أكبر', g_higher: 'الأكبر ⚖️',
+      missWatch: 'احفظها… وحدة منها بتختفي', missWhich: 'وش اللي راح من اللوح؟', missRight: 'عينك قوية! 👁️',
+      missWrong: 'اللي اختفى هو:', g_missing: 'لقى الغايب 👁️',
+      ach_higher10: 'الميزان', achd_higher10: '10 إجابات صحيحة في «أيّهما أكبر»',
+      ach_higher40: 'المسطرة', achd_higher40: '40 إجابة صحيحة في «أيّهما أكبر»',
+      ach_miss5: 'عين صقر', achd_miss5: 'لقيت الغايب 5 مرات', ach_miss25: 'ذاكرة حديد', achd_miss25: 'لقيت الغايب 25 مرة',
       ach_odd_eye: 'مجهر', achd_odd_eye: '10 جولات كاملة في «الدخيل»',
       ach_first_game: 'أول لعبة', achd_first_game: 'خلّص أول لعبة', ach_first_win: 'أول فوز', achd_first_win: 'اطلع الأول في لعبة', ach_liar5: 'كذّاب محترف', achd_liar5: 'اخدع 5 لاعبين', ach_bull: 'قنّاص', achd_bull: 'جيب «في الصميم» 🎯', ach_streak4: 'نار', achd_streak4: 'سلسلة 4 ورا بعض', ach_allin: 'كل شي أو لا شي', achd_allin: 'اكسب رهان ×3', ach_famous: 'المشهور', achd_famous: 'الشلة تختارك في «مين فينا؟»', ach_speedy: 'برق', achd_speedy: 'كن الأسرع 3 مرات', ach_games10: 'مدمن', achd_games10: 'العب 10 ألعاب', ach_wins5: 'أسطورة', achd_wins5: 'افز بـ 5 ألعاب',
       howSteps: ['أنشئ غرفة وشارك الكود أو الرابط مع الشلة.', 'كل جولة تبدأ بآلة الحظ: تحدد نوع الجولة ومضاعف النقاط.', '🤥 المقلب: اكتب كذبة مقنعة، بعدين اختار الصح وراهن عليه.', '🎯 أقرب رقم: خمّن، والأقرب ياخذ النقاط (والصميم +1000!).', '⚡ صح ولا خطأ و🔤 فكّ الإيموجي: جاوب بسرعة، كل ثانية تفرق.', '🧩 الدخيل و📊 رتّبها: لقّط اللي ما له دخل بينهم، أو رتّب أربعة أشياء من الأكبر للأصغر.', '👥 مين فينا؟ صوّت على واحد من الشلة ووافق الأغلبية.', '🕵️ الجاسوس: واحد ما يعرف الكلمة، الكل يكتب تلميح، وبعدين صوتوا مين الجاسوس!', 'عندك قدرتين كل لعبة: 🔍 كشّاف يشيل خيارين غلط، و💎 دبل يضاعف نقاط جولة.', 'اجمع سلاسل 🔥 واكسب الألقاب والإنجازات وارفع مستواك!'],
@@ -189,6 +197,14 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       minorWon: 'You were in the minority! 🎯 +400', minorLost: 'You went with the crowd', minorTie: 'Dead even — no minority',
       minorAll: 'Everyone picked the same!', minorSide: '{n}', g_minority: 'In the minority 🧭',
       ach_minority5: 'Against the Grain', achd_minority5: '5 times in the minority', ach_minority20: 'Lone Wolf', achd_minority20: '20 times in the minority',
+      type_higher: 'Which is Bigger?', desc_higher: 'Two things, one question — pick the greater, fastest gets a bonus',
+      type_missing: 'What Went Missing?', desc_missing: 'Memorise the four, then say which one disappeared',
+      higherRight: 'Correct! 🎯', higherWrong: 'The other one was bigger', g_higher: 'Picked the bigger ⚖️',
+      missWatch: 'Remember these — one is about to go', missWhich: 'Which name is no longer on the board?', missRight: 'Sharp eye! 👁️',
+      missWrong: 'The one that went was:', g_missing: 'Spotted the missing 👁️',
+      ach_higher10: 'The Scales', achd_higher10: '10 right in Which is Bigger',
+      ach_higher40: 'The Ruler', achd_higher40: '40 right in Which is Bigger',
+      ach_miss5: 'Sharp Eye', achd_miss5: 'Spot the missing one 5 times', ach_miss25: 'Steel Memory', achd_miss25: 'Spot the missing one 25 times',
       ach_odd_eye: 'Microscope', achd_odd_eye: '10 clean sweeps of Odd One Out',
       ach_first_game: 'First Game', achd_first_game: 'Finish your first game', ach_first_win: 'First Win', achd_first_win: 'Finish 1st in a game', ach_liar5: 'Pro Liar', achd_liar5: 'Fool 5 players', ach_bull: 'Sharpshooter', achd_bull: 'Hit a bullseye 🎯', ach_streak4: 'On Fire', achd_streak4: 'Get a 4 streak', ach_allin: 'All In', achd_allin: 'Win a ×3 bet', ach_famous: 'Famous', achd_famous: "Be the crowd's pick", ach_speedy: 'Lightning', achd_speedy: 'Be fastest 3 times', ach_games10: 'Regular', achd_games10: 'Play 10 games', ach_wins5: 'Legend', achd_wins5: 'Win 5 games',
       howSteps: ['Create a room and share the code or link with friends.', 'Every round starts with a slot machine: round type + point multiplier.', '🤥 The Bluff: write a convincing lie, then find the truth and bet on it.', '🎯 Closest Number: guess — closest wins (bullseye = +1000!).', '⚡ True or False & 🔤 Emoji Decode: answer fast, every second counts.', '🧩 Odd One Out & 📊 Line Them Up: spot the one that does not belong, or put four things in order.', "👥 Who's Most Likely: vote for a friend and side with the crowd.", "🕵️ The Spy: one player doesn't know the word — everyone drops a clue, then vote who's the spy!", 'Two power-ups per game: 🔍 Peek removes two wrong options, 💎 Double doubles one round.', 'Build 🔥 streaks, win awards & achievements and level up!'],
@@ -341,7 +357,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   // becomes a paid feature sold outside it.
   const DONATE_URL = 'https://paypal.me/mfsafadi';
 
-  const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', order: '📊', spy: '🕵️', many: '🙋', name: '🗣️', two: '🎭', minor: '🧭' };
+  const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', order: '📊', spy: '🕵️', many: '🙋', name: '🗣️', two: '🎭', minor: '🧭', higher: '⚖️', missing: '👁️' };
   const MODS = { normal: '✨', double: '💎', speed: '⏱️', jackpot: '🎁', golden: '👑' };
   const AWARD_E = { liar: '🤥', detective: '🕵️', sniper: '🎯', lightning: '⚡', gambler: '🎲', fire: '🔥', star: '🌟' };
   // hats that unlock with level (index -> level)
@@ -685,6 +701,75 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     return 'home';
   }
 
+  // Updating the screen without throwing it away.
+  //
+  // Every state change used to assign $app.innerHTML, which destroys every
+  // element and builds it again. On a screen you are in the middle of using —
+  // Line Them Up, where you tap four things in order — that is a visible flash
+  // under your finger on each tap, and it happens again every time any other
+  // player answers and the room broadcasts. Measured: one tap, one full
+  // rebuild, plus two more within the next second and a half from other
+  // people's answers.
+  //
+  // So when the screen is the same screen, the new markup is walked against
+  // the old one and only the differences are written: attributes, text, and
+  // nodes that are genuinely new. Nothing here tries to be a general diffing
+  // library — the moment the two trees disagree on shape it gives up and
+  // returns false, and the caller replaces everything exactly as before. That
+  // keeps the failure mode identical to today's behaviour rather than
+  // inventing a new one.
+  //
+  // Safe because nothing holds a reference to these nodes and no listener is
+  // attached to them: every handler in this app is delegated from $app.
+  function morph(from, to) {
+    if (from.nodeType !== to.nodeType || from.nodeName !== to.nodeName) return false;
+    if (from.nodeType === Node.TEXT_NODE || from.nodeType === Node.COMMENT_NODE) {
+      if (from.nodeValue !== to.nodeValue) from.nodeValue = to.nodeValue;
+      return true;
+    }
+    if (from.nodeType !== Node.ELEMENT_NODE) return true;
+
+    for (const a of [...from.attributes]) if (!to.hasAttribute(a.name)) from.removeAttribute(a.name);
+    for (const a of to.attributes) if (from.getAttribute(a.name) !== a.value) from.setAttribute(a.name, a.value);
+    // An input's live value is not in its attributes, and the player may be
+    // part way through typing into it.
+    if (from.tagName === 'INPUT' || from.tagName === 'TEXTAREA') {
+      const want = to.getAttribute('value');
+      if (want != null && from !== document.activeElement && from.value !== want) from.value = want;
+      return true;
+    }
+    // Children are matched by position, which is all this needs: these lists
+    // are rebuilt from the same template every time, so a node at index 3 is
+    // the same thing it was. A child that cannot be patched is replaced on its
+    // own rather than taking the whole screen with it.
+    const olds = [...from.childNodes];
+    const news = [...to.childNodes];
+    for (let i = 0; i < news.length; i++) {
+      const a = olds[i];
+      if (!a) { from.appendChild(news[i].cloneNode(true)); continue; }
+      if (!morph(a, news[i])) from.replaceChild(news[i].cloneNode(true), a);
+    }
+    for (let i = news.length; i < olds.length; i++) from.removeChild(olds[i]);
+    return true;
+  }
+
+  // Replaces the screen, or patches it if it is the same screen and the shapes
+  // line up. Returns true when the DOM was left standing.
+  function paint(html, same) {
+    if (!same) { $app.innerHTML = html; return false; }
+    const next = document.createElement('div');
+    next.innerHTML = html;
+    const olds = [...$app.childNodes];
+    const news = [...next.childNodes];
+    for (let i = 0; i < news.length; i++) {
+      const a = olds[i];
+      if (!a) { $app.appendChild(news[i].cloneNode(true)); continue; }
+      if (!morph(a, news[i])) $app.replaceChild(news[i].cloneNode(true), a);
+    }
+    for (let i = news.length; i < olds.length; i++) $app.removeChild(olds[i]);
+    return true;
+  }
+
   function render() {
     applyDir();
     const rs = state.room;
@@ -700,11 +785,14 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
 
     if (!same) { state.timeouts.forEach(clearTimeout); state.timeouts = []; }
     $app.classList.toggle('no-anim', same);
-    $app.innerHTML = view(key);
+    const kept = paint(view(key), same);
     state.lastKey = key;
 
-    if (same) $app.querySelectorAll('[data-scroll]').forEach(el => { if (scrolls[el.dataset.scroll] != null) el.scrollTop = scrolls[el.dataset.scroll]; });
-    if (fid) { const el = document.getElementById(fid); if (el) { el.focus({ preventScroll: true }); if (sel) try { el.setSelectionRange(sel[0], sel[1]); } catch {} } }
+    // A patched screen never lost its scroll position or its focus, so there
+    // is nothing to put back — and putting it back anyway would fight with a
+    // player who is scrolling right now.
+    if (same && !kept) $app.querySelectorAll('[data-scroll]').forEach(el => { if (scrolls[el.dataset.scroll] != null) el.scrollTop = scrolls[el.dataset.scroll]; });
+    if (fid && !kept) { const el = document.getElementById(fid); if (el) { el.focus({ preventScroll: true }); if (sel) try { el.setSelectionRange(sel[0], sel[1]); } catch {} } }
     else if (!same) { const af = $app.querySelector('[data-autofocus]'); if (af && matchMedia('(pointer:fine)').matches) af.focus(); }
     if (!same) mountHooks();
     renderReactBar();
@@ -727,6 +815,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       nameWrite: nameWriteView, nameReveal: nameRevealView,
       twoWrite: twoWriteView, twoGuess: twoGuessView, twoResult: twoResultView,
       minorPick: minorPickView, minorReveal: minorRevealView,
+      higherPick: higherView, higherReveal: higherRevealView,
+      missWatch: missView, missPick: missView, missReveal: missRevealView,
       scores: scoresView, final: finalView,
     };
     return (views[state.room.phase] || (() => ''))();
@@ -1329,6 +1419,81 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       }).join('')}</div>
       ${mine ? `<div class="center" style="margin-top:14px;font-weight:800">${mine.pairs === c.truth.length - 1 ? t('perfectOrder') : t('pairsRight', { n: mine.pairs })}</div>` : ''}
       ${everyOrder(c)}
+    </div></div></div></div>`;
+  }
+
+  // ---------- which is bigger ----------
+  function higherView() {
+    const c = state.room.current, mine = c.myPick;
+    const side = (k, label) => `<button class="opt big ${mine === k ? 'picked' : ''}"
+      data-act="higher" data-v="${k}" ${mine ? 'disabled' : ''}>${esc(label)}</button>`;
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      ${qCard('higher', c.question)}
+      <div class="timebar"><i data-bar="${state.room.deadline}"></i></div>
+      <div class="two-up">${side('left', c.left)}${side('right', c.right)}</div>
+      ${mine ? `<div class="center muted" style="margin-top:14px"><span class="dots">${t('waitOthers')}</span></div>` : ''}
+      ${whoRow(c.picked)}
+    </div></div></div></div>`;
+  }
+
+  function higherRevealView() {
+    const c = state.room.current, mid = myId();
+    const won = c.picks && c.picks[mid] === c.correct;
+    const side = (k, label) => `<div class="side ${c.correct === k ? 'ok' : ''}">
+      <div class="side-head"><b>${esc(label)}</b></div>
+      <div class="repw">${Object.entries(c.picks || {}).filter(([, v]) => v === k)
+        .map(([pid]) => { const p = P(pid); return p ? `<span class="repp">${J(p.avatar)}${esc(p.name)}</span>` : ''; }).join('')}</div></div>`;
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      ${qCard('higher', c.question)}
+      <div class="center" style="margin-top:10px;font-weight:800">${c.picks && c.picks[mid] ? (won ? t('higherRight') : t('higherWrong')) : ''}</div>
+      <div class="sides">${side('left', c.left)}${side('right', c.right)}</div>
+    </div></div></div></div>`;
+  }
+
+  // ---------- what went missing ----------
+  // One view for both phases: during the watch phase every item is there and
+  // nothing is tappable; from the pick phase the server simply stops sending
+  // the one that went, so there is nothing in the page to read it from.
+  function missView() {
+    const c = state.room.current, watching = c.watching, mine = c.myPick;
+    if (watching) {
+      return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+        ${qCard('missing', t('missWatch'))}
+        <div class="timebar"><i data-bar="${state.room.deadline}"></i></div>
+        <div class="grid4">${c.items.map((it, i) =>
+          `<button class="opt" style="animation-delay:${i * 60}ms" disabled>${esc(it.text)}</button>`).join('')}</div>
+      </div></div></div></div>`;
+    }
+    // The first version drew the empty slot as a "?", which meant the answer
+    // was the one thing on screen you could not read — no memory required at
+    // all. What is left on the board is shown plainly, and the four names you
+    // started with are the buttons; finding which one is no longer there is
+    // the round.
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      ${qCard('missing', t('missWhich'))}
+      <div class="timebar"><i data-bar="${state.room.deadline}"></i></div>
+      <div class="still">${c.items.map(it => `<span class="chip">${esc(it.text)}</span>`).join('')}</div>
+      <div class="grid4">${c.all.map((it, i) =>
+        `<button class="opt ${mine === it.id ? 'picked' : ''}" style="animation-delay:${i * 60}ms"
+          data-act="miss" data-id="${it.id}" ${mine ? 'disabled' : ''}>${esc(it.text)}</button>`).join('')}</div>
+      ${whoRow(c.picked)}
+    </div></div></div></div>`;
+  }
+
+  function missRevealView() {
+    const c = state.room.current, mid = myId();
+    const gone = (c.all || []).find(x => x.id === c.goneId);
+    const right = c.picks && c.picks[mid] === c.goneId;
+    const rows = (c.all || []).map(it => {
+      const voters = Object.entries(c.picks || {}).filter(([, v]) => v === it.id)
+        .map(([pid]) => { const p = P(pid); return p ? `<span class="repp">${J(p.avatar)}${esc(p.name)}</span>` : ''; }).join('');
+      return `<div class="ansrow ${it.id === c.goneId ? 'ok' : ''}">
+        <span class="nm">${esc(it.text)}</span><span class="repw">${voters}</span></div>`;
+    }).join('');
+    return `<div class="screen">${gameTop()}<div class="stage"><div class="scroll"><div class="wrap">
+      ${qCard('missing', `${t('missWrong')} ${gone ? gone.text : ''}`)}
+      <div class="center" style="margin-top:10px;font-weight:800">${c.picks && c.picks[mid] ? (right ? t('missRight') : '') : ''}</div>
+      <div class="answers">${rows}</div>
     </div></div></div></div>`;
   }
 
@@ -2166,6 +2331,18 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       return line(esc(label), `${ids.length}`, chips(ids, won ? 'ok' : 'no'), won ? 'ok' : '');
     }).join('');
 
+    const higher = r => (r.pair || []).map((label, i) => {
+      const k = i === 0 ? 'left' : 'right';
+      const ids = Object.entries(r.picks || {}).filter(([, v]) => v === k).map(([pid]) => pid);
+      return line(esc(label), k === r.correct ? `✅ ${t('repTruth')}` : '', chips(ids, k === r.correct ? 'ok' : 'no'), k === r.correct ? 'ok' : '');
+    }).join('');
+
+    const missing = r => (r.items || []).map(it => {
+      const ids = Object.entries(r.picks || {}).filter(([, v]) => v === it.id).map(([pid]) => pid);
+      const gone = it.id === r.goneId;
+      return line(esc(it.text), gone ? '👁️' : '', chips(ids, gone ? 'ok' : 'no'), gone ? 'ok' : '');
+    }).join('');
+
     const two = r => (r.sets || []).map(set => `<div class="repi">
       ${line(chip(set.pid), t('repSaid'), '')}
       ${set.lines.map((l, i) => line(esc(l), i === set.lie ? t('twoWasLie') : '',
@@ -2185,6 +2362,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         : r.type === 'many' ? many(r)
         : r.type === 'two' ? two(r)
         : r.type === 'minor' ? minor(r)
+        : r.type === 'higher' ? higher(r)
+        : r.type === 'missing' ? missing(r)
         : quick(r, r.type));
 
     const rounds = d.log.map(r => {
@@ -2574,6 +2753,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     async odd(el) { sfx.send(); buzz(20); await emit('odd', el.dataset.id); },
     async many(el) { sfx.send(); buzz(20); await emit('many', el.dataset.v === '1'); },
     async minor(el) { sfx.send(); buzz(20); await emit('minor', el.dataset.v); },
+    async higher(el) { sfx.send(); buzz(20); await emit('higher', el.dataset.v); },
+    async miss(el) { sfx.send(); buzz(20); await emit('miss', el.dataset.id); },
     // Fills the box and hands it back. Sending it would make the round the
     // game's answer rather than the player's, and a player who edits one word
     // has written a lie.
@@ -2607,9 +2788,13 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       const id = el.dataset.id, cur = state.draft.order;
       // Tapping something already placed takes it out and closes the gap.
       state.draft.order = cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id];
-      sfx.tap(); buzz(10); state.lastKey = ''; render();
+      // Not state.lastKey = '' — that forces the whole screen to be built
+      // again, entrance animations and all, which is what made picking an
+      // item look like the page reloading under your finger. The render below
+      // patches what changed and leaves the rest standing.
+      sfx.tap(); buzz(10); render();
     },
-    ordclear() { state.draft.order = []; sfx.tap(); state.lastKey = ''; render(); },
+    ordclear() { state.draft.order = []; sfx.tap(); render(); },
     async ordsend() {
       const r = await emit('order', orderSeq());
       if (r && r.error) { toast(t('err_' + r.error), 'err'); return; }

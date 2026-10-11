@@ -19,6 +19,7 @@ const COUNTER_FOR = {
   bluff: 'fooled', number: 'bullseyes', likely: 'famous', spy: 'spy_caught',
   odd: 'odd_sweeps', order: 'perfect_orders', many: 'many_exact',
   name: 'name_crowd', two: 'two_fool_all', minor: 'minority_wins',
+  higher: 'higher_wins', missing: 'miss_found',
   // Blitz and Emoji Decode are both won by answering first, and that is what
   // "fastest" counts — they share it honestly rather than each getting a
   // near-identical badge.
@@ -43,6 +44,7 @@ test('each new counter is carried from the game all the way to the profile', () 
   for (const [game, column] of [
     ['perfectOrders', 'perfect_orders'], ['nameCrowd', 'name_crowd'],
     ['manyExact', 'many_exact'], ['twoFoolAll', 'two_fool_all'], ['oddSweeps', 'odd_sweeps'], ['minorityWins', 'minority_wins'],
+    ['higherWins', 'higher_wins'], ['missFound', 'miss_found'],
   ]) {
     assert.ok(server.includes(`stats.${game}`), `the game never counts ${game}`);
     assert.ok(schema.includes(column), `the profile has nowhere to keep ${column}`);

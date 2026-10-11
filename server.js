@@ -35,14 +35,14 @@ const GHOST_MS = 25 * 1000; // grace for a lobby refresh before the seat is free
 const ROOM_TTL_MS = 30 * 60 * 1000;
 const ITEMS_PER_QUICK_ROUND = 3; // blitz & emoji rounds have 3 quick items
 const REACTIONS = ['😂', '🔥', '😱', '👏', '🤡', '💀', '😈', '❤️'];
-const TYPES = ['bluff', 'number', 'blitz', 'likely', 'emoji', 'odd', 'order', 'spy', 'many', 'name', 'two', 'minor'];
-const ACTIVE = ['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'order', 'spyClue', 'spyVote', 'manyAsk', 'manyGuess', 'nameWrite', 'twoWrite', 'twoGuess', 'minorPick'];
+const TYPES = ['bluff', 'number', 'blitz', 'likely', 'emoji', 'odd', 'order', 'spy', 'many', 'name', 'two', 'minor', 'higher', 'missing'];
+const ACTIVE = ['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'order', 'spyClue', 'spyVote', 'manyAsk', 'manyGuess', 'nameWrite', 'twoWrite', 'twoGuess', 'minorPick', 'higherPick', 'missPick'];
 const PHRASES = 12; // number of preset taunts the client knows
 
 const T = {
-  chill: { spin: 6, write: 70, vote: 35, guess: 35, blitz: 10, blitzResult: 3.5, numReveal: 9, scores: 12, likelyVote: 30, likelyReveal: 9, emoji: 15, emojiResult: 3.5, odd: 18, oddResult: 4.5, order: 50, orderResult: 11, spyClue: 50, spyVote: 30, spyReveal: 10, manyAsk: 22, manyGuess: 26, manyReveal: 11, nameWrite: 45, nameReveal: 12, twoWrite: 95, twoGuess: 24, twoResult: 7, minorPick: 22, minorReveal: 10 },
-  normal: { spin: 6, write: 45, vote: 25, guess: 25, blitz: 8, blitzResult: 3, numReveal: 8, scores: 10, likelyVote: 20, likelyReveal: 8, emoji: 10, emojiResult: 3, odd: 13, oddResult: 4, order: 38, orderResult: 10, spyClue: 35, spyVote: 20, spyReveal: 9, manyAsk: 16, manyGuess: 20, manyReveal: 9, nameWrite: 32, nameReveal: 10, twoWrite: 80, twoGuess: 18, twoResult: 6, minorPick: 16, minorReveal: 9 },
-  fast: { spin: 5.5, write: 30, vote: 15, guess: 15, blitz: 5, blitzResult: 2.5, numReveal: 7, scores: 8, likelyVote: 14, likelyReveal: 7, emoji: 7, emojiResult: 2.5, odd: 9, oddResult: 3, order: 24, orderResult: 8, spyClue: 22, spyVote: 13, spyReveal: 7, manyAsk: 11, manyGuess: 14, manyReveal: 7, nameWrite: 22, nameReveal: 8, twoWrite: 60, twoGuess: 13, twoResult: 5, minorPick: 11, minorReveal: 7 },
+  chill: { spin: 6, write: 70, vote: 35, guess: 35, blitz: 10, blitzResult: 3.5, numReveal: 9, scores: 12, likelyVote: 30, likelyReveal: 9, emoji: 15, emojiResult: 3.5, odd: 18, oddResult: 4.5, order: 50, orderResult: 11, spyClue: 50, spyVote: 30, spyReveal: 10, manyAsk: 22, manyGuess: 26, manyReveal: 11, nameWrite: 45, nameReveal: 12, twoWrite: 95, twoGuess: 24, twoResult: 7, minorPick: 22, minorReveal: 10, higherPick: 20, higherReveal: 9, missWatch: 7, missPick: 16, missReveal: 8 },
+  normal: { spin: 6, write: 45, vote: 25, guess: 25, blitz: 8, blitzResult: 3, numReveal: 8, scores: 10, likelyVote: 20, likelyReveal: 8, emoji: 10, emojiResult: 3, odd: 13, oddResult: 4, order: 38, orderResult: 10, spyClue: 35, spyVote: 20, spyReveal: 9, manyAsk: 16, manyGuess: 20, manyReveal: 9, nameWrite: 32, nameReveal: 10, twoWrite: 80, twoGuess: 18, twoResult: 6, minorPick: 16, minorReveal: 9, higherPick: 15, higherReveal: 8, missWatch: 6, missPick: 12, missReveal: 7 },
+  fast: { spin: 5.5, write: 30, vote: 15, guess: 15, blitz: 5, blitzResult: 2.5, numReveal: 7, scores: 8, likelyVote: 14, likelyReveal: 7, emoji: 7, emojiResult: 2.5, odd: 9, oddResult: 3, order: 24, orderResult: 8, spyClue: 22, spyVote: 13, spyReveal: 7, manyAsk: 11, manyGuess: 14, manyReveal: 7, nameWrite: 22, nameReveal: 8, twoWrite: 60, twoGuess: 13, twoResult: 5, minorPick: 11, minorReveal: 7, higherPick: 10, higherReveal: 7, missWatch: 5, missPick: 9, missReveal: 6 },
 };
 const MODS = [
   { id: 'normal', w: 50, mult: 1 },
@@ -147,6 +147,7 @@ const freshStats = () => ({
   // One per round type that had nothing to earn. Each counts the moment
   // that type is actually about, not just taking part in it.
   perfectOrders: 0, nameCrowd: 0, manyExact: 0, twoFoolAll: 0, oddSweeps: 0, minorityWins: 0,
+  higherWins: 0, missFound: 0,
 });
 const freshPowers = () => ({ peek: 1, double: 1 });
 
@@ -285,6 +286,24 @@ function snapshot(room, pid) {
     s.current.voted = Object.keys(c.lvotes);
     s.current.myVote = c.lvotes[pid] || null;
     if (ph === 'likelyReveal') Object.assign(s.current, { votes: c.lvotes, tally: c.tally, winners: c.winners });
+  }
+  if (c.type === 'higher' && ['higherPick', 'higherReveal'].includes(ph)) {
+    Object.assign(s.current, { question: c.q[L], left: c.left[L], right: c.right[L] });
+    s.current.myPick = c.picks[pid] || null;
+    s.current.picked = Object.keys(c.picks);
+    // Which side is bigger is the answer, so it waits for the reveal.
+    if (ph === 'higherReveal') Object.assign(s.current, { correct: c.correct, picks: c.picks, fastest: c.fastest });
+  }
+  if (c.type === 'missing' && ['missWatch', 'missPick', 'missReveal'].includes(ph)) {
+    s.current.items = c.items.map(it => ({ id: it.id, text: it[L] }));
+    s.current.watching = ph === 'missWatch';
+    // During the watch phase everything is on screen; from the pick phase on,
+    // the one that went is simply not in the list the client is given.
+    if (ph !== 'missWatch') s.current.items = s.current.items.filter(it => it.id !== c.goneId);
+    s.current.all = c.items.map(it => ({ id: it.id, text: it[L] }));
+    s.current.myPick = c.picks[pid] || null;
+    s.current.picked = Object.keys(c.picks);
+    if (ph === 'missReveal') Object.assign(s.current, { goneId: c.goneId, picks: c.picks, fastest: c.fastest });
   }
   if (c.type === 'minor' && ['minorPick', 'minorReveal'].includes(ph)) {
     Object.assign(s.current, { a: c.pair.a[L], b: c.pair.b[L] });
@@ -440,6 +459,12 @@ function botAction(room, b) {
   if (ph === 'order' && !c.orders[b.id]) {
     const seq = bots.orderGuess({ correctIds: c.truth });
     return seq && (() => submitOrder(room, b, seq));
+  }
+  if (ph === 'higherPick' && !c.picks[b.id]) {
+    return () => submitHigher(room, b, bots.higherPick({ correct: c.correct }));
+  }
+  if (ph === 'missPick' && !c.picks[b.id]) {
+    return () => submitMiss(room, b, bots.missPick({ ids: c.items.map(i => i.id), goneId: c.goneId }));
   }
   if (ph === 'minorPick' && !c.picks[b.id]) {
     return () => submitMinor(room, b, bots.minorPick());
@@ -702,6 +727,28 @@ function beginRound(room) {
     Object.assign(c, { q: entry.q, items, truth, orders: {} });
     room.phase = 'order';
     setTimer(room, pace(room, 'order'), () => revealOrder(room));
+  } else if (c.type === 'higher') {
+    const e = pickFrom(room, 'higher')[0];
+    // Which side is shown first is drawn, so the answer is not always on the
+    // same button for a player who has met the question before.
+    const flip = rnd(2) === 1;
+    Object.assign(c, {
+      q: e.q,
+      left: flip ? e.b : e.a,
+      right: flip ? e.a : e.b,
+      correct: (e.bigger === 'a') === !flip ? 'left' : 'right',
+      picks: {}, fastest: null,
+    });
+    room.phase = 'higherPick';
+    setTimer(room, pace(room, 'higherPick'), () => revealHigher(room));
+  } else if (c.type === 'missing') {
+    // Built from the Odd One Out bank: four things from one category, which is
+    // exactly what this needs and costs the content banks nothing.
+    const e = pickFrom(room, 'odd')[0];
+    const items = shuffle([e.odd, ...e.rest]).map(x => ({ ...x, id: rid(6) }));
+    Object.assign(c, { items, goneId: items[rnd(items.length)].id, picks: {}, fastest: null });
+    room.phase = 'missWatch';
+    setTimer(room, pace(room, 'missWatch'), () => startMissPick(room));
   } else if (c.type === 'minor') {
     Object.assign(c, { pair: pickFrom(room, 'minor')[0], picks: {} });
     room.phase = 'minorPick';
@@ -1004,6 +1051,102 @@ function revealSpy(room) {
   finishRound(room);
   room.phase = 'spyReveal';
   setTimer(room, pace(room, 'spyReveal'), () => showScores(room));
+  broadcast(room);
+}
+
+// ----- which is bigger -----
+// Knowledge, not acquaintance. Nothing in this round needs the players to
+// have met: a stranger can walk into a room and be on equal footing, which
+// is not true of "who's most likely" and only half true of the rounds that
+// ask about yourself.
+const HIGHER_POINTS = 300;
+const HIGHER_FAST = 150;
+
+function submitHigher(room, p, side) {
+  const c = room.current;
+  if (!c || room.phase !== 'higherPick') return { error: 'late' };
+  if (c.picks[p.id]) return { error: 'dup' };
+  if (side !== 'left' && side !== 'right') return { error: 'bad' };
+  c.picks[p.id] = side;
+  tookMs(room, p.id);
+  if (side === c.correct && !c.fastest) c.fastest = p.id;
+  if (connected(room).every(x => c.picks[x.id])) revealHigher(room);
+  else broadcast(room);
+  return { ok: true };
+}
+
+function revealHigher(room) {
+  if (room.phase !== 'higherPick') return;
+  const c = room.current;
+  for (const [pid, side] of Object.entries(c.picks)) {
+    const right = side === c.correct;
+    if (right) {
+      gain(room, pid, 'higher', HIGHER_POINTS);
+      const p = room.players.get(pid);
+      if (p) { p.stats.correct += 1; p.stats.higherWins += 1; }
+    }
+    streakResult(room, pid, right);
+  }
+  if (c.fastest) {
+    gain(room, c.fastest, 'fastest', HIGHER_FAST);
+    const f = room.players.get(c.fastest);
+    if (f) f.stats.fastest += 1;
+  }
+  for (const p of connected(room)) if (!c.picks[p.id]) streakResult(room, p.id, false);
+  finishRound(room);
+  room.phase = 'higherReveal';
+  setTimer(room, pace(room, 'higherReveal'), () => showScores(room));
+  broadcast(room);
+}
+
+// ----- what went missing -----
+// A memory round rather than a knowledge one, so it does not favour whoever
+// read the most trivia either. Four things are shown, then one of them is
+// taken away.
+const MISS_POINTS = 350;
+const MISS_FAST = 150;
+
+function startMissPick(room) {
+  if (room.phase !== 'missWatch') return;
+  room.phase = 'missPick';
+  setTimer(room, pace(room, 'missPick'), () => revealMiss(room));
+  broadcast(room);
+}
+
+function submitMiss(room, p, id) {
+  const c = room.current;
+  if (!c || room.phase !== 'missPick') return { error: 'late' };
+  if (c.picks[p.id]) return { error: 'dup' };
+  if (!c.items.some(it => it.id === id)) return { error: 'bad' };
+  c.picks[p.id] = id;
+  tookMs(room, p.id);
+  if (id === c.goneId && !c.fastest) c.fastest = p.id;
+  if (connected(room).every(x => c.picks[x.id])) revealMiss(room);
+  else broadcast(room);
+  return { ok: true };
+}
+
+function revealMiss(room) {
+  if (room.phase !== 'missPick') return;
+  const c = room.current;
+  for (const [pid, id] of Object.entries(c.picks)) {
+    const right = id === c.goneId;
+    if (right) {
+      gain(room, pid, 'missing', MISS_POINTS);
+      const p = room.players.get(pid);
+      if (p) { p.stats.correct += 1; p.stats.missFound += 1; }
+    }
+    streakResult(room, pid, right);
+  }
+  if (c.fastest) {
+    gain(room, c.fastest, 'fastest', MISS_FAST);
+    const f = room.players.get(c.fastest);
+    if (f) f.stats.fastest += 1;
+  }
+  for (const p of connected(room)) if (!c.picks[p.id]) streakResult(room, p.id, false);
+  finishRound(room);
+  room.phase = 'missReveal';
+  setTimer(room, pace(room, 'missReveal'), () => showScores(room));
   broadcast(room);
 }
 
@@ -1474,6 +1617,8 @@ const REVEAL_PHASE = {
   name: 'nameReveal',
   two: 'twoResult',
   minor: 'minorReveal',
+  higher: 'higherReveal',
+  missing: 'missReveal',
   ...Object.fromEntries(Object.entries(QUICK).map(([type, q]) => [type, q.result])),
 };
 const REVEAL_PHASES = new Set(Object.values(REVEAL_PHASE));
@@ -1730,6 +1875,8 @@ io.on('connection', socket => {
   socket.on('spyVote', (id, cb) => room && reply(cb, submitSpyVote(room, player, id)));
   socket.on('spyGuess', (text, cb) => room && reply(cb, submitSpyGuess(room, player, text)));
   socket.on('minor', (side, cb) => room && reply(cb, submitMinor(room, player, side)));
+  socket.on('higher', (side, cb) => room && reply(cb, submitHigher(room, player, side)));
+  socket.on('miss', (id, cb) => room && reply(cb, submitMiss(room, player, id)));
 
   socket.on('two', ({ lines, lie } = {}, cb) => room && reply(cb, submitTwo(room, player, lines, lie)));
   socket.on('twoGuess', (i, cb) => room && reply(cb, submitTwoGuess(room, player, i)));
@@ -1880,6 +2027,11 @@ const RESUME = {
   nameReveal: showScores,
   minorPick: revealMinor,
   minorReveal: showScores,
+  higherPick: revealHigher,
+  higherReveal: showScores,
+  missWatch: startMissPick,
+  missPick: revealMiss,
+  missReveal: showScores,
   twoWrite: startTwoGuess,
   twoGuess: revealTwo,
   twoResult: advanceTwo,

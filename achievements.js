@@ -40,6 +40,10 @@ const LIST = [
   { id: 'odd_eye', e: '🔬', test: p => p.odd_sweeps >= 10 },
   { id: 'minority5', e: '🧭', test: p => p.minority_wins >= 5 },
   { id: 'minority20', e: '🐺', test: p => p.minority_wins >= 20 },
+  { id: 'higher10', e: '⚖️', test: p => p.higher_wins >= 10 },
+  { id: 'higher40', e: '📐', test: p => p.higher_wins >= 40 },
+  { id: 'miss5', e: '👁️', test: p => p.miss_found >= 5 },
+  { id: 'miss25', e: '🧠', test: p => p.miss_found >= 25 },
 ];
 
 const IDS = LIST.map(a => a.id);

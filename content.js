@@ -1473,4 +1473,54 @@ const minor = [
   { a: { ar: 'أدرس ليلة الامتحان', en: 'Cram the night before' }, b: { ar: 'أذاكر من بدري', en: 'Study early' } },
 ];
 
-module.exports = { bluff, number, blitz, likely, emoji, odd, order, many, name, spy, minor };
+
+// higher: two things and one dimension — which is the greater? Pure knowledge,
+// so a stranger is on the same footing as someone's oldest friend. Pairs are
+// chosen to be decidable but not obvious; a pair where everyone knows the
+// answer is not a round.
+const higher = [
+  { q: { ar: 'أيّهما أكبر مساحةً؟', en: 'Which is larger by area?' }, a: { ar: 'الجزائر', en: 'Algeria' }, b: { ar: 'السعودية', en: 'Saudi Arabia' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكبر مساحةً؟', en: 'Which is larger by area?' }, a: { ar: 'فرنسا', en: 'France' }, b: { ar: 'اليابان', en: 'Japan' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكبر مساحةً؟', en: 'Which is larger by area?' }, a: { ar: 'مصر', en: 'Egypt' }, b: { ar: 'تركيا', en: 'Turkey' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكثر سكاناً؟', en: 'Which has more people?' }, a: { ar: 'نيجيريا', en: 'Nigeria' }, b: { ar: 'مصر', en: 'Egypt' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكثر سكاناً؟', en: 'Which has more people?' }, a: { ar: 'إندونيسيا', en: 'Indonesia' }, b: { ar: 'البرازيل', en: 'Brazil' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكثر سكاناً؟', en: 'Which has more people?' }, a: { ar: 'المغرب', en: 'Morocco' }, b: { ar: 'العراق', en: 'Iraq' }, bigger: 'b' },
+  { q: { ar: 'أيّهما أطول؟', en: 'Which is taller?' }, a: { ar: 'برج إيفل', en: 'The Eiffel Tower' }, b: { ar: 'تمثال الحرية', en: 'The Statue of Liberty' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أطول؟', en: 'Which is taller?' }, a: { ar: 'الزرافة', en: 'A giraffe' }, b: { ar: 'الفيل الأفريقي', en: 'An African elephant' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أطول عمراً في المتوسط؟', en: 'Which lives longer on average?' }, a: { ar: 'السلحفاة', en: 'A tortoise' }, b: { ar: 'الحصان', en: 'A horse' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أسرع؟', en: 'Which is faster?' }, a: { ar: 'الفهد', en: 'A cheetah' }, b: { ar: 'الحصان', en: 'A horse' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أسرع؟', en: 'Which is faster?' }, a: { ar: 'النعامة', en: 'An ostrich' }, b: { ar: 'الإنسان', en: 'A human' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أثقل؟', en: 'Which is heavier?' }, a: { ar: 'لتر ماء', en: 'A litre of water' }, b: { ar: 'لتر زيت', en: 'A litre of oil' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أثقل؟', en: 'Which is heavier?' }, a: { ar: 'الذهب', en: 'Gold' }, b: { ar: 'الفضة', en: 'Silver' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أقدم؟', en: 'Which is older?' }, a: { ar: 'الأهرامات', en: 'The pyramids' }, b: { ar: 'سور الصين العظيم', en: 'The Great Wall of China' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أقدم؟', en: 'Which is older?' }, a: { ar: 'جامعة القرويين', en: 'Al-Qarawiyyin University' }, b: { ar: 'جامعة أكسفورد', en: 'Oxford University' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أقدم؟', en: 'Which came first?' }, a: { ar: 'الراديو', en: 'Radio' }, b: { ar: 'التلفزيون', en: 'Television' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أقدم؟', en: 'Which came first?' }, a: { ar: 'القلم الرصاص', en: 'The pencil' }, b: { ar: 'القلم الجاف', en: 'The ballpoint pen' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أعمق؟', en: 'Which is deeper?' }, a: { ar: 'المحيط الهادئ', en: 'The Pacific Ocean' }, b: { ar: 'المحيط الأطلسي', en: 'The Atlantic Ocean' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أبعد عن الشمس؟', en: 'Which is further from the sun?' }, a: { ar: 'المريخ', en: 'Mars' }, b: { ar: 'الزهرة', en: 'Venus' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكبر حجماً؟', en: 'Which is bigger?' }, a: { ar: 'المشتري', en: 'Jupiter' }, b: { ar: 'زحل', en: 'Saturn' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكبر حجماً؟', en: 'Which is bigger?' }, a: { ar: 'القمر', en: 'The moon' }, b: { ar: 'كوكب عطارد', en: 'Mercury' }, bigger: 'b' },
+  { q: { ar: 'أيّهما أطول نهراً؟', en: 'Which river is longer?' }, a: { ar: 'النيل', en: 'The Nile' }, b: { ar: 'الفرات', en: 'The Euphrates' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكثر سعرات؟', en: 'Which has more calories?' }, a: { ar: 'ملعقة زيت', en: 'A spoon of oil' }, b: { ar: 'ملعقة سكر', en: 'A spoon of sugar' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكثر ماءً؟', en: 'Which holds more water?' }, a: { ar: 'البطيخ', en: 'Watermelon' }, b: { ar: 'الخيار', en: 'Cucumber' }, bigger: 'b' },
+  { q: { ar: 'أيّهما أحرّ؟', en: 'Which is hotter?' }, a: { ar: 'سطح الشمس', en: 'The surface of the sun' }, b: { ar: 'الصاعقة', en: 'A lightning bolt' }, bigger: 'b' },
+  { q: { ar: 'أيّهما أكثر عظاماً؟', en: 'Which has more bones?' }, a: { ar: 'الطفل الرضيع', en: 'A newborn' }, b: { ar: 'الإنسان البالغ', en: 'An adult' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكثر عضلات؟', en: 'Which uses more muscles?' }, a: { ar: 'الابتسامة', en: 'A smile' }, b: { ar: 'العبوس', en: 'A frown' }, bigger: 'b' },
+  { q: { ar: 'أيّهما أكبر عدد سكان؟', en: 'Which city is bigger?' }, a: { ar: 'القاهرة', en: 'Cairo' }, b: { ar: 'الرياض', en: 'Riyadh' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكبر عدد سكان؟', en: 'Which city is bigger?' }, a: { ar: 'طوكيو', en: 'Tokyo' }, b: { ar: 'لندن', en: 'London' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أبرد في المتوسط؟', en: 'Which is colder on average?' }, a: { ar: 'القطب الشمالي', en: 'The Arctic' }, b: { ar: 'القطب الجنوبي', en: 'Antarctica' }, bigger: 'b' },
+  { q: { ar: 'أيّهما أكثر لغاتٍ رسمية؟', en: 'Which has more official languages?' }, a: { ar: 'سويسرا', en: 'Switzerland' }, b: { ar: 'بلجيكا', en: 'Belgium' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكثر جزراً؟', en: 'Which has more islands?' }, a: { ar: 'اليونان', en: 'Greece' }, b: { ar: 'الفلبين', en: 'The Philippines' }, bigger: 'b' },
+  { q: { ar: 'أيّهما أثقل دماغاً؟', en: 'Which has the heavier brain?' }, a: { ar: 'الإنسان', en: 'A human' }, b: { ar: 'الدلفين', en: 'A dolphin' }, bigger: 'b' },
+  { q: { ar: 'أيّهما أكثر أرجلاً؟', en: 'Which has more legs?' }, a: { ar: 'العنكبوت', en: 'A spider' }, b: { ar: 'النملة', en: 'An ant' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أسرع في الماء؟', en: 'Which is faster in water?' }, a: { ar: 'الدلفين', en: 'A dolphin' }, b: { ar: 'السلحفاة البحرية', en: 'A sea turtle' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكبر إنتاجاً للقهوة؟', en: 'Which produces more coffee?' }, a: { ar: 'البرازيل', en: 'Brazil' }, b: { ar: 'إثيوبيا', en: 'Ethiopia' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أطول مدةً؟', en: 'Which lasts longer?' }, a: { ar: 'يوم على الزهرة', en: 'A day on Venus' }, b: { ar: 'سنة على الزهرة', en: 'A year on Venus' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أصغر مساحةً؟', en: 'Which is smaller by area?' }, a: { ar: 'الفاتيكان', en: 'Vatican City' }, b: { ar: 'موناكو', en: 'Monaco' }, bigger: 'b' },
+  { q: { ar: 'أيّهما أكثر استهلاكاً للشاي للفرد؟', en: 'Which drinks more tea per person?' }, a: { ar: 'تركيا', en: 'Turkey' }, b: { ar: 'بريطانيا', en: 'Britain' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكبر صحراء؟', en: 'Which desert is bigger?' }, a: { ar: 'الصحراء الكبرى', en: 'The Sahara' }, b: { ar: 'الربع الخالي', en: 'The Empty Quarter' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أثقل وزناً؟', en: 'Which weighs more?' }, a: { ar: 'الحوت الأزرق', en: 'A blue whale' }, b: { ar: 'عشرة أفيال', en: 'Ten elephants' }, bigger: 'a' },
+  { q: { ar: 'أيّهما أكثر نجوماً مرئية؟', en: 'Where can you see more stars?' }, a: { ar: 'الصحراء', en: 'The desert' }, b: { ar: 'وسط المدينة', en: 'A city centre' }, bigger: 'a' },
+];
+
+module.exports = { bluff, number, blitz, likely, emoji, odd, order, many, name, spy, minor, higher };

@@ -31,6 +31,8 @@ const THINK = {
   nameWrite: [5000, 13000],
   twoWrite: [9000, 22000],
   minorPick: [3000, 9000],
+  higherPick: [2500, 8000],
+  missPick: [3000, 9000],
   twoGuess: [3500, 9000],
   manyAsk: [3000, 8000],
   manyGuess: [4000, 10000],
@@ -77,9 +79,20 @@ const twoGuess = () => Math.floor(Math.random() * 3);
 // also keeps it from being a reliable minority to hide behind.
 const minorPick = () => (Math.random() < 0.5 ? 'a' : 'b');
 
+const higherPick = ({ correct }) =>
+  (Math.random() < ACCURACY.higher ? correct : (correct === 'left' ? 'right' : 'left'));
+
+// Remembering is the round, so a bot that always remembered would be no
+// fun to play against.
+function missPick({ ids, goneId }) {
+  if (Math.random() < ACCURACY.missing) return goneId;
+  const others = ids.filter(i => i !== goneId);
+  return others.length ? pick(others) : goneId;
+}
+
 // How often a bot is right. Deliberately short of perfect: a bot that always
 // knows is not an opponent, it is a wall.
-const ACCURACY = { blitz: 0.62, emoji: 0.55, order: 0.3 };
+const ACCURACY = { blitz: 0.62, emoji: 0.55, order: 0.3, higher: 0.6, missing: 0.45 };
 
 // Clues vague enough to be honest about any word in the category — which is
 // exactly what a careful human writes when they do not want to give it away.
@@ -275,5 +288,5 @@ function manyGuess({ total }) {
 module.exports = {
   NAMES, freeName, thinkFor,
   lie, bluffVote, numberGuess, blitzAnswer, emojiAnswer, votePlayer, orderGuess, spyClue, spyGuess,
-  manyAnswer, manyGuess, nameAnswer, twoLines, twoGuess, minorPick,
+  manyAnswer, manyGuess, nameAnswer, twoLines, twoGuess, minorPick, higherPick, missPick,
 };

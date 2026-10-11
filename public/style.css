@@ -877,3 +877,6 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 .side-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .side-head .cnt { font-weight: 800; color: var(--muted); }
 .side .repw { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* What is still on the board in What Went Missing. */
+.still { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 16px; }

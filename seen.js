@@ -16,9 +16,16 @@ const crypto = require('crypto');
 // Short on purpose: this is a key in a table with one row per player per item,
 // not a checksum. 10 hex characters over a bank of a few thousand entries.
 const keyOf = (type, entry) => {
-  const text = entry && typeof entry === 'object'
-    ? (entry.q && entry.q.en) || entry.en || entry.s && entry.s.en || (entry.w && entry.w.en) || JSON.stringify(entry)
-    : String(entry);
+  let text;
+  if (entry && typeof entry === 'object') {
+    text = (entry.q && entry.q.en) || entry.en || (entry.s && entry.s.en) || (entry.w && entry.w.en) || '';
+    // Some banks reuse one question across many entries and vary the options —
+    // "Which is larger by area?" asks about a different pair every time. The
+    // question alone would mark forty-two of them as one, and a player would
+    // be told they had seen rounds they had not.
+    if (entry.a && entry.b) text += '|' + ((entry.a.en || '') + '|' + (entry.b.en || ''));
+    if (!text) text = JSON.stringify(entry);
+  } else text = String(entry);
   return type + ':' + crypto.createHash('sha1').update(String(text)).digest('hex').slice(0, 10);
 };
 

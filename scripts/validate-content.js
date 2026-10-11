@@ -131,6 +131,9 @@ const KEYS = {
   // a pair is identified by both sides together: "coffee or tea" and
   // "tea or coffee" are the same round, and so is reusing one side.
   minor: x => [norm((x.a && x.a.ar) + '|' + (x.b && x.b.ar)), norm((x.a && x.a.en) + '|' + (x.b && x.b.en))],
+  // the same two things compared on the same dimension is the same round
+  higher: x => [norm((x.q && x.q.ar) + '|' + (x.a && x.a.ar) + '|' + (x.b && x.b.ar)),
+                norm((x.q && x.q.en) + '|' + (x.a && x.a.en) + '|' + (x.b && x.b.en))],
 };
 
 function loadHead() {
