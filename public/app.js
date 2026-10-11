@@ -904,9 +904,12 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   // where the screen is already full and a whole card would be shouting.
   function gamesCard(compact) {
     // The compact rows keep the arrow next to the name rather than out at the
-    // edge. On the final scoreboard the reaction bar floats over the first
-    // 54px of the row — measured — and the one thing that must stay readable
-    // is the thing that says this is a link.
+    // edge. Everywhere inside a room the reaction bar floats over a 44px
+    // column in the bottom corner — measured — on the same side a label at
+    // the row's end would sit, and it swaps sides with the page direction. So
+    // in the lobby and on the final scoreboard the mark that says this is a
+    // link is kept next to the name. The home screen has no reaction bar,
+    // which is why the full card there can afford to put "Open" at the edge.
     const rows = GAMES.map((g, i) => `<button class="game-row" data-act="game" data-i="${i}">
       <span class="ge">${g.e}</span>
       <span class="gt"><b>${t('game_' + g.id)}${compact ? ' ↗' : ''}</b>${compact ? '' : `<small>${t('gamed_' + g.id)}</small>`}</span>
@@ -1122,6 +1125,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
               </form>` : ''}
               <div class="muted" style="font-size:12px;margin-top:10px">${t('myQsWarn')}</div>`}
         </div>
+        <div class="section-title"><span>${t('moreGames')}</span></div>
+        ${gamesCard(true)}
       </div></div>
       ${dock(host
         ? `${online.length < 2 ? `<div class="center muted" style="font-size:13px;margin-bottom:8px">${t('soloHint')}</div>` : `<div class="center muted" style="font-size:13px;margin-bottom:8px">${t('readyN', { n: fmt(online.filter(p => p.ready || p.id === mid).length), m: fmt(online.length) })}</div>`}<button class="btn block pulse" data-act="start" style="min-height:60px;font-size:19px">${t('start')}</button>`

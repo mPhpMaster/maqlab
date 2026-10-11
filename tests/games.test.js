@@ -60,14 +60,31 @@ test('a tap opens one of the listed games and nothing else', () => {
 });
 
 test('it is shown where a player will meet it', () => {
-  // The home screen, and the final scoreboard — the two moments someone is
-  // deciding what to play next. If both call sites go, the feature is dead
-  // code and this test is the only thing that would say so.
-  const home = app.match(/function homeView\(\)[\s\S]*?\n  }\n/);
-  const final = app.match(/function finalView\(\)[\s\S]*?\n  }\n/);
-  assert.ok(home && final, 'homeView or finalView moved');
-  assert.match(home[0], /gamesCard\(false\)/, 'the home screen no longer shows the other games');
-  assert.match(final[0], /gamesCard\(true\)/, 'the final scoreboard no longer shows the other games');
+  // The home screen, the lobby, and the final scoreboard — the three moments
+  // someone has nothing to do and is deciding what to play. If the call sites
+  // go, the feature is dead code and this test is the only thing that would
+  // say so.
+  const views = {
+    homeView: /gamesCard\(false\)/,
+    lobbyView: /gamesCard\(true\)/,
+    finalView: /gamesCard\(true\)/,
+  };
+  for (const [name, want] of Object.entries(views)) {
+    const src = app.match(new RegExp(`function ${name}\\(\\)[\\s\\S]*?\\n  }\\n`));
+    assert.ok(src, `${name} moved`);
+    assert.match(src[0], want, `${name} no longer shows the other games`);
+  }
+});
+
+test('inside a room the link mark stays clear of the reaction bar', () => {
+  // The bar is fixed in the bottom corner, on whichever side the page
+  // direction puts last — the same side a label at the end of the row sits
+  // on. It covered "Open" in Arabic until the compact rows stopped putting
+  // anything out there.
+  const fn = app.match(/function gamesCard\(compact\)[\s\S]*?\n  }\n/);
+  assert.ok(fn, 'gamesCard moved');
+  assert.match(fn[0], /compact \? ' ↗' : ''/, 'the compact rows no longer mark themselves as links');
+  assert.match(fn[0], /\$\{compact \? '' : `<span class="go">/, 'the compact rows put a label back at the edge');
 });
 
 test('each row can be read in either direction', () => {
