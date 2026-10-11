@@ -867,6 +867,40 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
 .support-card p { margin: 0 0 8px; font-size: 13px; line-height: 1.6; }
 .support-card .btn { margin-top: 4px; }
 
+/* The other two games. Same quiet register as the support card: it is an
+   offer, not a billboard, and it sits below the room list where someone who
+   has finished looking for a game to join will see it.
+
+   The name and the arrow are the only things that have to be readable at a
+   glance, so the row is laid out as icon / text / verb and takes its
+   direction from the page rather than from the markup. */
+.games-card {
+  margin-top: 14px; padding: 14px; border-radius: 16px;
+  background: var(--card); border: 1px solid var(--line);
+}
+.games-card > b { display: block; font-size: 15px; }
+.games-card > p { margin: 4px 0 10px; font-size: 13px; line-height: 1.6; }
+.game-row {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 10px 12px; margin-top: 8px; border-radius: 14px;
+  background: var(--card2); border: 1px solid var(--line);
+  color: var(--text); text-align: start; font: inherit;
+}
+.game-row:hover { border-color: var(--lemon); }
+.game-row .ge { font-size: 22px; flex: 0 0 auto; }
+.game-row .gt { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; }
+.game-row .gt b { font-size: 14px; font-weight: 800; }
+/* Two titles in two scripts, and one of them is English inside an Arabic
+   page: let each line lay itself out. */
+.game-row .gt b, .game-row .gt small { unicode-bidi: plaintext; }
+.game-row .gt small { color: var(--muted); font-size: 12px; line-height: 1.5; }
+.game-row .go { flex: 0 0 auto; color: var(--muted); font-size: 12px; font-weight: 800; white-space: nowrap; }
+
+/* On the final scoreboard there is no room for a card, so it is one line per
+   game and no descriptions. */
+.games-strip { margin-top: 16px; display: grid; gap: 8px; }
+.games-strip .game-row { margin-top: 0; }
+
 /* The minority round: two choices, nothing else competing for the eye. */
 .type-tag.minor { background: rgba(120,220,200,.18); color: #7fe0d0; }
 .two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }

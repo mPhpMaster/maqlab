@@ -74,6 +74,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       supportTitle: '☕ ادعم اللعبة', supportBody: 'مقلب تشتغل على خادم مجاني — لهذا تاخذ ٢٠ ثانية تقريباً تصحى أول مرة. لو حبيت تساعد في تكاليف التشغيل، هذا رابط للتبرع.',
       supportNothing: 'ما تحصل مقابلها شي داخل اللعبة — اللعبة كاملة مجانية للكل، والتبرع اختياري تماماً.',
       supportBtn: 'تبرّع', supportSmall: 'عجبتك اللعبة؟ ادعم تكاليف الخادم ☕',
+      moreGames: '🎮 ألعابي الثانية', moreGamesBody: 'نفس الصانع — وكلها تشتغل في ديسكورد وفي المتصفح.', openGame: 'افتح',
+      game_gtl: 'خمّن اللغة', gamed_gtl: 'اثنا عشر نمط أسئلة: برمجة وشبكات وأمن سيبراني',
+      game_letterup: 'إنسان حيوان نبات جماد', gamed_letterup: 'حرف واحد، عبّي الخانات، وبعدها تصوّتون',
       type_minor: 'الأقلية', desc_minor: 'اختر الخيار اللي تتوقع أقل ناس بتختاره — الأقلية هي اللي تكسب',
       minorPickQ: 'وش تختار؟', minorTip: 'تكسب لو كنت مع الأقل — فكّر وش بيختار الباقون',
       minorWon: 'كنت مع الأقلية! 🎯 +400', minorLost: 'كنت مع الأغلبية', minorTie: 'تعادل — ما في أقلية',
@@ -192,6 +195,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       supportTitle: '☕ Support the game', supportBody: 'MAQLAB runs on a free server — that is why it takes about 20 seconds to wake up the first time. If you would like to help with the running costs, here is a link.',
       supportNothing: 'It buys you nothing in the game — all of it is free for everyone, and this is entirely optional.',
       supportBtn: 'Donate', supportSmall: 'Enjoying MAQLAB? Help with the server bill ☕',
+      moreGames: '🎮 My other games', moreGamesBody: 'Same maker — both run in Discord and in the browser.', openGame: 'Open',
+      game_gtl: 'Guess the Language', gamed_gtl: 'Twelve quiz modes — code, networks, security',
+      game_letterup: 'LetterUp', gamed_letterup: 'One letter, fill the categories, then vote',
       type_minor: 'The Minority', desc_minor: 'Pick the option you think fewest will choose — the smaller side wins',
       minorPickQ: 'Which one?', minorTip: 'You score for being on the smaller side — think about what everyone else will pick',
       minorWon: 'You were in the minority! 🎯 +400', minorLost: 'You went with the crowd', minorTie: 'Dead even — no minority',
@@ -356,6 +362,17 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   // through its own checkout, and the moment a donation unlocks something it
   // becomes a paid feature sold outside it.
   const DONATE_URL = 'https://paypal.me/mfsafadi';
+
+  // The other two games, linked from the home screen and from the final
+  // scoreboard. They go through openLink for the same reason the donate button
+  // does: inside the Discord Activity the page is in an iframe on a
+  // discordsays.com proxy origin, where a plain <a target="_blank"> goes
+  // nowhere. The markup carries an index, not a URL, so the address a tap
+  // opens is only ever one of these two.
+  const GAMES = [
+    { id: 'gtl', e: '🌍', url: 'https://guess-the-language-chi.vercel.app' },
+    { id: 'letterup', e: '🔤', url: 'https://letterup-two.vercel.app' },
+  ];
 
   const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', order: '📊', spy: '🕵️', many: '🙋', name: '🗣️', two: '🎭', minor: '🧭', higher: '⚖️', missing: '👁️' };
   const MODS = { normal: '✨', double: '💎', speed: '⏱️', jackpot: '🎁', golden: '👑' };
@@ -714,7 +731,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   // So when the screen is the same screen, the new markup is walked against
   // the old one and only the differences are written: attributes, text, and
   // nodes that are genuinely new. Nothing here tries to be a general diffing
-  // library — the moment the two trees disagree on shape it gives up and
+  // library — the moment two nodes disagree on what they are it gives up and
   // returns false, and the caller replaces everything exactly as before. That
   // keeps the failure mode identical to today's behaviour rather than
   // inventing a new one.
@@ -738,19 +755,74 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       if (want != null && from !== document.activeElement && from.value !== want) from.value = want;
       return true;
     }
-    // Children are matched by position, which is all this needs: these lists
-    // are rebuilt from the same template every time, so a node at index 3 is
-    // the same thing it was. A child that cannot be patched is replaced on its
-    // own rather than taking the whole screen with it.
+    // Children used to be matched by position, on the theory that a list
+    // rebuilt from the same template puts the same thing at index 3 every
+    // time. It does not. Eighteen of these views insert a line when you have
+    // answered -- "waiting for others", above the row of players -- and that
+    // one insertion shifts every later child by one. Matched by position, the
+    // row of players is then patched into the waiting line and rebuilt from
+    // scratch underneath it. Measured on a tap, before this: 159 of the 181
+    // elements on screen were brand new, in `higher`, `blitz`, `minor`,
+    // `emoji` and `likely` alike. `order` was clean only because its child
+    // list is the one that never changes shape.
+    //
+    // So children are matched by what they are, and a short lookahead covers
+    // the insertion or the removal of a child without giving up on the ones
+    // after it.
     const olds = [...from.childNodes];
     const news = [...to.childNodes];
-    for (let i = 0; i < news.length; i++) {
-      const a = olds[i];
-      if (!a) { from.appendChild(news[i].cloneNode(true)); continue; }
-      if (!morph(a, news[i])) from.replaceChild(news[i].cloneNode(true), a);
+    for (const op of alignChildren(olds.map(keyOf), news.map(keyOf))) {
+      if (op.op === 'insert') {
+        const anchor = olds[op.before], clone = news[op.n].cloneNode(true);
+        if (anchor) from.insertBefore(clone, anchor); else from.appendChild(clone);
+      } else if (op.op === 'remove') {
+        from.removeChild(olds[op.o]);
+      } else {
+        const a = olds[op.o], b = news[op.n];
+        if (!morph(a, b)) from.replaceChild(b.cloneNode(true), a);
+      }
     }
-    for (let i = news.length; i < olds.length; i++) from.removeChild(olds[i]);
     return true;
+  }
+
+  // What makes two children the same child. The tag, the id, and the first
+  // class -- the one that says what the thing is, where the rest say what
+  // state it is in. A button that gains "picked" is the same button; a
+  // "waiting" line where the player row used to be is not the player row.
+  function keyOf(n) {
+    if (n.nodeType !== Node.ELEMENT_NODE) return 't' + n.nodeType;
+    const cls = (n.getAttribute('class') || '').trim().split(/\s+/)[0] || '';
+    return n.nodeName + '#' + (n.id || '') + '.' + cls;
+  }
+
+  // Pure on purpose: it decides what to do from two lists of keys and touches
+  // no DOM, so tests/morph.test.js can hold it to account without a browser.
+  //
+  // LOOK is 4 rather than 1 because the templates put whitespace between
+  // elements: inserting one line inserts two nodes, the line and the newline
+  // in front of it, and a lookahead of one would still rebuild everything
+  // below it.
+  function alignChildren(a, b, look = 4) {
+    const ops = [];
+    let i = 0, j = 0;
+    while (j < b.length) {
+      if (i >= a.length) { ops.push({ op: 'insert', n: j, before: i }); j++; continue; }
+      if (a[i] === b[j]) { ops.push({ op: 'patch', o: i, n: j }); i++; j++; continue; }
+      // is the child that is here now still coming, a little further down the
+      // new list? then what sits in front of it is new.
+      let ahead = 0;
+      for (let k = 1; k <= look && j + k < b.length; k++) if (b[j + k] === a[i]) { ahead = k; break; }
+      if (ahead) { for (let k = 0; k < ahead; k++) { ops.push({ op: 'insert', n: j, before: i }); j++; } continue; }
+      // or is the child the new list wants a little further down the old one?
+      // then what sits in front of that is gone.
+      let gone = 0;
+      for (let k = 1; k <= look && i + k < a.length; k++) if (a[i + k] === b[j]) { gone = k; break; }
+      if (gone) { for (let k = 0; k < gone; k++) { ops.push({ op: 'remove', o: i }); i++; } continue; }
+      // neither: a different thing in the same slot, patched where it stands.
+      ops.push({ op: 'patch', o: i, n: j }); i++; j++;
+    }
+    for (; i < a.length; i++) ops.push({ op: 'remove', o: i });
+    return ops;
   }
 
   // Replaces the screen, or patches it if it is the same screen and the shapes
@@ -828,6 +900,26 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     const L = levelInfo(state.xp);
     return `<div class="level-pill"><span class="lv">${L.level}</span><span>${t('level')}</span><span class="bar"><i style="width:${(L.into / L.need) * 100}%"></i></span></div>`;
   }
+  // Two shapes, one list. `compact` is the version for the final scoreboard,
+  // where the screen is already full and a whole card would be shouting.
+  function gamesCard(compact) {
+    // The compact rows keep the arrow next to the name rather than out at the
+    // edge. On the final scoreboard the reaction bar floats over the first
+    // 54px of the row — measured — and the one thing that must stay readable
+    // is the thing that says this is a link.
+    const rows = GAMES.map((g, i) => `<button class="game-row" data-act="game" data-i="${i}">
+      <span class="ge">${g.e}</span>
+      <span class="gt"><b>${t('game_' + g.id)}${compact ? ' ↗' : ''}</b>${compact ? '' : `<small>${t('gamed_' + g.id)}</small>`}</span>
+      ${compact ? '' : `<span class="go">${t('openGame')} ↗</span>`}
+    </button>`).join('');
+    if (compact) return `<div class="games-strip">${rows}</div>`;
+    return `<div class="games-card">
+      <b>${t('moreGames')}</b>
+      <p class="muted">${t('moreGamesBody')}</p>
+      ${rows}
+    </div>`;
+  }
+
   function meCard() {
     if (!signedIn()) {
       // Until the server answers we show the shape of the card, not a claim
@@ -946,6 +1038,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         </div>
         ${accountBar()}
         ${lobbyList()}
+        ${gamesCard(false)}
         <div class="links">
           <button data-act="how">❓ ${t('how')}</button>
           <button data-act="edit">🎨 ${t('editAvatar')}</button>
@@ -1900,6 +1993,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         ${awards ? `<div class="section-title"><span>🏅 ${t('awards')}</span></div><div class="awards">${awards}</div>` : ''}
         <div class="glass xp-card"><div class="top"><span>${t('level')} <b id="lv">${L.level}</b></span><span class="gain" id="xpg"></span></div><div class="bar"><i id="xpbar" style="width:${(L.into / L.need) * 100}%"></i></div></div>
         <div class="board" style="margin-top:14px">${ranked.slice(3).map((p, i) => `<div class="brow ${p.id === mid ? 'me' : ''}"><span class="rk">${i + 4}</span>${J(p.avatar)}<span class="nm">${esc(p.name)}</span><span class="sc">${fmt(p.score)}</span></div>`).join('')}</div>
+        ${gamesCard(true)}
         <div class="center" style="margin-top:16px">
           <button class="btn sm ghost quiet" data-act="donate">${t('supportSmall')}</button>
         </div>
@@ -2759,6 +2853,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     // game's answer rather than the player's, and a player who edits one word
     // has written a lie.
     donate() { buzz(10); openLink(DONATE_URL); },
+    game(el) { const g = GAMES[Number(el.dataset.i)]; if (g) { sfx.tap(); buzz(10); openLink(g.url); } },
     async stuck() {
       buzz(10);
       const r = await emit('stuck');   // emit() reports the error itself
