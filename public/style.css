@@ -854,3 +854,15 @@ body[data-tint=spy] .bg .b3 { background: var(--coral); }
    and a streak squeezed "Nova" into 25px and drew it as "...va". */
 .brow .nm { min-width: 4.5em; }
 .brow .streak { flex: 0 0 auto; }
+
+/* The support ask. Quiet by design and it sells nothing: a donation unlocks
+   no badge, no cosmetic and no advantage, which is both fair to players who
+   do not pay and the line that keeps an outbound link allowed in a Discord
+   Activity at all. */
+.support-card {
+  margin-top: 14px; padding: 14px; border-radius: 16px;
+  background: var(--card); border: 1px solid var(--line);
+}
+.support-card b { display: block; margin-bottom: 6px; font-size: 15px; }
+.support-card p { margin: 0 0 8px; font-size: 13px; line-height: 1.6; }
+.support-card .btn { margin-top: 4px; }

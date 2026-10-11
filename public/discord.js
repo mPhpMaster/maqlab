@@ -90,7 +90,13 @@ export async function getDiscordBootstrap({ onLeave, onStage } = {}) {
     const { code: roomCode } = await stage('room', roomP, onStage);
     if (!roomCode) return null;
 
-    return { name, roomCode, session, user, isAdmin };
+    // Inside the Activity the page is sandboxed on a discordsays.com proxy
+    // origin, where a plain target="_blank" goes nowhere at all — it fails
+    // silently, which is the worst way for a link to fail. Discord opens
+    // external links itself, behind its own "you are leaving Discord" prompt.
+    const openLink = url => discordSdk.commands.openExternalLink({ url });
+
+    return { name, roomCode, session, user, isAdmin, openLink };
   } catch (e) {
     // Inside the iframe there is no web flow to fall back to, so say what
     // broke instead of leaving the player on a screen that never resolves.

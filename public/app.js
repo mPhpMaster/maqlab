@@ -71,6 +71,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ach_two_fooler: 'وجه بريء', achd_two_fooler: 'ما أحد لقى كذبتك في جولة',
       ach_two_master: 'ما يرفّ له جفن', achd_two_master: 'خدعت الكل 5 مرات',
       ach_odd_sweep: 'عين الدخيل', achd_odd_sweep: 'اكشف الدخيل في الثلاثة كلها',
+      supportTitle: '☕ ادعم اللعبة', supportBody: 'مقلب تشتغل على خادم مجاني — لهذا تاخذ ٢٠ ثانية تقريباً تصحى أول مرة. لو حبيت تساعد في تكاليف التشغيل، هذا رابط للتبرع.',
+      supportNothing: 'ما تحصل مقابلها شي داخل اللعبة — اللعبة كاملة مجانية للكل، والتبرع اختياري تماماً.',
+      supportBtn: 'تبرّع', supportSmall: 'عجبتك اللعبة؟ ادعم تكاليف الخادم ☕',
       ach_odd_eye: 'مجهر', achd_odd_eye: '10 جولات كاملة في «الدخيل»',
       ach_first_game: 'أول لعبة', achd_first_game: 'خلّص أول لعبة', ach_first_win: 'أول فوز', achd_first_win: 'اطلع الأول في لعبة', ach_liar5: 'كذّاب محترف', achd_liar5: 'اخدع 5 لاعبين', ach_bull: 'قنّاص', achd_bull: 'جيب «في الصميم» 🎯', ach_streak4: 'نار', achd_streak4: 'سلسلة 4 ورا بعض', ach_allin: 'كل شي أو لا شي', achd_allin: 'اكسب رهان ×3', ach_famous: 'المشهور', achd_famous: 'الشلة تختارك في «مين فينا؟»', ach_speedy: 'برق', achd_speedy: 'كن الأسرع 3 مرات', ach_games10: 'مدمن', achd_games10: 'العب 10 ألعاب', ach_wins5: 'أسطورة', achd_wins5: 'افز بـ 5 ألعاب',
       howSteps: ['أنشئ غرفة وشارك الكود أو الرابط مع الشلة.', 'كل جولة تبدأ بآلة الحظ: تحدد نوع الجولة ومضاعف النقاط.', '🤥 المقلب: اكتب كذبة مقنعة، بعدين اختار الصح وراهن عليه.', '🎯 أقرب رقم: خمّن، والأقرب ياخذ النقاط (والصميم +1000!).', '⚡ صح ولا خطأ و🔤 فكّ الإيموجي: جاوب بسرعة، كل ثانية تفرق.', '🧩 الدخيل و📊 رتّبها: لقّط اللي ما له دخل بينهم، أو رتّب أربعة أشياء من الأكبر للأصغر.', '👥 مين فينا؟ صوّت على واحد من الشلة ووافق الأغلبية.', '🕵️ الجاسوس: واحد ما يعرف الكلمة، الكل يكتب تلميح، وبعدين صوتوا مين الجاسوس!', 'عندك قدرتين كل لعبة: 🔍 كشّاف يشيل خيارين غلط، و💎 دبل يضاعف نقاط جولة.', 'اجمع سلاسل 🔥 واكسب الألقاب والإنجازات وارفع مستواك!'],
@@ -173,6 +176,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ach_two_fooler: 'Straight Face', achd_two_fooler: 'Nobody finds your lie',
       ach_two_master: 'Career Liar', achd_two_master: 'Fool the whole table 5 times',
       ach_odd_sweep: 'Odd Spotter', achd_odd_sweep: 'Spot the odd one in all three',
+      supportTitle: '☕ Support the game', supportBody: 'MAQLAB runs on a free server — that is why it takes about 20 seconds to wake up the first time. If you would like to help with the running costs, here is a link.',
+      supportNothing: 'It buys you nothing in the game — all of it is free for everyone, and this is entirely optional.',
+      supportBtn: 'Donate', supportSmall: 'Enjoying MAQLAB? Help with the server bill ☕',
       ach_odd_eye: 'Microscope', achd_odd_eye: '10 clean sweeps of Odd One Out',
       ach_first_game: 'First Game', achd_first_game: 'Finish your first game', ach_first_win: 'First Win', achd_first_win: 'Finish 1st in a game', ach_liar5: 'Pro Liar', achd_liar5: 'Fool 5 players', ach_bull: 'Sharpshooter', achd_bull: 'Hit a bullseye 🎯', ach_streak4: 'On Fire', achd_streak4: 'Get a 4 streak', ach_allin: 'All In', achd_allin: 'Win a ×3 bet', ach_famous: 'Famous', achd_famous: "Be the crowd's pick", ach_speedy: 'Lightning', achd_speedy: 'Be fastest 3 times', ach_games10: 'Regular', achd_games10: 'Play 10 games', ach_wins5: 'Legend', achd_wins5: 'Win 5 games',
       howSteps: ['Create a room and share the code or link with friends.', 'Every round starts with a slot machine: round type + point multiplier.', '🤥 The Bluff: write a convincing lie, then find the truth and bet on it.', '🎯 Closest Number: guess — closest wins (bullseye = +1000!).', '⚡ True or False & 🔤 Emoji Decode: answer fast, every second counts.', '🧩 Odd One Out & 📊 Line Them Up: spot the one that does not belong, or put four things in order.', "👥 Who's Most Likely: vote for a friend and side with the crowd.", "🕵️ The Spy: one player doesn't know the word — everyone drops a clue, then vote who's the spy!", 'Two power-ups per game: 🔍 Peek removes two wrong options, 💎 Double doubles one round.', 'Build 🔥 streaks, win awards & achievements and level up!'],
@@ -247,7 +253,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     room: null, code: null, joining: false,
     draft: { name: '', code: '', lie: '', guess: '', spyClue: '', spyGuess: '', order: [], nameAns: '', two: ['', '', ''], twoLie: null, askQ: '', askA: '', stuck: false },
     bet: 1, showQR: false, reactOpen: false,
-    me: null, isAdmin: false, lobbies: null, achList: null,
+    me: null, isAdmin: false, lobbies: null, achList: null, openLink: null,
     // meKnown stays false until /api/auth/me answers. Rendering a sign-in
     // button before that is a lie half the time, and it is what made the
     // screen flip from signed-out to signed-in a moment after every load.
@@ -300,6 +306,13 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   };
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const J = (av, cls) => Jelly.svg(av, cls);
+  // Outside Discord an ordinary new tab; inside the Activity only Discord can
+  // open an outbound link, and a plain one fails without saying so.
+  function openLink(url) {
+    if (state.openLink) { Promise.resolve(state.openLink(url)).catch(() => {}); return; }
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
   const now = () => Date.now() + (state.clockOffset || 0);
   const myId = () => state.room && state.tokens[state.room.code];
   const isHost = () => state.room && state.room.hostId === myId();
@@ -310,6 +323,13 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   const fmt = n => Number(n).toLocaleString('en-US');
   const later = (ms, fn) => state.timeouts.push(setTimeout(fn, ms));
   function applyDir() { document.documentElement.lang = state.lang; document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr'; document.title = 'MAQLAB | مقلب'; }
+
+  // A donation buys nothing: no badge, no cosmetic, no advantage, nothing
+  // recorded against the account. That is deliberate and it is the line that
+  // keeps this allowed — Discord requires anything a player *buys* to go
+  // through its own checkout, and the moment a donation unlocks something it
+  // becomes a paid feature sold outside it.
+  const DONATE_URL = 'https://paypal.me/mfsafadi';
 
   const TYPES = { bluff: '🤥', number: '🎯', blitz: '⚡', likely: '👥', emoji: '🔤', odd: '🧩', order: '📊', spy: '🕵️', many: '🙋', name: '🗣️', two: '🎭' };
   const MODS = { normal: '✨', double: '💎', speed: '⏱️', jackpot: '🎁', golden: '👑' };
@@ -1663,6 +1683,9 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         ${awards ? `<div class="section-title"><span>🏅 ${t('awards')}</span></div><div class="awards">${awards}</div>` : ''}
         <div class="glass xp-card"><div class="top"><span>${t('level')} <b id="lv">${L.level}</b></span><span class="gain" id="xpg"></span></div><div class="bar"><i id="xpbar" style="width:${(L.into / L.need) * 100}%"></i></div></div>
         <div class="board" style="margin-top:14px">${ranked.slice(3).map((p, i) => `<div class="brow ${p.id === mid ? 'me' : ''}"><span class="rk">${i + 4}</span>${J(p.avatar)}<span class="nm">${esc(p.name)}</span><span class="sc">${fmt(p.score)}</span></div>`).join('')}</div>
+        <div class="center" style="margin-top:16px">
+          <button class="btn sm ghost quiet" data-act="donate">${t('supportSmall')}</button>
+        </div>
       </div></div>
       ${dock(`<div class="row">${isHost() ? `<button class="btn grow" data-act="again">${t('playAgain')}</button>` : ''}<button class="btn ghost grow" data-act="leave">${t('home')}</button></div>`)}
     </div>`;
@@ -2380,9 +2403,20 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     modal(`<div class="center"><div class="logo sm">${t('appName')}</div></div>
       ${STR[state.lang].aboutBody.map(p => `<p>${esc(p)}</p>`).join('')}
       <div class="mode-strip" style="margin:14px 0">${Object.keys(TYPES).map(k => `<span class="chip">${TYPES[k]} ${t('type_' + k)}</span>`).join('')}</div>
+      <div class="support-card">
+        <b>${t('supportTitle')}</b>
+        <p>${t('supportBody')}</p>
+        <p class="muted">${t('supportNothing')}</p>
+        <button class="btn mint block" data-act="donate">${t('supportBtn')}</button>
+      </div>
       <div class="center muted" style="font-size:12px">${t('aboutMade')} · ${t('version')} 2.0</div>
       <div class="center" style="margin-top:8px;font-size:12px"><a href="/terms" target="_blank" style="color:var(--muted)">${t('terms')}</a> · <a href="/privacy" target="_blank" style="color:var(--muted)">${t('privacy')}</a></div>
-      <button class="btn block ghost" data-close style="margin-top:14px">${t('close')}</button>`);
+      <button class="btn block ghost" data-close style="margin-top:14px">${t('close')}</button>`,
+      // Modals live outside the app container, so the main click delegate
+      // never sees them — every interactive modal brings its own listener.
+      m => m.addEventListener('click', e => {
+        if (e.target.closest('[data-act="donate"]')) { buzz(10); openLink(DONATE_URL); }
+      }));
   }
 
   // ================= actions =================
@@ -2481,6 +2515,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     // Fills the box and hands it back. Sending it would make the round the
     // game's answer rather than the player's, and a player who edits one word
     // has written a lie.
+    donate() { buzz(10); openLink(DONATE_URL); },
     async stuck() {
       buzz(10);
       const r = await emit('stuck');   // emit() reports the error itself
@@ -2628,6 +2663,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     // it was verified against Discord on the server. Asking again here would
     // be one more round trip between the player and their lobby.
     useBearer(info.session);
+    // Only Discord can open an outbound link from inside its own iframe.
+    state.openLink = info.openLink || null;
     state.me = { id: info.user.id, name: info.name };
     state.meKnown = true;
     state.isAdmin = !!info.isAdmin;
