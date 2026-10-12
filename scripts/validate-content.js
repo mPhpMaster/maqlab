@@ -114,6 +114,27 @@ const SHAPES = {
     bilingual(x, 'many', i, 'prompt');
     if (x && x.en && !/\?\s*$/.test(x.en)) err('many', i, 'prompt should be a question');
   },
+  // The minority round: two options, and the smaller side wins. Nothing here
+  // can tell a good pair from a dull one, but it can tell a pair from a pair
+  // with one side missing.
+  minor: (x, i) => {
+    bilingual(x.a, 'minor', i, 'a');
+    bilingual(x.b, 'minor', i, 'b');
+    for (const lang of ['ar', 'en']) {
+      if (x.a && x.b && norm(x.a[lang]) === norm(x.b[lang])) err('minor', i, `both sides are the same thing in ${lang}`);
+    }
+  },
+  // Higher or Lower. The answer is a single letter, and a round whose answer
+  // is missing or misspelled marks every player wrong.
+  higher: (x, i) => {
+    bilingual(x.q, 'higher', i, 'q');
+    bilingual(x.a, 'higher', i, 'a');
+    bilingual(x.b, 'higher', i, 'b');
+    if (x.bigger !== 'a' && x.bigger !== 'b') err('higher', i, `bigger must be "a" or "b", not ${JSON.stringify(x.bigger)}`);
+    for (const lang of ['ar', 'en']) {
+      if (x.a && x.b && norm(x.a[lang]) === norm(x.b[lang])) err('higher', i, `both sides are the same thing in ${lang}`);
+    }
+  },
 };
 
 // What identifies an entry, for duplicate detection.
@@ -165,6 +186,12 @@ function run() {
   for (const bank of banks) {
     const list = content[bank];
     if (!Array.isArray(list)) { err(bank, 0, 'bank is not an array'); continue; }
+    // A bank with no schema is a bank nothing here checks. The minority and
+    // higher-or-lower rounds shipped that way: 160 entries between them, read
+    // only for duplicates, so a missing `bigger` would have reached players
+    // as a round that marks everyone wrong.
+    if (!SHAPES[bank]) err(bank, 0, 'no schema — nothing in this file checks the shape of these entries');
+    if (!KEYS[bank]) err(bank, 0, 'no identity — duplicates in this bank would go unnoticed');
 
     const before = head && head[bank] ? new Set(head[bank].map(x => KEYS[bank](x).join('|'))) : null;
     const seen = new Map();
