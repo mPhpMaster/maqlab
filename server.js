@@ -2575,6 +2575,13 @@ app.get('/api/lobbies', (_, res) => {
     // players should have three people in it.
     const online = humans(r).filter(p => p.connected);
     if (!r.settings.public || !online.length || r.players.size >= MAX_PLAYERS) continue;
+    // Only rooms still waiting to start. A room was listed for as long as it
+    // was public, so a stranger could tap in on round seven of a game among
+    // friends — arriving with no score, into a round already half answered.
+    // Listing stops at kickoff and starts again when the room comes back to
+    // the lobby; the code still works the whole time, for the people who were
+    // given it.
+    if (r.phase !== 'lobby') continue;
     const host = r.players.get(r.hostId);
     list.push({
       code: r.code, players: online.length, phase: r.phase, round: r.round,
@@ -2582,7 +2589,7 @@ app.get('/api/lobbies', (_, res) => {
       host: host ? host.name : '', avatar: host ? host.avatar : null,
     });
   }
-  list.sort((a, b) => (a.phase === 'lobby' ? -1 : 1) - (b.phase === 'lobby' ? -1 : 1) || b.players - a.players);
+  list.sort((a, b) => b.players - a.players);
   res.json({ lobbies: list.slice(0, 30) });
 });
 
