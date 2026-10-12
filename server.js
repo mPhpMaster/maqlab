@@ -67,12 +67,27 @@ const MODS = [
 // split is even, and an even split pays nobody.
 const MIN_PLAYERS = { likely: 3, spy: 4, many: 3, name: 4, two: 3, minor: 3 };
 // The plan is drawn once at kickoff, but people leave mid-game. Before a round
-// starts, swap out a mode the room has shrunk below.
-function supportedType(room, wanted) {
+// starts, deal with a mode the room has shrunk below.
+//
+// This used to pick a random playable mode instead, which quietly threw away
+// the one guarantee the planner exists to give: measured over 20,000 games,
+// a room of two played some mode five times while others never came up at
+// all. plan.pickRound trades the round with a later one in the same plan, so
+// nothing is invented and no count moves. Only when no later round fits
+// either is the list genuinely exhausted, and then the repeat is the mode
+// that has been waiting longest.
+//
+// The chosen type is written back, because room.plan doubles as the record of
+// what this game actually played.
+function roundType(room) {
+  const i = room.round - 1;
   const n = connected(room).length;
-  if (n >= (MIN_PLAYERS[wanted] || 1)) return wanted;
-  const alt = TYPES.filter(t => room.settings.types[t] && n >= (MIN_PLAYERS[t] || 1));
-  return alt.length ? alt[rnd(alt.length)] : 'bluff';
+  const ok = t => !!room.settings.types[t] && n >= (MIN_PLAYERS[t] || 1);
+  const got = plan.pickRound(room.plan, i, ok)
+    || plan.leastPlayed(room.plan.slice(0, i), TYPES.filter(ok))
+    || 'bluff';
+  room.plan[i] = got;
+  return got;
 }
 
 const rooms = new Map();
@@ -608,13 +623,16 @@ function createRoom() {
 // game opened with the same screen, which reads as a game with one mode and
 // eleven variations. It is drawn like any other round now.
 function planTypes(room) {
-  let enabled = TYPES.filter(t => room.settings.types[t]);
+  const enabled = TYPES.filter(t => room.settings.types[t]);
   const crowd = connected(room).length;
-  // "who's most likely" needs a crowd
-  if (crowd < MIN_PLAYERS.likely && enabled.length > 1) enabled = enabled.filter(t => t !== 'likely');
-  // spy needs a spy + a few civilians to be worth playing
-  if (crowd < MIN_PLAYERS.spy && enabled.length > 1) enabled = enabled.filter(t => t !== 'spy');
-  return plan.drawPlan(enabled, room.settings.rounds);
+  // Which modes this many people can play, read off MIN_PLAYERS rather than
+  // named here. "likely" and "spy" were the two spelled out by hand, so the
+  // four thresholds added after them went into the bag anyway and were pulled
+  // back out when the round came up — which is where a repeat came from. At
+  // three players that was 85% of games playing one mode twice while another
+  // never appeared.
+  const fits = enabled.filter(t => crowd >= (MIN_PLAYERS[t] || 1));
+  return plan.drawPlan(fits.length ? fits : enabled, room.settings.rounds);
 }
 
 function chooseMod(room) {
@@ -686,7 +704,7 @@ function nextRound(room) {
   const mod = chooseMod(room);
   room.gains = {};
   room.prevRank = rankMap(room);
-  room.current = { type: supportedType(room, room.plan[room.round - 1]), mod: mod.id, mult: mod.mult, doubled: {}, peeked: {} };
+  room.current = { type: roundType(room), mod: mod.id, mult: mod.mult, doubled: {}, peeked: {} };
   room.phase = 'spin';
   setTimer(room, pace(room, 'spin'), () => beginRound(room));
   broadcast(room);

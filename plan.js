@@ -47,4 +47,53 @@ function drawPlan(enabled, rounds) {
   return plan;
 }
 
-module.exports = { drawPlan };
+// The round that actually comes up, when the crowd is not the crowd the plan
+// was dealt for. Some modes need three or four people; the plan is dealt once
+// at kickoff and players leave.
+//
+// The rule is the same rule: no mode twice until the rest have had their turn.
+// So the answer is a trade, not a fresh draw — the bag dealt one of each, and
+// swapping two rounds of the same plan keeps every count exactly where it was.
+// Reaching outside the plan for a random playable mode is what broke the
+// guarantee: it could deal a third Blitz while Odd One Out never appeared.
+//
+// `ok(type)` answers whether the room as it stands can play that mode.
+// Returns the type to play, or null when nothing left in the plan fits — the
+// caller then has a genuinely exhausted list and has to repeat something.
+function pickRound(plan, index, ok) {
+  if (!Array.isArray(plan) || index < 0 || index >= plan.length) return null;
+  if (ok(plan[index])) return plan[index];
+  const prev = index > 0 ? plan[index - 1] : null;
+  // Two passes, so a trade only lands the same mode twice in a row when there
+  // was nothing else left to trade with.
+  for (const avoidPrev of [true, false]) {
+    for (let j = index + 1; j < plan.length; j++) {
+      if (!ok(plan[j]) || (avoidPrev && plan[j] === prev)) continue;
+      [plan[index], plan[j]] = [plan[j], plan[index]];
+      return plan[index];
+    }
+  }
+  return null;
+}
+
+// When a repeat is unavoidable — a room small enough that it has played
+// everything it can play — this is which one to repeat: whichever has been
+// waiting longest. A room of two has eight playable modes and twelve rounds,
+// so four rounds have to double up; they should be four different modes.
+function leastPlayed(played, candidates) {
+  const pool = (candidates || []).filter(Boolean);
+  if (!pool.length) return null;
+  const log = played || [];
+  const n = {};
+  for (const t of log) n[t] = (n[t] || 0) + 1;
+  const low = Math.min(...pool.map(t => n[t] || 0));
+  let least = pool.filter(t => (n[t] || 0) === low);
+  const prev = log[log.length - 1];
+  if (least.length > 1 && prev) {
+    const notPrev = least.filter(t => t !== prev);
+    if (notPrev.length) least = notPrev;
+  }
+  return least[Math.floor(Math.random() * least.length)];
+}
+
+module.exports = { drawPlan, pickRound, leastPlayed };
