@@ -83,8 +83,15 @@ function roundType(room) {
   const i = room.round - 1;
   const n = connected(room).length;
   const ok = t => !!room.settings.types[t] && n >= (MIN_PLAYERS[t] || 1);
+  // Falling back on 'bluff' is how an unchecked mode got played: a host who
+  // leaves only Name Something on and plays with two people cannot have it,
+  // and the round became a Bluff they had switched off. The last resort is
+  // one of their own choices, undersized, which is at least the game they
+  // asked for — and the lobby now says which modes need a bigger table.
+  const chosen = TYPES.filter(t => room.settings.types[t]);
   const got = plan.pickRound(room.plan, i, ok)
     || plan.leastPlayed(room.plan.slice(0, i), TYPES.filter(ok))
+    || plan.leastPlayed(room.plan.slice(0, i), chosen)
     || 'bluff';
   room.plan[i] = got;
   return got;
@@ -215,6 +222,16 @@ function snapshot(room, pid) {
     code: room.code, hostId: room.hostId, phase: room.phase, settings: room.settings,
     players: [...room.players.values()].map(publicPlayer),
     round: room.round, gameNo: room.gameNo, deadline: room.deadline, now: Date.now(),
+    // What the host's control should say: a reveal or the scoreboard is
+    // waiting to move on, anything else is still being answered and gets
+    // skipped. Decided here off the set the server already keeps, so the
+    // client does not hold its own copy of which phases are which.
+    clock: isRevealPhase(room.phase) || room.phase === 'scores' ? 'next' : 'skip',
+    // How many people each mode needs, so the lobby can say so on the toggle
+    // itself. Sent rather than copied into the client: the client had no idea
+    // these thresholds existed, so a host could switch everything else off
+    // and start a game whose every round was unplayable.
+    mins: MIN_PLAYERS,
     teamScores: teamScores(room), balloon: { size: room.balloon.size, pops: room.balloon.pops },
   };
   // The host's own questions go only to the host: everyone else would be
@@ -541,6 +558,11 @@ function setTimer(room, sec, fn) {
   // finish, and they want opposite fixes.
   room.phaseStart = Date.now();
   room.deadline = Date.now() + sec * 1000;
+  // Kept so the host can run the clock out early. Every phase already knows
+  // what happens when its time is up; "skip" and "next" are that, sooner.
+  // Not persisted — a room restored from the database is restored mid-phase
+  // and sets its own clock again.
+  room.onTime = fn;
   room.timer = setTimeout(fn, sec * 1000);
   // Every phase change comes through here, which makes it the one checkpoint
   // worth writing down without waiting for the throttle.
@@ -1258,7 +1280,12 @@ function startTwoGuess(room) {
   // Only sets from people still in the room, and only a few of them, so the
   // round stays a round instead of becoming the whole evening.
   c.order = shuffle(connected(room).filter(x => c.sets[x.id]).map(x => x.id)).slice(0, TWO_SETS_PER_ROUND);
-  if (!c.order.length) { finishRound(room); return showScores(room); }
+  // Nobody wrote a set, so there is nothing to play. showScores only runs
+  // from a registered reveal phase, so the phase has to be moved first: left
+  // in twoWrite it returned, set no clock, and the game stopped there with
+  // nothing in the log. The round's own 95-second clock did this too — the
+  // host's skip only made it easy to reach.
+  if (!c.order.length) { finishRound(room); room.phase = 'twoResult'; return showScores(room); }
   c.idx = 0;
   c.picks = c.order.map(() => ({}));
   room.phase = 'twoGuess';
@@ -1902,10 +1929,27 @@ io.on('connection', socket => {
   socket.on('many', (yes, cb) => room && reply(cb, submitMany(room, player, yes)));
   socket.on('manyGuess', (n, cb) => room && reply(cb, submitManyGuess(room, player, n)));
 
+  // The host cutting the clock short — "Next" on a reveal, "Skip" while
+  // people are still answering. Both are the same thing: run what this phase
+  // was going to do when its time ran out.
+  //
+  // This replaced a list of four phase names. There are fourteen reveals, so
+  // the button did nothing on ten of them, and no phase anyone was still
+  // answering in could be cut short at all — a table that had all answered a
+  // typed round sat watching eighty seconds of clock. Running the phase's own
+  // callback means there is no second route through the game to keep in step,
+  // and a round type added later needs nothing here. Every callback already
+  // guards on the phase it belongs to, so a stale one does nothing.
   socket.on('next', (_, cb) => {
     if (!host()) return reply(cb, { error: 'host' });
-    if (['bluffReveal', 'numReveal', 'likelyReveal', 'spyReveal'].includes(room.phase)) showScores(room);
-    else if (room.phase === 'scores') { clearTimer(room); nextRound(room); }
+    // A double tap is not a mistake worth a message: the first tap moved the
+    // screen on. Without the throttle the second one would run the next
+    // phase's clock too, and a reveal would skip straight past the scores.
+    if (limited('next', 500)) return reply(cb, { ok: true });
+    const fn = room.onTime;
+    if (!fn || room.phase === 'lobby' || room.phase === 'final') return reply(cb, { error: 'late' });
+    clearTimer(room);
+    fn();
     reply(cb, { ok: true });
   });
   socket.on('end', (_, cb) => { if (host() && room.phase !== 'lobby') finishGame(room); reply(cb, { ok: true }); });

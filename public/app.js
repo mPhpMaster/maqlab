@@ -43,7 +43,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       mdesc_normal: 'نقاط عادية', mdesc_double: 'كل النقاط مضاعفة!', mdesc_speed: 'الوقت أقصر والنقاط ×1.5', mdesc_jackpot: 'أعلى لاعب بالجولة ياخذ صندوق مفاجآت 🎁', mdesc_golden: 'آخر جولة… كل شيء ×3!',
       writeLie: 'اكتب إجابة كاذبة مقنعة…', lieHint: 'كل واحد ينخدع بكذبتك = +300', send: 'أرسل 😈', yourLie: 'كذبتك', waitOthers: 'ننتظر الباقين',
       pickTruth: 'وين الإجابة الصحيحة؟ 🤔', bet1: 'آمن', bet2: 'واثق', bet3: 'متأكد 100%', yours: 'كذبتك', betInfo: 'صح = 500 × رهانك • غلط = −150 لكل مستوى زيادة', voted: 'تم التصويت ✓',
-      lieBy: 'كذبة {n}', houseLie: 'كذبة اللعبة 🤖', truth: 'الصح ✅', fooledN: 'انخدع {n} 😈', gotIt: 'عرفوها 🧠', nobody: 'ما أحد عرفها! 😱', next: 'التالي ⏭', nextIn: 'التالي بعد', seeImages: 'شوف صور', gotFooledBy: 'انقلبت على يد {n} 😂',
+      lieBy: 'كذبة {n}', houseLie: 'كذبة اللعبة 🤖', truth: 'الصح ✅', fooledN: 'انخدع {n} 😈', gotIt: 'عرفوها 🧠', nobody: 'ما أحد عرفها! 😱', next: 'التالي ⏭', nextIn: 'التالي بعد', skip: 'تخطى ⏭', needsN: 'يحتاج {n}', seeImages: 'شوف صور', gotFooledBy: 'انقلبت على يد {n} 😂',
       yourGuess: 'تخمينك', typeNumber: 'اكتب رقم', true: 'صح', false: 'خطأ', whatTheySaid: 'وش جاوبوا', rightAns: 'أصبت! 🎉', wrongAns: 'أخطأت 😬', noAns: 'ما جاوبت ⏰', fastestIs: '⚡ الأسرع: {n}',
       pickPlayer: 'اختار واحد من الشلة 👇', youPicked: 'اخترت {n}', likelyWinner: 'الشلة اختارت: {n}!', votesN: { one: 'صوت واحد', two: 'صوتان', few: '{n} أصواتٍ', many: '{n} صوتاً', other: '{n} صوتٍ' }, withCrowd: 'مع الأغلبية +300 👥', noVotes: 'ما أحد صوّت',
       whatEmoji: 'وش تعني هالإيموجيات؟', answerWas: 'الجواب: {v}',
@@ -164,7 +164,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       mdesc_normal: 'Regular points', mdesc_double: 'Every point is doubled!', mdesc_speed: 'Less time, points ×1.5', mdesc_jackpot: "The round's top player wins a mystery box 🎁", mdesc_golden: 'Final round… everything ×3!',
       writeLie: 'Type a convincing fake answer…', lieHint: 'Every player you fool = +300', send: 'Send 😈', yourLie: 'Your lie', waitOthers: 'Waiting for others',
       pickTruth: 'Which one is the truth? 🤔', bet1: 'Safe', bet2: 'Sure', bet3: 'All in', yours: 'yours', betInfo: 'Right = 500 × bet • Wrong = −150 per extra level', voted: 'Voted ✓',
-      lieBy: "{n}'s lie", houseLie: 'House lie 🤖', truth: 'TRUTH ✅', fooledN: '{n} fooled 😈', gotIt: 'Got it 🧠', nobody: 'Nobody got it! 😱', next: 'Next ⏭', nextIn: 'Next in', seeImages: 'See images', gotFooledBy: '{n} got you! 😂',
+      lieBy: "{n}'s lie", houseLie: 'House lie 🤖', truth: 'TRUTH ✅', fooledN: '{n} fooled 😈', gotIt: 'Got it 🧠', nobody: 'Nobody got it! 😱', next: 'Next ⏭', nextIn: 'Next in', skip: 'Skip ⏭', needsN: 'needs {n}', seeImages: 'See images', gotFooledBy: '{n} got you! 😂',
       yourGuess: 'Your guess', typeNumber: 'Type a number', true: 'True', false: 'False', whatTheySaid: 'What everyone said', rightAns: 'Correct! 🎉', wrongAns: 'Wrong 😬', noAns: 'No answer ⏰', fastestIs: '⚡ Fastest: {n}',
       pickPlayer: 'Pick someone 👇', youPicked: 'You picked {n}', likelyWinner: 'The crowd picked: {n}!', votesN: { one: '1 vote', other: '{n} votes' }, withCrowd: 'With the crowd +300 👥', noVotes: 'No votes',
       whatEmoji: 'What do these emojis mean?', answerWas: 'Answer: {v}',
@@ -891,7 +891,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       missWatch: missView, missPick: missView, missReveal: missRevealView,
       scores: scoresView, final: finalView,
     };
-    return (views[state.room.phase] || (() => ''))();
+    return hostControl((views[state.room.phase] || (() => ''))());
   }
 
   // ---------- shared pieces ----------
@@ -1007,12 +1007,32 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   const dock = inner => `<div class="dock"><div class="wrap">${inner}</div></div>`;
   // Reveal/score screens auto-advance on a server timer. Show that countdown so
   // it never looks frozen, and let the host jump ahead early.
-  function hostNext() {
+  function hostNext(key) {
     const dl = state.room.deadline || 0;
     const cd = dl ? `<span class="cd" data-count="${dl}"></span>` : '';
     return dock(isHost()
-      ? `<button class="btn ghost block" data-act="next">${t('next')}${cd}</button>`
+      ? `<button class="btn ghost block" data-act="next">${t(key || 'next')}${cd}</button>`
       : `<div class="center muted" style="font-size:13px">${t('nextIn')}${cd}</div>`);
+  }
+
+  // The host's control belongs on every screen of every mode, so it is put
+  // there from one place rather than added to each view by hand. Added by
+  // hand, it reached five views out of thirty: ten reveals had no way past
+  // them but the clock, and no round anyone was still answering could be cut
+  // short at all. A view that already docks something keeps what it has.
+  //
+  // Which word it uses comes from the server (room.clock), because the server
+  // is what knows whether a phase is a reveal or a round in progress.
+  function hostControl(html) {
+    const s = state.room;
+    if (!html || !s || ['lobby', 'final', 'enter'].includes(s.phase)) return html;
+    if (html.includes('class="dock"')) return html;
+    // Mid-round, everyone but the host already has the round's own clock on
+    // screen; a second countdown under it says nothing.
+    if (!isHost() && s.clock !== 'next') return html;
+    const at = html.lastIndexOf('</div>');
+    if (at < 0) return html;
+    return html.slice(0, at) + hostNext(s.clock === 'skip' ? 'skip' : 'next') + html.slice(at);
   }
   const quickDots = (c, final) => `<div class="blitz-dots">${Array.from({ length: c.total }, (_, i) => `<i class="${i < c.idx || (final && i === c.idx) ? 'done' : i === c.idx ? 'on' : ''}"></i>`).join('')}</div>`;
 
@@ -1102,7 +1122,14 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
           <div class="set-row"><div class="lbl">${t('qLang')}</div>${seg('lang', ['en', 'ar'], v => v === 'ar' ? 'العربية' : 'English')}</div>
           <div class="set-row"><div class="lbl">${t('rounds')}</div>${seg('rounds', [3, 5, 8, 12], v => v)}</div>
           <div class="set-row"><div class="lbl">${t('types')}</div><div class="types">
-            ${Object.keys(TYPES).map(k => `<button class="type-tog ${st.types[k] ? 'on' : ''}" data-act="type" data-k="${k}" ${dis}><span class="e">${TYPES[k]}</span>${t('type_' + k)}</button>`).join('')}
+            ${Object.keys(TYPES).map(k => {
+              // A mode this table is too small for, said on the toggle itself.
+              // Without it a host could switch everything else off and start a
+              // game in which not one round could be played as chosen.
+              const need = (state.room.mins || {})[k] || 1;
+              const short = online.length < need;
+              return `<button class="type-tog ${st.types[k] ? 'on' : ''} ${short ? 'short' : ''}" data-act="type" data-k="${k}" ${dis}><span class="e">${TYPES[k]}</span>${t('type_' + k)}${short ? `<i class="need">${t('needsN', { n: fmt(need) })}</i>` : ''}</button>`;
+            }).join('')}
           </div></div>
           <div class="set-row"><div class="lbl">${t('pace')}</div>${seg('pace', ['chill', 'normal', 'fast'], v => t(v))}</div>
           <div class="set-row"><div class="lbl">${t('teams')}</div><div class="seg">${[false, true].map(v => `<button class="${st.teams === v ? 'on' : ''}" data-act="teams" data-v="${v}" ${dis}>${v ? t('teamsOn') : t('teamsOff')}</button>`).join('')}</div></div>
