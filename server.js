@@ -20,6 +20,7 @@ const plan = require('./plan');
 const bots = require('./bots');
 const replay = require('./replay');
 const persist = require('./persist');
+const progress = require('./progress');
 
 const PORT = process.env.PORT || 3000;
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
@@ -846,7 +847,7 @@ function submitLie(room, p, text) {
     room.current.stuckUsed[p.id] = normalize(offered) === normalize(text) ? 'asis' : 'edited';
   }
   tookMs(room, p.id);
-  if (connected(room).every(x => room.current.lies[x.id])) startVote(room); else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -923,7 +924,7 @@ function submitVote(room, p, optionId, bet) {
   if (opt.authors.includes(p.id)) return { error: 'own' };
   bet = [1, 2, 3].includes(bet) ? bet : 1;
   room.current.votes[p.id] = { id: optionId, bet };
-  if (connected(room).every(x => room.current.votes[x.id])) revealBluff(room); else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -967,7 +968,7 @@ function submitGuess(room, p, val) {
   if (!Number.isFinite(n) || n < 0 || n > 1e12) return { error: 'nan' };
   room.current.guesses[p.id] = n;
   tookMs(room, p.id);
-  if (connected(room).every(x => room.current.guesses[x.id] != null)) revealNumber(room); else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1001,7 +1002,7 @@ function submitLikely(room, p, target) {
   if (!room.players.get(target)?.connected) return { error: 'bad' };
   room.current.lvotes[p.id] = target;
   tookMs(room, p.id);
-  if (connected(room).every(x => room.current.lvotes[x.id])) revealLikely(room); else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1033,7 +1034,7 @@ function submitSpyClue(room, p, text) {
   if (!text) return { error: 'empty' };
   room.current.clues[p.id] = text;
   tookMs(room, p.id);
-  if (connected(room).every(x => room.current.clues[x.id])) startSpyVote(room); else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1049,7 +1050,7 @@ function submitSpyVote(room, p, targetId) {
   if (p.id === targetId) return { error: 'selfvote' };
   if (!room.players.get(targetId)?.connected) return { error: 'bad' };
   room.current.votes[p.id] = targetId;
-  if (connected(room).every(x => room.current.votes[x.id])) revealSpy(room); else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1110,8 +1111,7 @@ function submitHigher(room, p, side) {
   c.picks[p.id] = side;
   tookMs(room, p.id);
   if (side === c.correct && !c.fastest) c.fastest = p.id;
-  if (connected(room).every(x => c.picks[x.id])) revealHigher(room);
-  else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1161,8 +1161,7 @@ function submitMiss(room, p, id) {
   c.picks[p.id] = id;
   tookMs(room, p.id);
   if (id === c.goneId && !c.fastest) c.fastest = p.id;
-  if (connected(room).every(x => c.picks[x.id])) revealMiss(room);
-  else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1207,8 +1206,7 @@ function submitMinor(room, p, side) {
   if (side !== 'a' && side !== 'b') return { error: 'bad' };
   c.picks[p.id] = side;
   tookMs(room, p.id);
-  if (connected(room).every(x => c.picks[x.id])) revealMinor(room);
-  else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1269,8 +1267,7 @@ function submitTwo(room, p, lines, lie) {
     lie: idx,
   };
   tookMs(room, p.id);
-  if (connected(room).every(x => room.current.sets[x.id])) startTwoGuess(room);
-  else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1301,9 +1298,7 @@ function submitTwoGuess(room, p, i) {
   const idx = Number(i);
   if (!Number.isInteger(idx) || idx < 0 || idx > 2) return { error: 'bad' };
   c.picks[c.idx][p.id] = idx;
-  const whose = c.order[c.idx];
-  if (connected(room).every(x => x.id === whose || c.picks[c.idx][x.id] != null)) revealTwo(room);
-  else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1369,8 +1364,7 @@ function submitName(room, p, text) {
   if (!text) return { error: 'empty' };
   room.current.said[p.id] = matchAnswerCase(text, room.settings.lang);
   tookMs(room, p.id);
-  if (connected(room).every(x => room.current.said[x.id])) revealName(room);
-  else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1427,8 +1421,7 @@ function submitMany(room, p, yes) {
   if (room.phase !== 'manyAsk') return { error: 'late' };
   if (room.current.said[p.id] != null) return { error: 'dup' };
   room.current.said[p.id] = !!yes;
-  if (connected(room).every(x => room.current.said[x.id] != null)) startManyGuess(room);
-  else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1446,8 +1439,7 @@ function submitManyGuess(room, p, n) {
   const v = Number(n);
   if (!Number.isInteger(v) || v < 0 || v > max) return { error: 'bad' };
   room.current.guesses[p.id] = v;
-  if (connected(room).every(x => room.current.guesses[x.id] != null)) revealMany(room);
-  else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1507,7 +1499,7 @@ function submitQuick(room, p, value) {
     if (!c.items[c.idx].opts.some(o => o.id === value)) return { error: 'bad' };
     ans[p.id] = { id: value, t: Date.now() - c.itemStart };
   }
-  if (connected(room).every(x => ans[x.id])) resolveQuickItem(room); else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1579,7 +1571,7 @@ function submitOrder(room, p, ids) {
   if (got.size !== want.size || [...got].some(id => !want.has(id))) return { error: 'bad' };
   c.orders[p.id] = ids.map(String);
   tookMs(room, p.id);
-  if (connected(room).every(x => c.orders[x.id])) revealOrder(room); else broadcast(room);
+  if (!advanceIfAllIn(room)) broadcast(room);
   return { ok: true };
 }
 
@@ -1772,17 +1764,29 @@ function backToLobby(room) {
   broadcast(room);
 }
 
+// What each answering phase does once nobody is left to wait for. The keys are
+// ACTIVE's, and "has this player answered" lives in progress.js; both are held
+// to ACTIVE by tests/progress.test.js.
+const ON_ALL_IN = {
+  write: startVote, vote: revealBluff, guess: revealNumber, likelyVote: revealLikely,
+  blitz: resolveQuickItem, emoji: resolveQuickItem, odd: resolveQuickItem,
+  order: revealOrder, spyClue: startSpyVote, spyVote: revealSpy,
+  manyAsk: startManyGuess, manyGuess: revealMany, nameWrite: revealName,
+  twoWrite: startTwoGuess, twoGuess: revealTwo,
+  minorPick: revealMinor, higherPick: revealHigher, missPick: revealMiss,
+};
+
+// Moves the round on when everyone still here has answered, and says whether
+// it did, so a submit broadcasts only when nothing else will.
+function advanceIfAllIn(room) {
+  if (!progress.allAnswered(room.phase, room.current, connected(room))) return false;
+  ON_ALL_IN[room.phase](room);
+  return true;
+}
+
+// Someone left or was kicked: they may have been the last one we were waiting for.
 function checkProgress(room) {
-  const ps = connected(room), c = room.current;
-  if (!ps.length || !c) return;
-  if (room.phase === 'write' && ps.every(p => c.lies[p.id])) startVote(room);
-  else if (room.phase === 'vote' && ps.every(p => c.votes[p.id])) revealBluff(room);
-  else if (room.phase === 'guess' && ps.every(p => c.guesses[p.id] != null)) revealNumber(room);
-  else if (room.phase === 'likelyVote' && ps.every(p => c.lvotes[p.id])) revealLikely(room);
-  else if ((room.phase === 'blitz' || room.phase === 'emoji') && ps.every(p => c.answers[c.idx][p.id])) resolveQuickItem(room);
-  else if (room.phase === 'order' && ps.every(p => c.orders[p.id])) revealOrder(room);
-  else if (room.phase === 'spyClue' && ps.every(p => c.clues[p.id])) startSpyVote(room);
-  else if (room.phase === 'spyVote' && ps.every(p => c.votes[p.id])) revealSpy(room);
+  advanceIfAllIn(room);
 }
 
 // ---------------- sockets ----------------
