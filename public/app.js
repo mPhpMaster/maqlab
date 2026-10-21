@@ -100,7 +100,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       laughHint: 'اضحك على أحلى كذبة 😂 وصاحبها ياخذ +200', g_funniest: 'أضحك كذبة 😂',
       rivals: '⚔️ خصومك', nemesis: 'عدوك اللدود', nemesisD: { one: 'قلبك مرةً واحدةً 😤', two: 'قلبك مرتين 😤', few: 'قلبك {n} مراتٍ 😤', many: 'قلبك {n} مرةً 😤', other: 'قلبك {n} مرةٍ 😤' }, victim: 'ضحيتك المفضلة', victimD: { one: 'قلبته مرةً واحدةً 😈', two: 'قلبته مرتين 😈', few: 'قلبته {n} مراتٍ 😈', many: 'قلبته {n} مرةً 😈', other: 'قلبته {n} مرةٍ 😈' },
       phrases: ['ما راح تعرفها 😏', 'أنا الفايز 🏆', 'يا ساتر 😂', 'ركّز يا بطل!', 'كذّاب! 🤥', 'يلا بسرعة ⏰', 'حظ أوفر 😅', 'الله عليك 👏', 'مستحيل! 😱', 'صدقني هذي الصح 😇', 'خلاص تعبت 😴', 'انتقامي قادم 😈'],
-      signIn: 'دخول بديسكورد', signInToPlay: 'سجّل دخولك بديسكورد عشان تلعب — اسمك وصورتك يجونك منه', signOut: 'تسجيل خروج', guestNote: 'ما أنت مسجّل دخول — سجّل عشان تفتح الإنجازات', signedInAs: 'مسجّل باسم',
+      signIn: 'دخول بديسكورد', signInToPlay: 'سجّل دخولك بديسكورد عشان تلعب — اسمك وصورتك يجونك منه', signOut: 'تسجيل خروج', guestNote: 'ما أنت مسجّل دخول — سجّل عشان تفتح الإنجازات', signedInAs: 'مسجّل باسم', loginOk: 'تم تسجيل الدخول ✓', crewWaiting: 'الشلة تنتظرك 👋', hostedBy: 'المضيف: {h}', roomGone: 'الغرفة هذي سكّرت — اطلب من ربعك رابط جديد', loginFailed: 'ما تم تسجيل الدخول — جرّب مرة ثانية',
       profile: 'الملف الشخصي', leaderboard: 'المتصدرون', suggestBtn: 'أرسل اقتراح', about: 'عن اللعبة', adminPanel: 'لوحة الإدارة',
       boardWeek: 'هذا الأسبوع', boardAll: 'منذ البداية', boardEmptyWeek: 'ما لعب أحد هالأسبوع بعد — كن أول واحد', rank: 'الترتيب', games: { one: 'لعبة', two: 'لعبتان', few: 'ألعابٍ', many: 'لعبةً', other: 'لعبةٍ' }, wins: { one: 'فوز', two: 'فوزان', few: 'فوزاتٍ', many: 'فوزاً', other: 'فوزٍ' }, winRate: 'نسبة الفوز', bestScore: 'أعلى نتيجة', totalScore: 'مجموع النقاط',
       curStreak: 'سلسلة الفوز', bestStreak: 'أطول سلسلة', followers: { one: 'متابِع', two: 'متابِعان', few: 'متابِعين', many: 'متابِعاً', other: 'متابِعٍ' }, followingN: 'يتابع', memberSince: 'عضو منذ',
@@ -221,7 +221,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       laughHint: 'Laugh at the funniest lie 😂 — its author gets +200', g_funniest: 'Funniest lie 😂',
       rivals: '⚔️ Your rivals', nemesis: 'Your nemesis', nemesisD: { one: 'Fooled you once 😤', other: 'Fooled you {n} times 😤' }, victim: 'Favourite victim', victimD: { one: 'You fooled them once 😈', other: 'You fooled them {n} times 😈' },
       phrases: ["You'll never get it 😏", "I'm winning 🏆", 'LOL 😂', 'Focus!', 'Liar! 🤥', 'Hurry up ⏰', 'Better luck next time 😅', 'Nice one 👏', 'No way! 😱', "Trust me, that's it 😇", "I'm tired 😴", 'Revenge is coming 😈'],
-      signIn: 'Sign in with Discord', signInToPlay: 'Sign in with Discord to play — your name comes from there', signOut: 'Sign out', guestNote: "You're not signed in — sign in to start earning these", signedInAs: 'Signed in as',
+      signIn: 'Sign in with Discord', signInToPlay: 'Sign in with Discord to play — your name comes from there', signOut: 'Sign out', guestNote: "You're not signed in — sign in to start earning these", signedInAs: 'Signed in as', loginOk: 'Signed in ✓', crewWaiting: 'Your crew is waiting 👋', hostedBy: 'Hosted by {h}', roomGone: 'This room has closed — ask your friends for a new link', loginFailed: "Sign-in didn't go through — try again",
       profile: 'Profile', leaderboard: 'Leaderboard', suggestBtn: 'Send a suggestion', about: 'About', adminPanel: 'Admin',
       boardWeek: 'This week', boardAll: 'All time', boardEmptyWeek: 'Nobody has played this week yet — be the first', rank: 'Rank', games: { one: 'Game', other: 'Games' }, wins: { one: 'Win', other: 'Wins' }, winRate: 'Win rate', bestScore: 'Best score', totalScore: 'Total points',
       curStreak: 'Win streak', bestStreak: 'Longest streak', followers: { one: 'Follower', other: 'Followers' }, followingN: 'Following', memberSince: 'Member since',
@@ -698,6 +698,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       socket.emit('leave'); state.room = null; state.code = null;
     }
     if (state.route.name === 'room' && state.code !== state.route.code && state.tokens[state.route.code] && state.profile.name) join(state.route.code, false);
+    if (state.route.name === 'room' && state.code !== state.route.code && !IN_DISCORD) loadPreview(state.route.code);
     render();
     // A shared /match/<id> link lands on the home screen with the scoreboard
     // on top of it, so closing it leaves the visitor somewhere they can play.
@@ -1078,7 +1079,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     return `<div class="screen"><div class="topbar"><button class="icon-btn" data-act="home">${state.lang === 'ar' ? '→' : '←'}</button><div class="mid"><span class="chip">${t('room')} <b style="letter-spacing:3px;direction:ltr">${esc(state.route.code)}</b></span></div><div style="width:44px"></div></div>
       <div class="scroll"><div class="wrap">
         <div class="hero"><div class="logo sm">${t('appName')}</div><div class="tagline">${t('tagline')}</div></div>
-        <div class="glass col" style="padding:16px">${meCard()}<button class="btn block" data-act="enter">${t('enterRoom')} 🚪</button></div>
+        ${previewCard()}
+        <div class="glass col" style="padding:16px;margin-top:10px">${meCard()}${signedIn() ? `<button class="btn block" data-act="enter">${t('enterRoom')} 🚪</button>` : ''}</div>
       </div></div></div>`;
   }
 
@@ -2299,6 +2301,21 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     if (!state.achList) api('/api/achievements').then(d => { state.achList = d.list || []; }).catch(() => {});
   }
 
+  // The OAuth callback sends people back to where they started with
+  // ?login=ok|failed|banned. Said once, then taken off the address so a reload
+  // does not say it again. Back on an invite link and signed in, the player
+  // goes straight into the room: that is the tap they signed in to make.
+  function afterSignIn() {
+    const outcome = new URLSearchParams(location.search).get('login');
+    if (!outcome) return;
+    history.replaceState(null, '', location.pathname);
+    if (outcome === 'ok' && signedIn()) {
+      toast(t('loginOk'));
+      if (state.route.name === 'room' && state.code !== state.route.code) join(state.route.code);
+    } else if (outcome === 'banned') toast(t('err_banned'), 'err');
+    else toast(t('loginFailed'), 'err');
+  }
+
   const signedIn = () => !!state.me;
   function needAccount() {
     if (signedIn()) return true;
@@ -2332,6 +2349,31 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     return `<div class="section-title"><span>🚪 ${t('openRooms')}</span><button class="chip" data-act="rooms-refresh">↻ ${t('refresh')}</button></div>
       <div class="glass lobby-list">${rows}</div>`;
   }
+  // Who is behind an invite link, shown before signing in. The person who
+  // opened it was asked to join a friend: the friend's name is the reason to
+  // press the button, and a bare room code is not.
+  async function loadPreview(code) {
+    if (state.preview && state.preview.code === code) return;
+    state.preview = { code, data: null };
+    const d = await api(`/api/room/${encodeURIComponent(code)}`);
+    if (!state.preview || state.preview.code !== code || d.error === 'network') return;
+    state.preview = { code, data: d };
+    if (state.route.name === 'room' && !state.code) render();
+  }
+  function previewCard() {
+    const pv = state.preview && state.preview.code === state.route.code && state.preview.data;
+    if (!pv) return '';
+    if (!pv.exists) return `<div class="glass center muted" style="padding:14px;font-size:14px">${t('roomGone')}</div>`;
+    return `<div class="glass lobby-list"><div class="lobby-row" style="cursor:default">
+        ${pv.avatar ? J(pv.avatar) : ''}
+        <div class="grow">
+          <b>${t('crewWaiting')}</b>
+          <small>${pv.phase === 'lobby' ? t('hostedBy', { h: esc(pv.host || '') }) : `${t('playing')} · ${fmt(pv.round)}/${fmt(pv.rounds)}`}</small>
+        </div>
+        <span class="chip">${fmt(pv.players)}/12</span>
+      </div></div>`;
+  }
+
   async function loadLobbies() {
     const r = await api('/api/lobbies');
     const next = r.lobbies || [];
@@ -2806,7 +2848,8 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     retry: () => location.reload(),
     signin: () => {
       if (state.inDiscord) { toast(t('discordSignInBusy'), 'err'); return; }
-      location.href = '/api/auth/discord/start';
+      // Comes back to this page, so an invite link still leads into its room.
+      location.href = '/api/auth/discord/start?next=' + encodeURIComponent(location.pathname);
     },
     async signout() { await post('/api/auth/logout'); state.me = null; state.isAdmin = false; state.lastKey = ''; render(); },
     profile: el => openProfile(el.dataset.uid),
@@ -3030,7 +3073,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
     state.discordDone = true;
     state.lastKey = '';
     // Not in Discord: this is an ordinary web visit, so ask who we are.
-    if (!info) { await loadMe(); render(); return; }
+    if (!info) { await loadMe(); render(); afterSignIn(); return; }
     if (info.failed) { state.discordError = info.failed; await loadMe(); render(); toast(t('discordFailed', { e: info.failed }), 'err'); return; }
 
     // The bootstrap already carries the answer /api/auth/me would give, and

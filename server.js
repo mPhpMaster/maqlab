@@ -2295,7 +2295,15 @@ app.use(express.static(path.join(__dirname, 'public'), {
 app.get('/api/room/:code', (req, res) => {
   const r = rooms.get(String(req.params.code).toUpperCase());
   if (!r) return res.status(404).json({ exists: false });
-  res.json({ exists: true, phase: r.phase, players: connected(r).length });
+  // Enough for an invite link to show who is waiting before anyone signs in.
+  // Whoever has the code was given it, and the open-rooms list shows the same
+  // host and count for any public room.
+  const host = r.players.get(r.hostId);
+  res.json({
+    exists: true, phase: r.phase, players: humans(r).filter(p => p.connected).length,
+    round: r.round, rounds: r.settings.rounds,
+    host: host ? host.name : '', avatar: host ? host.avatar : null,
+  });
 });
 app.get('/api/qr', async (req, res) => {
   try {
@@ -2307,6 +2315,12 @@ app.get('/api/qr', async (req, res) => {
 // ---- sign in ----
 const origin = req => `${req.protocol}://${req.get('host')}`;
 const OAUTH_STATE = 'maqlab_oauth';
+// Where to come back to after Discord. An invited friend used to sign in and
+// land on the home screen with the room code gone. Only a room link or home is
+// accepted, so this can never become a redirect to somewhere else.
+const OAUTH_NEXT = 'maqlab_next';
+const safeNext = p => (/^\/room\/[A-Za-z]{4,5}$/.test(String(p || '')) ? String(p) : '/');
+const oauthCookie = { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 10 * 60 * 1000 };
 
 async function signIn(res, { id, name, avatar }) {
   if (db.on()) {
@@ -2321,7 +2335,8 @@ async function signIn(res, { id, name, avatar }) {
 app.get('/api/auth/discord/start', (req, res) => {
   if (!DISCORD_CLIENT_ID) return res.status(500).send('Discord sign-in is not configured');
   const state = crypto.randomBytes(16).toString('base64url');
-  res.cookie(OAUTH_STATE, state, { httpOnly: true, sameSite: 'lax', maxAge: 10 * 60 * 1000 });
+  res.cookie(OAUTH_STATE, state, oauthCookie);
+  res.cookie(OAUTH_NEXT, safeNext(req.query.next), oauthCookie);
   const params = new URLSearchParams({
     client_id: DISCORD_CLIENT_ID, redirect_uri: `${origin(req)}/api/auth/discord/callback`,
     response_type: 'code', scope: 'identify', state,
@@ -2331,7 +2346,10 @@ app.get('/api/auth/discord/start', (req, res) => {
 
 app.get('/api/auth/discord/callback', async (req, res) => {
   const expected = auth.readCookie(req.headers.cookie, OAUTH_STATE);
-  if (!req.query.code || !req.query.state || req.query.state !== expected) return res.redirect('/?login=failed');
+  const next = safeNext(auth.readCookie(req.headers.cookie, OAUTH_NEXT));
+  const back = outcome => res.redirect(`${next}?login=${outcome}`);
+  res.clearCookie(OAUTH_NEXT);
+  if (!req.query.code || !req.query.state || req.query.state !== expected) return back('failed');
   res.clearCookie(OAUTH_STATE);
   try {
     const tok = await fetch('https://discord.com/api/oauth2/token', {
@@ -2342,15 +2360,15 @@ app.get('/api/auth/discord/callback', async (req, res) => {
         redirect_uri: `${origin(req)}/api/auth/discord/callback`,
       }),
     }).then(r => r.json());
-    if (!tok.access_token) return res.redirect('/?login=failed');
+    if (!tok.access_token) return back('failed');
     const me = await fetch('https://discord.com/api/v10/users/@me', {
       headers: { Authorization: `Bearer ${tok.access_token}` },
     }).then(r => r.json());
-    if (!me.id) return res.redirect('/?login=failed');
+    if (!me.id) return back('failed');
     const r = await signIn(res, { id: me.id, name: cleanName(me.global_name || me.username) });
-    res.redirect(r.error === 'banned' ? '/?login=banned' : '/?login=ok');
+    back(r.error === 'banned' ? 'banned' : 'ok');
   } catch {
-    res.redirect('/?login=failed');
+    back('failed');
   }
 });
 
