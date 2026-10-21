@@ -2221,6 +2221,41 @@ async function restoreRooms() {
 
 // ---------------- http ----------------
 app.set('trust proxy', 1); // Render terminates TLS ahead of us; needed for secure cookies + req.protocol
+
+// Security headers. No X-Frame-Options: the game runs framed inside Discord,
+// so framing is limited with frame-ancestors instead, to Discord's own hosts.
+// The policy is report-only for now: violations are logged at
+// /api/csp-report, and once a week of real traffic shows none it can be
+// switched to Content-Security-Policy.
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  // The views set style="" on elements throughout.
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "frame-ancestors 'self' https://discord.com https://*.discord.com https://discordapp.com https://*.discordapp.com https://*.discordsays.com",
+  'report-uri /api/csp-report',
+].join('; ');
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Content-Security-Policy-Report-Only', CSP);
+  if (process.env.NODE_ENV === 'production') res.setHeader('Strict-Transport-Security', 'max-age=15552000; includeSubDomains');
+  next();
+});
+// At most a few lines a minute, so a page stuck in a loop cannot fill the log.
+let cspLogged = 0, cspWindow = 0;
+app.post('/api/csp-report', express.json({ type: ['application/csp-report', 'application/json', 'application/reports+json'], limit: '16kb' }), (req, res) => {
+  const now = Date.now();
+  if (now - cspWindow > 60000) { cspWindow = now; cspLogged = 0; }
+  const r = (req.body && (req.body['csp-report'] || req.body[0]?.body || req.body)) || {};
+  if (cspLogged++ < 5) console.log('csp:', r['violated-directive'] || r.effectiveDirective || '?', r['blocked-uri'] || r.blockedURL || '?', 'on', r['document-uri'] || r.documentURL || '?');
+  res.status(204).end();
+});
 app.use(express.json());
 
 // Link previews. Crawlers don't run our JS, so the share card has to be in the
