@@ -37,8 +37,7 @@ function note(room, type, entries) {
   for (const e of entries) bag.add(keyOf(type, e));
 }
 
-// Who the memory is for. Guests have nothing to attach it to, and bots have
-// nothing to remember.
+// Who the memory is for. Bots have nothing to remember.
 const owners = players => [...new Set(players.filter(p => !p.bot && p.userId).map(p => p.userId))];
 
 // Prefer what nobody present has seen. Falling back to the full pool rather

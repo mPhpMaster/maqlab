@@ -101,7 +101,7 @@ test('an ordering round keeps the real values, not just the order', () => {
   assert.deepEqual(e.orders, { p1: ['b', 'a'] });
 });
 
-test('the roster carries guests and bots, who game_results never sees', () => {
+test('the roster carries bots, who game_results never sees', () => {
   const r = replay.roster([
     { id: 'p1', userId: 'u1', name: 'Her', avatar: { s: 1 }, score: 900 },
     { id: 'p2', userId: null, name: 'Zap', avatar: { s: 2 }, bot: true, score: 400 },

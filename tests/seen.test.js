@@ -54,7 +54,7 @@ test('with no memory at all, nothing changes', () => {
   assert.deepEqual(seen.fresh(idx, content.bluff, 'bluff', new Set()), idx);
 });
 
-// The memory is attached to an account. A guest has nothing to attach it to,
+// The memory is attached to an account. A bot has nothing to attach it to,
 // and writing a row keyed by a per-room player id would be a row that is never
 // read again.
 test('only signed-in people are remembered', () => {

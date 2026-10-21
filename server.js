@@ -1694,8 +1694,8 @@ function computeAwards(room) {
   return out;
 }
 
-// Lifetime totals are written once, here, and only for signed-in players.
-// Guests keep playing exactly as before — they just leave no trace.
+// Lifetime totals are written once, here. Every player is signed in, so every
+// player gets a row.
 async function recordResults(room) {
   if (!db.on()) return;
   const ranked = [...room.players.values()].filter(p => p.score > 0 || p.connected).sort((a, b) => b.score - a.score);
@@ -1704,8 +1704,8 @@ async function recordResults(room) {
   // into a single scoreboard that anyone holding the link can open.
   const matchId = crypto.randomUUID();
   // Saved before the per-player rows, and separately from them, because the
-  // replay has to hold everyone who played — guests and bots included — and
-  // game_results only ever has rows for accounts.
+  // replay has to hold everyone who played — bots included — and game_results
+  // only has rows for accounts.
   try {
     await db.saveMatch({
       id: matchId, roomCode: room.code, gameNo: room.gameNo,
@@ -1825,11 +1825,11 @@ io.on('connection', socket => {
     let p = token && r.players.get(token);
     if (!p) {
       if (connected(r).length >= MAX_PLAYERS) return reply(cb, { error: 'full' });
-      p = { id: rid(), name, avatar, score: 0, streak: 0, stats: freshStats(), powers: freshPowers(), connected: true, socketId: null, team: null, ready: false, userId: session ? session.id : null };
+      p = { id: rid(), name, avatar, score: 0, streak: 0, stats: freshStats(), powers: freshPowers(), connected: true, socketId: null, team: null, ready: false, userId: session.id };
       if (r.settings.teams) p.team = smallerTeam(r);
       r.players.set(p.id, p);
-    } else { p.name = name; p.avatar = avatar; if (session) p.userId = session.id; }
-    if (session && db.on()) db.touchProfile({ userId: session.id, name, avatar }).catch(() => {});
+    } else { p.name = name; p.avatar = avatar; p.userId = session.id; }
+    if (db.on()) db.touchProfile({ userId: session.id, name, avatar }).catch(() => {});
     if (room && player && room !== r) leave(false);
     room = r; player = p;
     p.connected = true; p.socketId = socket.id;
@@ -2251,8 +2251,8 @@ app.get('/match/:id/card.png', async (req, res) => {
 app.get('/match/:id', async (req, res) => {
   let title = SITE_TITLE, desc = SITE_DESC, image = null;
   if (db.on() && UUID.test(req.params.id)) {
-    // The replay knows everyone who played; game_results only has the rows for
-    // signed-in players, so a guest would be missing from the card.
+    // The replay knows everyone who played; game_results has no rows for bots,
+    // so the card reads the roster from the replay.
     const [rows, rep] = await Promise.all([
       db.getMatch(req.params.id).catch(() => []),
       db.getReplay(req.params.id).catch(() => null),
@@ -2360,15 +2360,6 @@ app.get('/api/auth/me', async (req, res) => {
   res.json({ user: { id: s.id, name: profile ? profile.name : s.name }, isAdmin: auth.isAdmin(s.id) });
 });
 
-// Local-only shortcut so the signed-in UI can be developed without a Discord
-// app. Needs DEV_LOGIN=1 *and* a loopback caller, and is never set in prod.
-app.post('/api/auth/dev', async (req, res) => {
-  const loopback = ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.ip);
-  if (process.env.DEV_LOGIN !== '1' || !loopback) return res.status(404).end();
-  const id = String(req.body?.id || 'dev-1');
-  await signIn(res, { id, name: cleanName(req.body?.name || 'Dev') });
-  res.json({ ok: true });
-});
 
 // ---- profiles, leaderboard, social ----
 const needsDb = (res) => { if (db.on()) return false; res.status(503).json({ error: 'no_db' }); return true; };
@@ -2652,8 +2643,8 @@ app.post('/api/discord/room', (req, res) => {
 });
 
 
-// A failing database must never take the game down with it: people who are
-// only playing as guests never touch it. Express 4 does not catch rejections
+// A failing database must never take the game down with it: a game in
+// progress never touches it. Express 4 does not catch rejections
 // from async handlers, so both nets are needed.
 app.use((err, req, res, _next) => {
   console.error('request failed:', req.method, req.originalUrl, '-', err.message);

@@ -119,8 +119,8 @@ function roundEntry(room, L) {
 }
 
 // The roster is part of the replay rather than read back from game_results,
-// because that table only has rows for signed-in players — a round whose best
-// lie was written by a guest would replay with a blank where the author goes.
+// because that table has no rows for bots — a round whose best lie was written
+// by a bot would replay with a blank where the author goes.
 const roster = ranked =>
   ranked.map((p, i) => ({
     pid: p.id, userId: p.userId || null, name: p.name, avatar: p.avatar,

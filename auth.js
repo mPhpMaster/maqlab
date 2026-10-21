@@ -1,6 +1,5 @@
-// Identity. Players can still play as anonymous guests — a session only
-// matters for the things that must outlive the round: profile, leaderboard,
-// follows, moderation.
+// Identity. Playing requires a Discord sign-in, so every player has a session.
+// It is what ties a player to a profile, the leaderboard, follows and moderation.
 //
 // Sessions are HMAC-signed tokens rather than server-side state, so a restart
 // doesn't log everyone out. They travel as an HttpOnly cookie on the web, and
