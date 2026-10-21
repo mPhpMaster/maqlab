@@ -92,7 +92,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ach_miss5: 'عين صقر', achd_miss5: 'لقيت الغايب 5 مرات', ach_miss25: 'ذاكرة حديد', achd_miss25: 'لقيت الغايب 25 مرة',
       ach_odd_eye: 'مجهر', achd_odd_eye: '10 جولات كاملة في «الدخيل»',
       ach_first_game: 'أول لعبة', achd_first_game: 'خلّص أول لعبة', ach_first_win: 'أول فوز', achd_first_win: 'اطلع الأول في لعبة', ach_liar5: 'كذّاب محترف', achd_liar5: 'اخدع 5 لاعبين', ach_bull: 'قنّاص', achd_bull: 'جيب «في الصميم» 🎯', ach_streak4: 'نار', achd_streak4: 'سلسلة 4 ورا بعض', ach_allin: 'كل شي أو لا شي', achd_allin: 'اكسب رهان ×3', ach_famous: 'المشهور', achd_famous: 'الشلة تختارك في «مين فينا؟»', ach_speedy: 'برق', achd_speedy: 'كن الأسرع 3 مرات', ach_games10: 'مدمن', achd_games10: 'العب 10 ألعاب', ach_wins5: 'أسطورة', achd_wins5: 'افز بـ 5 ألعاب',
-      howSteps: ['أنشئ غرفة وشارك الكود أو الرابط مع الشلة.', 'كل جولة تبدأ بآلة الحظ: تحدد نوع الجولة ومضاعف النقاط.', '🤥 المقلب: اكتب كذبة مقنعة، بعدين اختار الصح وراهن عليه.', '🎯 أقرب رقم: خمّن، والأقرب ياخذ النقاط (والصميم +1000!).', '⚡ صح ولا خطأ و🔤 فكّ الإيموجي: جاوب بسرعة، كل ثانية تفرق.', '🧩 الدخيل و📊 رتّبها: لقّط اللي ما له دخل بينهم، أو رتّب أربعة أشياء من الأكبر للأصغر.', '👥 مين فينا؟ صوّت على واحد من الشلة ووافق الأغلبية.', '🕵️ الجاسوس: واحد ما يعرف الكلمة، الكل يكتب تلميح، وبعدين صوتوا مين الجاسوس!', 'عندك قدرتين كل لعبة: 🔍 كشّاف يشيل خيارين غلط، و💎 دبل يضاعف نقاط جولة.', 'اجمع سلاسل 🔥 واكسب الألقاب والإنجازات وارفع مستواك!'],
+      howSteps: ['أنشئ غرفة وشارك الكود أو الرابط مع الشلة.', 'كل جولة تبدأ بآلة الحظ: تحدد نوع الجولة ومضاعف النقاط.', 'عندك قدرتين كل لعبة: 🔍 كشّاف يشيل خيارين غلط، و💎 دبل يضاعف نقاط جولة.', 'اجمع سلاسل 🔥 واكسب الألقاب والإنجازات وارفع مستواك!'], howModes: 'أنواع الجولات ({n})', howMin: 'يحتاج {n} لاعبين أو أكثر',
       bullseye: 'في الصميم! 🎯', streakToast: 'سلسلة {n}! 🔥',
       teams: 'وضع الفرق', teamsOff: 'كل واحد لحاله', teamsOn: 'فريقين ⚔️', team_A: 'الجمر 🔥', team_B: 'الموج 🌊', joinTeam: 'انضم', teamWins: 'فاز فريق {n}! 🏆', teamTie: 'تعادل الفريقين! 🤝',
       ready: 'جاهز ✋', notReady: 'مو جاهز بعد', readyN: '{n}/{m} جاهزين',
@@ -213,7 +213,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       ach_miss5: 'Sharp Eye', achd_miss5: 'Spot the missing one 5 times', ach_miss25: 'Steel Memory', achd_miss25: 'Spot the missing one 25 times',
       ach_odd_eye: 'Microscope', achd_odd_eye: '10 clean sweeps of Odd One Out',
       ach_first_game: 'First Game', achd_first_game: 'Finish your first game', ach_first_win: 'First Win', achd_first_win: 'Finish 1st in a game', ach_liar5: 'Pro Liar', achd_liar5: 'Fool 5 players', ach_bull: 'Sharpshooter', achd_bull: 'Hit a bullseye 🎯', ach_streak4: 'On Fire', achd_streak4: 'Get a 4 streak', ach_allin: 'All In', achd_allin: 'Win a ×3 bet', ach_famous: 'Famous', achd_famous: "Be the crowd's pick", ach_speedy: 'Lightning', achd_speedy: 'Be fastest 3 times', ach_games10: 'Regular', achd_games10: 'Play 10 games', ach_wins5: 'Legend', achd_wins5: 'Win 5 games',
-      howSteps: ['Create a room and share the code or link with friends.', 'Every round starts with a slot machine: round type + point multiplier.', '🤥 The Bluff: write a convincing lie, then find the truth and bet on it.', '🎯 Closest Number: guess — closest wins (bullseye = +1000!).', '⚡ True or False & 🔤 Emoji Decode: answer fast, every second counts.', '🧩 Odd One Out & 📊 Line Them Up: spot the one that does not belong, or put four things in order.', "👥 Who's Most Likely: vote for a friend and side with the crowd.", "🕵️ The Spy: one player doesn't know the word — everyone drops a clue, then vote who's the spy!", 'Two power-ups per game: 🔍 Peek removes two wrong options, 💎 Double doubles one round.', 'Build 🔥 streaks, win awards & achievements and level up!'],
+      howSteps: ['Create a room and share the code or link with friends.', 'Every round starts with a slot machine: round type + point multiplier.', 'Two power-ups per game: 🔍 Peek removes two wrong options, 💎 Double doubles one round.', 'Build 🔥 streaks, win awards & achievements and level up!'], howModes: 'The rounds ({n})', howMin: 'needs {n}+ players',
       bullseye: 'BULLSEYE! 🎯', streakToast: '{n} streak! 🔥',
       teams: 'Team mode', teamsOff: 'Solo', teamsOn: 'Two teams ⚔️', team_A: 'Ember 🔥', team_B: 'Wave 🌊', joinTeam: 'Join', teamWins: 'Team {n} wins! 🏆', teamTie: "It's a tie! 🤝",
       ready: 'Ready ✋', notReady: 'Not ready', readyN: '{n}/{m} ready',
@@ -2272,7 +2272,23 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       if (k === 'leave') { closeModal(); confirmBox(t('leave') + '?', leaveRoom); }
     }));
   }
-  function howTo() { modal(`<h3>${t('how')}</h3><ol>${STR[state.lang].howSteps.map(s => `<li>${s}</li>`).join('')}</ol><button class="btn block" data-close>${t('close')}</button>`); }
+  // The modes come from TYPES and their own name and description strings, and
+  // the player minimums from the server, so a mode added later is explained
+  // here without anyone remembering to. The hand-written list this replaced
+  // stopped at eight of fourteen.
+  async function howTo() {
+    if (!state.modeMins) {
+      const r = await api('/api/modes');
+      state.modeMins = Object.fromEntries((r.modes || []).map(m => [m.id, m.min]));
+    }
+    const modes = Object.keys(TYPES).map(k => {
+      const min = state.modeMins[k] > 1 ? ` <small class="muted">(${t('howMin', { n: fmt(state.modeMins[k]) })})</small>` : '';
+      return `<li>${TYPES[k]} <b>${t('type_' + k)}</b> — ${t('desc_' + k)}${min}</li>`;
+    }).join('');
+    modal(`<h3>${t('how')}</h3><ol>${STR[state.lang].howSteps.map(s => `<li>${s}</li>`).join('')}</ol>
+      <h4>${t('howModes', { n: fmt(Object.keys(TYPES).length) })}</h4><ul class="how-modes">${modes}</ul>
+      <button class="btn block" data-close>${t('close')}</button>`);
+  }
   function switchLang() { state.lang = state.lang === 'ar' ? 'en' : 'ar'; store.set('uiLang', state.lang); state.lastKey = ''; render(); }
   function toggleMusic() { state.music = !state.music; store.set('music', state.music); if (state.music) { ctx(); startMusic(); } }
 
@@ -2341,7 +2357,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
         ${l.avatar ? J(l.avatar) : ''}
         <div class="grow">
           <b>${esc(l.host || '')}</b>
-          <small>${l.phase === 'lobby' ? t('inLobby') : `${t('playing')} · ${l.round}/${l.rounds}`}</small>
+          <small>${t('inLobby')}</small>
         </div>
         <span class="chip">${fmt(l.players)}/12</span>
         <span class="code">${esc(l.code)}</span>

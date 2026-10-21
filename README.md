@@ -17,17 +17,23 @@ To play with people on the same network: open `http://<your IP>:3000` on their p
 ```
 Logs go to `server.log` and `server.err.log` in the same folder.
 
-## Round types (8)
+## Round types (14)
 | Round | Idea | Scoring |
 |---|---|---|
 | 🤥 **Bluff** | Everyone writes a lie, then picks the truth and bets ×1/×2/×3 | Right = 500×bet • wrong on a high bet = −150 per level • each player fooled by your lie = +300 |
-| 🎯 **Closest number** | A question whose answer is a number | Dead on (±1%) +1000 • closest +600 • second +300 • third +150 |
-| ⚡ **True or false** | 3 fast statements | Correct +200 + up to +200 for speed • fastest +100 |
-| 🔤 **Decode the emoji** | 3 emoji puzzles, 4 options each | Correct +300 + up to +300 for speed • fastest +100 |
-| 👥 **Who's most likely?** | Everyone votes for someone in the room (needs 3+ players) | With the majority +300 • the person chosen +150 |
+| 🎯 **Closest Number** | A question whose answer is a number | Dead on (±1%) +1000 • closest +600 • second +300 • third +150 |
+| ⚡ **True or False** | 3 fast statements | Correct +200 + up to +200 for speed • fastest +100 |
+| 🔤 **Emoji Decode** | 3 emoji puzzles, 4 options each | Correct +300 + up to +300 for speed • fastest +100 |
+| 👥 **Who's Most Likely?** | Everyone votes for someone in the room (needs 3+ players) | With the majority +300 • the person chosen +150 |
 | 🧩 **Odd One Out** | 4 things, one of which does not belong — the group is never named | Correct +300 + up to +300 for speed • fastest +100 |
 | 📊 **Line Them Up** | Put 4 things in order, largest first | +250 for every neighbouring pair in the right order • +250 more for a perfect order |
 | 🕵️ **Spy** | One player is the spy and sees only the category, never the word. Everyone writes a clue, then votes on who the spy is (needs 4+ players) | Catching the spy +350 • spy escaping (under half the votes) +500 • spy guessing the word +300 |
+| 🙋 **How Many of Us?** | Answer a yes/no question about yourself in private, then guess how many said yes (needs 3+ players) | Exactly right +500 • one off +250 |
+| 🗣️ **Name Something** | Write the first thing that comes to mind for a prompt (needs 4+ players) | +200 for every other player who wrote the same |
+| 🎭 **Two Truths and a Lie** | Write three things about yourself, one untrue; everyone else finds the lie (needs 3+ players) | Spotting the lie +300 • the author +150 for each player fooled |
+| 🧭 **The Minority** | Pick the option you think fewest people will choose (needs 3+ players) | The smaller side +400 |
+| ⚖️ **Which is Bigger?** | Two things — pick the bigger one | Correct +300 • fastest correct +150 |
+| 👁️ **What Went Missing?** | Memorise four things; one disappears, find it | Correct +350 • fastest correct +150 |
 
 **Multipliers (the slot machine):** normal, points ×2 💎, speed ×1.5 ⏱️, mystery box 🎁, and the last round is always the **Golden Round ×3** 👑.
 
@@ -75,7 +81,7 @@ The game runs inside Discord (launched from the rocket 🚀 button in a voice ch
 
 ## Files
 - `server.js`: the game engine (rooms, round scheduling, scoring, powers, titles)
-- `content.js`: all the content in English and Arabic — 1,055 questions (bluff 157, numbers 125, true/false 152, most likely 117, emoji 167, odd one out 135, line them up 91, spy 111). `npm run check` validates the banks for duplicates, schema, and answers that give themselves away by length.
+- `content.js`: all the content in English and Arabic — 1,743 entries in 12 banks (bluff 198, number 148, blitz 304, likely 156, emoji 186, odd 147, order 100, many 83, name 76, spy 143, minor 102, higher 100). Two Truths and a Lie is written by the players, and What Went Missing is built from the odd bank. `tests/docs.test.js` fails when these numbers drift from the banks. `npm run check` validates the banks for duplicates, schema, and answers that give themselves away by length.
 - `db.js` + `db/schema.sql`: profiles, match results, match replays, follows, reports, suggestions
 - `auth.js`: signed session tokens, Discord sign-in, admin checks
 - `bots.js`: what a bot does in each round (the server decides when)
@@ -103,7 +109,7 @@ npm start          # http://localhost:3000
 ```
 اللوقز تروح لـ`server.log` و`server.err.log` في نفس المجلد.
 
-## أنواع الجولات (8)
+## أنواع الجولات (14)
 | الجولة | الفكرة | النقاط |
 |---|---|---|
 | 🤥 **المقلب** | الكل يكتب كذبة، بعدين يختار الصح ويراهن ×1/×2/×3 | صح = 500×الرهان • غلط برهان عالي = −150 لكل مستوى • كل واحد ينخدع بكذبتك = +300 |
@@ -114,6 +120,12 @@ npm start          # http://localhost:3000
 | 🧩 **الدخيل** | 4 أشياء، وحدة ما لها دخل — والفئة ما تُذكر أبداً | صح +300 + سرعة حتى +300 • الأسرع +100 |
 | 📊 **رتّبها** | رتّب 4 أشياء من الأكبر للأصغر | +250 لكل جارَين في الترتيب الصح • +250 زيادة للترتيب المثالي |
 | 🕵️ **الجاسوس** | واحد بينهم جاسوس يشوف الفئة بس (بدون الكلمة)، الكل يكتب تلميح، وبعدين يصوّتون مين الجاسوس (يحتاج 4 لاعبين أو أكثر) | لقّطوا الجاسوس +350 • الجاسوس إذا هرب (أقل من نص الأصوات) +500 • الجاسوس إذا خمّن الكلمة الصح +300 |
+| 🙋 **كم واحد فينا؟** | جاوب عن نفسك بنعم أو لا بدون ما أحد يشوف، بعدين خمّن كم واحد قال نعم (يحتاج 3 لاعبين أو أكثر) | بالضبط +500 • فرق واحد +250 |
+| 🗣️ **اذكر شيئاً** | اكتب أول شي يجي على بالك (يحتاج 4 لاعبين أو أكثر) | +200 عن كل واحد كتب مثلك |
+| 🎭 **صدقين وكذبة** | اكتب ثلاث أشياء عن نفسك وحدة منها كذب، والباقين يطلّعون الكذبة (يحتاج 3 لاعبين أو أكثر) | لقّطت الكذبة +300 • صاحبها +150 عن كل واحد انخدع |
+| 🧭 **الأقلية** | اختار الخيار اللي تتوقع أقل ناس يختارونه (يحتاج 3 لاعبين أو أكثر) | الطرف الأقل +400 |
+| ⚖️ **أيّهما أكبر؟** | شيئين — اختار الأكبر | صح +300 • الأسرع بالصح +150 |
+| 👁️ **وش اختفى؟** | احفظ أربعة أشياء، وحدة تختفي، لقّطها | صح +350 • الأسرع بالصح +150 |
 
 **المضاعفات (آلة الحظ):** عادي، نقاط ×2 💎، سرعة ×1.5 ⏱️، صندوق الحظ 🎁، وآخر جولة دايماً **الجولة الذهبية ×3** 👑.
 

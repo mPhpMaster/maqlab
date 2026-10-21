@@ -2292,6 +2292,10 @@ app.use(express.static(path.join(__dirname, 'public'), {
     else if (/\.(html|js|css)$/.test(filePath)) res.setHeader('Cache-Control', 'no-cache');
   },
 }));
+// Every mode and the table size it needs, from the same TYPES and MIN_PLAYERS
+// the game runs on, so the help screen cannot fall behind them.
+app.get('/api/modes', (_, res) => res.json({ modes: TYPES.map(id => ({ id, min: MIN_PLAYERS[id] || 1 })) }));
+
 app.get('/api/room/:code', (req, res) => {
   const r = rooms.get(String(req.params.code).toUpperCase());
   if (!r) return res.status(404).json({ exists: false });
