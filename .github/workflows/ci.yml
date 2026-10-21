@@ -20,7 +20,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,3 +32,6 @@ jobs:
       # --strict: a warning is a failure here, so it is fixed before it ships.
       - run: npm run check
       - run: npm test
+      # Every mode played to the end by signed-in players on real sockets,
+      # including the last holdout leaving mid-round. About four minutes.
+      - run: npm run test:e2e

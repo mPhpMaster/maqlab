@@ -13,7 +13,8 @@
     "check": "node scripts/validate-content.js --strict",
     "check:new": "node scripts/validate-content.js --new --strict",
     "prestart": "node scripts/validate-content.js",
-    "test": "node --test \"tests/**/*.test.js\""
+    "test": "node --test \"tests/**/*.test.js\"",
+    "test:e2e": "node --test --test-concurrency=1 \"tests/e2e/*.e2e.js\""
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
