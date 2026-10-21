@@ -1,0 +1,34 @@
+name: CI
+
+# The tests and the content check used to run only when someone remembered.
+# A broken bank, a failing test or a client file that no longer parses (which
+# shows players a blank page) now stops the change here instead of on Render.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          # Same major version Render runs (render.yaml, NODE_VERSION).
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # --strict: a warning is a failure here, so it is fixed before it ships.
+      - run: npm run check
+      - run: npm test
