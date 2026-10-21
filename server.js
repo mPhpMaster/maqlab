@@ -32,6 +32,17 @@ const server = http.createServer(app);
 const io = new Server(server, { maxHttpBufferSize: 64 * 1024 });
 
 const MAX_PLAYERS = 12;
+// Rooms held at once. A room is a few hundred KB at most, so this is a small
+// share of the free plan's 512 MB, and it is far above any real evening; a
+// room with nobody in it is reaped after five minutes anyway.
+const MAX_ROOMS = 300;
+const roomsFull = () => rooms.size >= MAX_ROOMS;
+// The per-socket flood guard: a refill rate, a burst, and how many dropped
+// packets in a row before the socket is cut off.
+const EVENT_RATE = 20;
+const EVENT_BURST = 40;
+const FLOOD_DISCONNECT = 200;
+const OBJECT_PAYLOADS = new Set(['join', 'settings', 'vote', 'two']);
 const GHOST_MS = 25 * 1000; // grace for a lobby refresh before the seat is freed
 const ROOM_TTL_MS = 30 * 60 * 1000;
 const ITEMS_PER_QUICK_ROUND = 3; // blitz & emoji rounds have 3 quick items
@@ -1801,7 +1812,28 @@ io.on('connection', socket => {
   const limits = {};
   const limited = (k, ms) => { const n = Date.now(); if (n - (limits[k] || 0) < ms) return true; limits[k] = n; return false; };
 
+  // Under the per-event limits, one budget for everything a socket sends:
+  // EVENT_RATE a second, bursts up to EVENT_BURST. Nobody playing comes near
+  // it; a script does, and its extra packets are dropped before any handler
+  // runs. A socket that keeps going after that is disconnected.
+  let budget = EVENT_BURST, refilled = Date.now(), dropped = 0;
+  socket.use((packet, next) => {
+    const now = Date.now();
+    budget = Math.min(EVENT_BURST, budget + ((now - refilled) / 1000) * EVENT_RATE);
+    refilled = now;
+    if (budget < 1) { if (++dropped > FLOOD_DISCONNECT) socket.disconnect(true); return; }
+    budget -= 1;
+    // These handlers destructure their payload, and null or a bare string
+    // would throw inside them instead of being turned away.
+    if (OBJECT_PAYLOADS.has(packet[0]) && (packet[1] === null || typeof packet[1] !== 'object')) packet[1] = {};
+    next();
+  });
+
   socket.on('create', (opts, cb) => {
+    // Joining has always needed a Discord account; creating did not, so a
+    // script could open rooms nobody could ever sit down in.
+    if (!session) return reply(cb, { error: 'signin' });
+    if (limited('create', 3000) || roomsFull()) return reply(cb, { error: 'busy' });
     const room = createRoom();
     // The room opens in the language the person creating it is reading. They
     // can still change it; it is a starting point, not a decision taken for
@@ -2662,6 +2694,9 @@ app.post('/api/discord/room', (req, res) => {
   if (!instanceId) return res.status(400).json({ error: 'missing_instance' });
   const existing = discordInstanceRooms.get(instanceId);
   if (existing && rooms.has(existing)) return res.json({ code: existing });
+  // No session here on purpose: this runs alongside sign-in so the Activity
+  // opens without a wait. The cap is what keeps it from filling the server.
+  if (roomsFull()) return res.status(503).json({ error: 'busy' });
   const room = createRoom();
   room.settings.public = false; // a voice-channel game isn't advertised to strangers
   discordInstanceRooms.set(instanceId, room.code);
