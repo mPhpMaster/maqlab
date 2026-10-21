@@ -52,7 +52,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       leave: 'غادر الغرفة', endGame: 'أنهِ اللعبة الحين', sound: 'الأصوات', music: 'الموسيقى', on: 'شغّال', off: 'مطفي', uiLang: 'English', menu: 'القائمة',
       kicked: 'تم إخراجك من الغرفة', confirmKick: 'تبي تطلّع {n} من الغرفة؟', yes: 'إيه', cancel: 'إلغاء', reconnecting: 'انقطع الاتصال… نحاول نرجع', waking: 'نوقظ الخادم… ياخذ نص دقيقة تقريباً', loading: 'جاري الدخول…', close: 'تمام', pokedYou: '{n} نغزك 👉',
       power_peek: 'كشّاف', power_double: 'دبل', powerOn: 'مفعّل ✓', peekDone: 'شلنا خيارين غلط 🔍', doubleDone: 'نقاطك بهالجولة ×2 💎', doubledBy: '💎 {n} فعّل الدبل!',
-      err_truth: 'هذي الإجابة الصحيحة! اكتب كذبة 😏', err_own: 'ما تقدر تختار كذبتك 😅', err_selfvote: 'ما تقدر تصوت لنفسك 😅', err_noroom: 'الغرفة غير موجودة', err_full: 'الغرفة ممتلئة', err_nan: 'اكتب رقم صحيح', err_empty: 'اكتب شيء أول', err_late: 'انتهى الوقت ⏰', err_host: 'للمضيف فقط', err_dup: 'استخدمتها خلاص', err_nopower: 'خلصت هالقدرة', err_nopeek: 'الكشّاف يشتغل وقت الاختيار بس 🔍', err_bad: 'خيار غير صالح', err_signin: 'سجّل دخولك بديسكورد أول', err_busy: 'الخادم مزحوم شوي — جرّب بعد لحظات',
+      err_truth: 'هذي الإجابة الصحيحة! اكتب كذبة 😏', err_own: 'ما تقدر تختار كذبتك 😅', err_selfvote: 'ما تقدر تصوت لنفسك 😅', err_noroom: 'الغرفة غير موجودة', err_full: 'الغرفة ممتلئة', err_nan: 'اكتب رقم صحيح', err_empty: 'اكتب شيء أول', err_late: 'انتهى الوقت ⏰', err_host: 'للمضيف فقط', err_dup: 'استخدمتها خلاص', err_nopower: 'خلصت هالقدرة', err_nopeek: 'الكشّاف يشتغل وقت الاختيار بس 🔍', err_bad: 'خيار غير صالح', err_signin: 'سجّل دخولك بديسكورد أول', err_busy: 'الخادم مزحوم شوي — جرّب بعد لحظات', err_watching: 'تتفرج على هاللعبة — تلعب من الجاية', watchingBanner: 'دخلت واللعبة شغالة 👀 تتفرج هالمرة، وتلعب من اللعبة الجاية',
       g_correct: 'إجابة صحيحة', g_fooled: 'خدعت لاعبين', g_betLoss: 'خسارة الرهان', g_streak: 'سلسلة 🔥', g_bullseye: 'في الصميم 🎯', g_closest: 'الأقرب', g_second: 'المركز الثاني', g_third: 'المركز الثالث', g_blitz: 'إجابات صحيحة', g_emoji: 'إجابات صحيحة', g_odd: 'إجابات صحيحة', g_speed: 'مكافأة السرعة', g_fastest: 'الأسرع ⚡', g_jackpot: 'صندوق الحظ 🎁', g_majority: 'مع الأغلبية 👥', g_famous: 'اختاروك 🌟', g_double: 'دبل 💎', g_spyCatch: 'لقّط الجاسوس', g_spyEvade: 'هرب من اللقطة', g_spyGuess: 'خمّن الكلمة',
       a_liar: 'سيد المقالب', a_liar_d: { one: 'خدع مرةً واحدةً', two: 'خدع مرتين', few: 'خدع {n} مراتٍ', many: 'خدع {n} مرةً', other: 'خدع {n} مرةٍ' }, a_detective: 'المحقق', a_detective_d: { one: 'إجابة صحيحة واحدة', two: 'إجابتان صحيحتان', few: '{n} إجاباتٍ صحيحةٍ', many: '{n} إجابةً صحيحةً', other: '{n} إجابةٍ صحيحةٍ' }, a_sniper: 'القناص', a_sniper_d: { one: 'تخمين دقيق واحد', two: 'تخمينان دقيقان', few: '{n} تخميناتٍ دقيقةٍ', many: '{n} تخميناً دقيقاً', other: '{n} تخمينٍ دقيقٍ' }, a_lightning: 'البرق', a_lightning_d: { one: 'الأسرع مرةً واحدةً', two: 'الأسرع مرتين', few: 'الأسرع {n} مراتٍ', many: 'الأسرع {n} مرةً', other: 'الأسرع {n} مرةٍ' }, a_gambler: 'المغامر', a_gambler_d: { one: 'راهن بقوة مرةً واحدةً', two: 'راهن بقوة مرتين', few: 'راهن بقوة {n} مراتٍ', many: 'راهن بقوة {n} مرةً', other: 'راهن بقوة {n} مرةٍ' }, a_fire: 'ولّعت', a_fire_d: 'سلسلة {n} 🔥', a_star: 'نجم الشلة', a_star_d: { one: 'اختاروه مرةً واحدةً', two: 'اختاروه مرتين', few: 'اختاروه {n} مراتٍ', many: 'اختاروه {n} مرةً', other: 'اختاروه {n} مرةٍ' },
       ann_first: 'صرت الأول! 👑', ann_combo: 'كومبو ×{n} 🔥', ann_unstoppable: 'ما ينوقف!! 🔥🔥', ann_legend: 'مقلب أسطوري! 😈', ann_perfect: 'مثالي! 3 من 3 ✨', ann_golden: 'الجولة الذهبية! 👑',
@@ -173,7 +173,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
       leave: 'Leave room', endGame: 'End game now', sound: 'Sound effects', music: 'Music', on: 'On', off: 'Off', uiLang: 'العربية', menu: 'Menu',
       kicked: 'You were removed from the room', confirmKick: 'Remove {n} from the room?', yes: 'Yes', cancel: 'Cancel', reconnecting: 'Connection lost… reconnecting', waking: 'Waking the server up… this takes about half a minute', loading: 'Joining…', close: 'Got it', pokedYou: '{n} poked you 👉',
       power_peek: 'Peek', power_double: 'Double', powerOn: 'Active ✓', peekDone: 'Removed two wrong options 🔍', doubleDone: 'Your points this round ×2 💎', doubledBy: '💎 {n} used Double!',
-      err_truth: "That's the real answer! Write a lie 😏", err_own: "You can't pick your own lie 😅", err_selfvote: "You can't vote for yourself 😅", err_noroom: "Room doesn't exist", err_full: 'Room is full', err_nan: 'Enter a valid number', err_empty: 'Type something first', err_late: "Time's up ⏰", err_host: 'Host only', err_dup: 'Already used', err_nopower: 'No uses left', err_nopeek: 'Peek only works while choosing 🔍', err_bad: 'Invalid choice', err_signin: 'Sign in with Discord first', err_busy: 'The server is busy — try again in a moment',
+      err_truth: "That's the real answer! Write a lie 😏", err_own: "You can't pick your own lie 😅", err_selfvote: "You can't vote for yourself 😅", err_noroom: "Room doesn't exist", err_full: 'Room is full', err_nan: 'Enter a valid number', err_empty: 'Type something first', err_late: "Time's up ⏰", err_host: 'Host only', err_dup: 'Already used', err_nopower: 'No uses left', err_nopeek: 'Peek only works while choosing 🔍', err_bad: 'Invalid choice', err_signin: 'Sign in with Discord first', err_busy: 'The server is busy — try again in a moment', err_watching: "You're watching this game — you play from the next one", watchingBanner: "You joined mid-game 👀 Watching this one — you're in from the next game",
       g_correct: 'Correct answer', g_fooled: 'Fooled players', g_betLoss: 'Lost bet', g_streak: 'Streak 🔥', g_bullseye: 'Bullseye 🎯', g_closest: 'Closest', g_second: '2nd closest', g_third: '3rd closest', g_blitz: 'Correct answers', g_emoji: 'Correct answers', g_odd: 'Correct answers', g_speed: 'Speed bonus', g_fastest: 'Fastest ⚡', g_jackpot: 'Jackpot 🎁', g_majority: 'With the crowd 👥', g_famous: 'Crowd pick 🌟', g_double: 'Double 💎', g_spyCatch: 'Caught the spy', g_spyEvade: 'Evaded capture', g_spyGuess: 'Guessed the word',
       a_liar: 'Master Liar', a_liar_d: { one: 'Fooled once', other: 'Fooled {n} times' }, a_detective: 'Detective', a_detective_d: { one: '1 correct answer', other: '{n} correct answers' }, a_sniper: 'Sniper', a_sniper_d: { one: '1 spot-on guess', other: '{n} spot-on guesses' }, a_lightning: 'Lightning', a_lightning_d: { one: 'Fastest once', other: 'Fastest {n} times' }, a_gambler: 'High Roller', a_gambler_d: { one: 'Bet big once', other: 'Bet big {n} times' }, a_fire: 'On Fire', a_fire_d: '{n} streak 🔥', a_star: 'Crowd Favorite', a_star_d: { one: 'Picked once', other: 'Picked {n} times' },
       ann_first: "You're #1! 👑", ann_combo: 'Combo ×{n} 🔥', ann_unstoppable: 'UNSTOPPABLE!! 🔥🔥', ann_legend: 'Legendary bluff! 😈', ann_perfect: 'Perfect! 3 of 3 ✨', ann_golden: 'GOLDEN ROUND! 👑',
@@ -858,7 +858,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
 
     if (!same) { state.timeouts.forEach(clearTimeout); state.timeouts = []; }
     $app.classList.toggle('no-anim', same);
-    const kept = paint(view(key), same);
+    const kept = paint(asWatcher(view(key)), same);
     state.lastKey = key;
 
     // A patched screen never lost its scroll position or its focus, so there
@@ -1024,6 +1024,14 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   //
   // Which word it uses comes from the server (room.clock), because the server
   // is what knows whether a phase is a reveal or a round in progress.
+  // Joined mid-game: the screen is the room's, so they can follow it, but the
+  // answer controls are switched off and a line says when they are in.
+  function asWatcher(html) {
+    const m = me(), s = state.room;
+    if (!html || !m || !m.watching || !s || ['lobby', 'final'].includes(s.phase)) return html;
+    return html.replace('<div class="screen"', '<div class="screen watching"')
+      .replace(/(<div class="screen watching"[^>]*>)/, `$1<div class="watch-banner">${t('watchingBanner')}</div>`);
+  }
   function hostControl(html) {
     const s = state.room;
     if (!html || !s || ['lobby', 'final', 'enter'].includes(s.phase)) return html;

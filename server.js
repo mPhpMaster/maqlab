@@ -43,6 +43,9 @@ const EVENT_RATE = 20;
 const EVENT_BURST = 40;
 const FLOOD_DISCONNECT = 200;
 const OBJECT_PAYLOADS = new Set(['join', 'settings', 'vote', 'two']);
+// Every event that is an answer or a power, which a watcher may not send.
+const ANSWER_EVENTS = new Set(['lie', 'vote', 'guess', 'blitz', 'emoji', 'odd', 'order', 'likely', 'power', 'spyClue', 'spyVote', 'spyGuess',
+  'minor', 'higher', 'miss', 'two', 'twoGuess', 'name', 'many', 'manyGuess', 'stuck']);
 const GHOST_MS = 25 * 1000; // grace for a lobby refresh before the seat is freed
 const ROOM_TTL_MS = 30 * 60 * 1000;
 const ITEMS_PER_QUICK_ROUND = 3; // blitz & emoji rounds have 3 quick items
@@ -174,7 +177,10 @@ function cleanAvatar(a) {
 // Names are cut to fit the UI, but by code point, not UTF-16 unit: slicing a
 // Discord display name mid-emoji splits a surrogate pair and leaves mojibake.
 const cleanName = s => [...String(s == null ? '' : s).replace(/\s+/g, ' ').trim()].slice(0, 14).join('').trim() || 'Player';
-const connected = room => [...room.players.values()].filter(p => p.connected);
+// Who the game is being played by: in the room, and not just watching.
+// Everything that waits for answers, counts heads or picks a player reads
+// this, so a watcher can never hold a round up or be voted for.
+const connected = room => [...room.players.values()].filter(p => p.connected && !p.watching);
 const freshStats = () => ({
   fooled: 0, correct: 0, snipes: 0, bullseyes: 0, fastest: 0, highBets: 0, bestStreak: 0,
   famous: 0, spyCaught: 0, spyEvaded: 0,
@@ -187,7 +193,7 @@ const freshPowers = () => ({ peek: 1, double: 1 });
 
 // ---------------- snapshots ----------------
 function publicPlayer(p) {
-  return { id: p.id, name: p.name, avatar: p.avatar, score: p.score, connected: p.connected, streak: p.streak, powers: p.powers, team: p.team, ready: p.ready, userId: p.userId || null, bot: !!p.bot };
+  return { id: p.id, name: p.name, avatar: p.avatar, score: p.score, connected: p.connected, streak: p.streak, powers: p.powers, team: p.team, ready: p.ready, userId: p.userId || null, bot: !!p.bot, watching: !!p.watching };
 }
 
 const MAX_BOTS = 5;
@@ -710,7 +716,7 @@ function fillForSolo(room) {
 
 function startGame(room) {
   Object.assign(room, { round: 0, gameNo: room.gameNo + 1, gains: {}, awards: [], bestLie: null, used: {}, log: [] });
-  for (const p of room.players.values()) { p.score = 0; p.streak = 0; p.stats = freshStats(); p.powers = freshPowers(); }
+  for (const p of room.players.values()) { p.score = 0; p.streak = 0; p.stats = freshStats(); p.powers = freshPowers(); p.watching = false; }
   room.pairs = {}; room.rivals = {};
   for (const p of room.players.values()) p.ready = false;
   if (room.settings.teams) balanceTeams(room); else for (const p of room.players.values()) p.team = null;
@@ -1701,7 +1707,7 @@ function computeAwards(room) {
 // player gets a row.
 async function recordResults(room) {
   if (!db.on()) return;
-  const ranked = [...room.players.values()].filter(p => p.score > 0 || p.connected).sort((a, b) => b.score - a.score);
+  const ranked = [...room.players.values()].filter(p => !p.watching && (p.score > 0 || p.connected)).sort((a, b) => b.score - a.score);
   const top = ranked.length ? ranked[0].score : 0;
   // Every row of this game shares one id, so /match/<id> can gather them back
   // into a single scoreboard that anyone holding the link can open.
@@ -1716,7 +1722,14 @@ async function recordResults(room) {
       // The pace is part of the result, not a setting that happened to be on:
       // without it a slow answer cannot be told from a tight clock, which is
       // the one question the round timings were added to answer.
-      data: { v: 1, pace: room.settings.pace, players: replay.roster(ranked), log: room.log },
+      data: {
+        v: 1, pace: room.settings.pace, players: replay.roster(ranked), log: room.log,
+        // For the drop-off report: who left with nothing, whether strangers
+        // could walk in, and how many modes were in the mix.
+        gone: replay.gone([...room.players.values()], ranked),
+        public: !!room.settings.public, modes: Object.values(room.settings.types).filter(Boolean).length,
+        rounds: room.settings.rounds,
+      },
     });
   } catch (e) {
     console.error('could not save match replay', e.message);
@@ -1771,7 +1784,7 @@ function finishGame(room) {
 function backToLobby(room) {
   clearTimer(room);
   Object.assign(room, { phase: 'lobby', round: 0, current: null, deadline: null, gains: {}, prevRank: {}, awards: [], bestLie: null });
-  for (const p of room.players.values()) { p.score = 0; p.streak = 0; p.powers = freshPowers(); p.ready = false; }
+  for (const p of room.players.values()) { p.score = 0; p.streak = 0; p.powers = freshPowers(); p.ready = false; p.watching = false; }
   broadcast(room);
 }
 
@@ -1826,6 +1839,13 @@ io.on('connection', socket => {
     // These handlers destructure their payload, and null or a bare string
     // would throw inside them instead of being turned away.
     if (OBJECT_PAYLOADS.has(packet[0]) && (packet[1] === null || typeof packet[1] !== 'object')) packet[1] = {};
+    // Someone watching this game cannot answer in it. Turned away here, once,
+    // rather than in each of the submit functions.
+    if (player && player.watching && ANSWER_EVENTS.has(packet[0])) {
+      const ack = packet[packet.length - 1];
+      if (typeof ack === 'function') ack({ error: 'watching' });
+      return;
+    }
     next();
   });
 
@@ -1860,11 +1880,18 @@ io.on('connection', socket => {
     avatar = cleanAvatar(avatar);
     let p = token && r.players.get(token);
     if (!p) {
-      if (connected(r).length >= MAX_PLAYERS) return reply(cb, { error: 'full' });
-      p = { id: rid(), name, avatar, score: 0, streak: 0, stats: freshStats(), powers: freshPowers(), connected: true, socketId: null, team: null, ready: false, userId: session.id };
+      // Watchers take a seat too: they are players from the next game on.
+      if ([...r.players.values()].filter(x => x.connected).length >= MAX_PLAYERS) return reply(cb, { error: 'full' });
+      p = { id: rid(), name, avatar, score: 0, streak: 0, stats: freshStats(), powers: freshPowers(), connected: true, socketId: null, team: null, ready: false, userId: session.id,
+        joinedRound: r.phase === 'lobby' ? 0 : r.round, leftRound: null,
+        // Arriving mid-game: watch this one, play from the next. A newcomer
+        // seated with no points could not catch up (one finished on 500
+        // against 8,920), and every round had to wait for someone who had
+        // not seen how it works.
+        watching: !['lobby', 'final'].includes(r.phase) };
       if (r.settings.teams) p.team = smallerTeam(r);
       r.players.set(p.id, p);
-    } else { p.name = name; p.avatar = avatar; p.userId = session.id; }
+    } else { p.name = name; p.avatar = avatar; p.userId = session.id; p.leftRound = null; }
     if (db.on()) db.touchProfile({ userId: session.id, name, avatar }).catch(() => {});
     if (room && player && room !== r) leave(false);
     room = r; player = p;
@@ -2077,6 +2104,7 @@ io.on('connection', socket => {
     if (!room || !player) return;
     const r = room, p = player;
     p.connected = false; p.socketId = null;
+    if (r.phase !== 'lobby' && r.phase !== 'final') p.leftRound = r.round;
     socket.leave(r.code);
     if (!soft && r.phase === 'lobby') r.players.delete(p.id);
     else if (soft && r.phase === 'lobby') sweepGhost(r, p.id);

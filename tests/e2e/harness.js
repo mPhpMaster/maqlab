@@ -114,7 +114,7 @@ function act(p) {
 //   during   optional async (players, room) => {} run once, when `when` first holds
 //   when     (room) => bool, default: from round 2 on
 //   silent   indexes of players who never answer
-async function playGame(url, { n, types, rounds = 3, tag = 'g', during, when = s => s.round >= 2, silent = [], timeoutMs = 90000 }) {
+async function playGame(url, { n, types, rounds = 3, tag = 'g', during, when = s => s.round >= 2, silent = [], keepOpen = false, timeoutMs = 90000 }) {
   const players = Array.from({ length: n }, (_, i) => player(url, `${tag}-p${i}`));
   for (const i of silent) players[i].silent = true;
   const close = () => players.forEach(p => p.sock.disconnect());
@@ -176,8 +176,20 @@ async function playGame(url, { n, types, rounds = 3, tag = 'g', during, when = s
       players,
     };
   } finally {
-    close();
+    // keepOpen leaves the sockets up for checks after the game; the caller closes them.
+    if (!keepOpen) close();
   }
 }
 
-module.exports = { startServer, playGame, rejoin, sleep };
+// A new player arriving in a room that is already playing.
+async function joinLate(url, id, code) {
+  const p = player(url, id);
+  for (let i = 0; i < 100 && !p.sock.connected; i++) await sleep(50);
+  const r = await call(p.sock, 'join', { code });
+  if (r.error) throw new Error(`${id} late join failed: ${r.error}`);
+  p.token = r.token; p.code = code;
+  await sleep(300);
+  return p;
+}
+
+module.exports = { startServer, playGame, rejoin, joinLate, call, sleep };

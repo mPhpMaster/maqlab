@@ -39,6 +39,9 @@ button:disabled { cursor: default; }
 
 #app { position: fixed; inset: 0; z-index: 1; display: flex; flex-direction: column; }
 .screen { flex: 1; min-height: 0; display: flex; flex-direction: column; animation: fadeUp .35s ease-out; }
+/* Joined mid-game: the round stays readable and scrollable, its controls do not answer. */
+.screen.watching button:not(.icon-btn), .screen.watching input, .screen.watching textarea { pointer-events: none; opacity: .55; }
+.watch-banner { margin: 8px 12px 0; padding: 8px 12px; border-radius: 12px; background: var(--card2); font-size: 13px; font-weight: 700; text-align: center; }
 .wrap { width: 100%; max-width: 560px; margin: 0 auto; padding: 0 16px; }
 .scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 .scroll::-webkit-scrollbar { display: none; }

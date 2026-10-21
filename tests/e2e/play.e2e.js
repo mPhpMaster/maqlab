@@ -6,7 +6,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
-const { startServer, playGame, sleep } = require('./harness');
+const { startServer, playGame, joinLate, call, sleep } = require('./harness');
 
 const server = fs.readFileSync(path.join(__dirname, '..', '..', 'server.js'), 'utf8');
 const TYPES = server.match(/const TYPES = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(s => s.replace(/'/g, ''));
@@ -83,6 +83,33 @@ test('the host leaving mid-game hands the game to someone and it finishes', asyn
   });
   assert.ok(g.final, `stopped in ${g.phase} at round ${g.round}`);
   assert.ok(before && g.hostId && g.hostId !== before, 'nobody took over as host');
+});
+
+// A newcomer used to sit down with no points mid-game, could not catch up,
+// and every round waited for them. Now they watch this game and play the next.
+test('someone joining mid-game watches it, and plays the next one', async () => {
+  let late, watchingAtJoin, answer;
+  const g = await playGame(srv.url, {
+    n: 4, rounds: 5, tag: 'late', timeoutMs: 120000, keepOpen: true,
+    when: s => s.round >= 2 && !['lobby', 'final'].includes(s.phase),
+    types: ['higher'],
+    during: async (players, s) => {
+      late = await joinLate(srv.url, 'late-new', players[0].code);
+      watchingAtJoin = late.s.players.find(p => p.id === late.me).watching;
+      answer = await call(late.sock, 'higher', 'left');
+    },
+  });
+  try {
+    assert.ok(g.final, `stopped in ${g.phase} at round ${g.round}`);
+    assert.equal(watchingAtJoin, true, 'the newcomer was seated as a player mid-game');
+    assert.deepEqual(answer, { error: 'watching' }, 'a watcher was allowed to answer');
+    noStall(g);
+    // Back in the lobby, the watcher is a player like everyone else.
+    const host = g.players[0];
+    await call(host.sock, 'lobby');
+    await sleep(300);
+    assert.equal(late.s.players.find(p => p.id === late.me).watching, false, 'still watching after the game ended');
+  } finally { late && late.sock.disconnect(); g.players.forEach(p => p.sock.disconnect()); }
 });
 
 test('the server logged no uncaught errors', () => {
