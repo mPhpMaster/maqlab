@@ -96,7 +96,7 @@ test('every phase a round can wait in has a way to be resumed', () => {
   // a listener on require, and the point is that no phase is missing
   const fs = require('node:fs');
   const path = require('node:path');
-  const src = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+  const src = require('../scripts/server-source')();
   const table = src.match(/const RESUME = \{[\s\S]*?\n\};/)[0];
   const listed = [...table.matchAll(/^\s{2}([a-zA-Z]+):/gm)].map(m => m[1]);
   // the phases that carry a timer, from the game itself
@@ -119,7 +119,7 @@ test('a room keeps its Discord voice channel across a restart', () => {
     used: {}, discordInstance: 'i-123',
   };
   assert.equal(persist.load(JSON.parse(JSON.stringify(persist.dump(room)))).discordInstance, 'i-123');
-  const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+  const server = require('../scripts/server-source')();
   assert.match(server, /if \(room\.discordInstance\) discordInstanceRooms\.set\(room\.discordInstance, room\.code\);/, 'restore no longer re-links the channel to its room');
   assert.match(server, /room\.discordInstance = instanceId;/, 'a new Activity room no longer remembers its channel');
 });

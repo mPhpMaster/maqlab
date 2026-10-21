@@ -10,7 +10,7 @@ const path = require('node:path');
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
 const app = read('public/app.js');
 const css = read('public/style.css');
-const server = read('server.js');
+const server = require('../scripts/server-source')();
 
 // Measured on the live page: in an Arabic interface, an English question put
 // its question mark at x=2 and its first letter at x=11 — the "?" rendered

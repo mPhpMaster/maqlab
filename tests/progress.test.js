@@ -11,7 +11,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const progress = require('../progress');
 
-const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+const server = require('../scripts/server-source')();
 const ACTIVE = server.match(/const ACTIVE = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(s => s.replace(/'/g, ''));
 const onAllIn = server.match(/const ON_ALL_IN = \{([\s\S]*?)\n\};/)[1];
 const ON_ALL_IN = [...onAllIn.matchAll(/(\w+): \w+/g)].map(m => m[1]);

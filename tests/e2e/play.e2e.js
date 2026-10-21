@@ -8,7 +8,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { startServer, playGame, joinLate, call, sleep } = require('./harness');
 
-const server = fs.readFileSync(path.join(__dirname, '..', '..', 'server.js'), 'utf8');
+const server = require('../../scripts/server-source')();
 const TYPES = server.match(/const TYPES = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(s => s.replace(/'/g, ''));
 // Each mode's answering phases, so the test can say a mode was actually
 // played rather than skipped by the planner.

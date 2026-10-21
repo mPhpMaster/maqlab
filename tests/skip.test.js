@@ -19,7 +19,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const root = path.join(__dirname, '..');
-const server = fs.readFileSync(path.join(root, 'server.js'), 'utf8');
+const server = require('../scripts/server-source')();
 const app = fs.readFileSync(path.join(root, 'public', 'app.js'), 'utf8');
 
 const TYPES = server.match(/const TYPES = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(t => t.replace(/'/g, ''));

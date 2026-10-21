@@ -12,7 +12,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { drawPlan, pickRound, leastPlayed } = require('../plan');
 
-const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+const server = require('../scripts/server-source')();
 const TYPES = server.match(/const TYPES = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(t => t.replace(/'/g, ''));
 // The crowd each mode needs, read out of the server so a new threshold is
 // covered here without anyone remembering to add it. That is exactly the fault

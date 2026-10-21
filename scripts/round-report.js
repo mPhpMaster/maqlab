@@ -78,7 +78,7 @@ const PHASE_FOR = {
 };
 
 function paceTable() {
-  const src = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+  const src = require('./server-source')();
   const block = src.match(/const T = \{[\s\S]*?\n\};/)[0];
   const out = {};
   for (const pace of ['chill', 'normal', 'fast']) {
@@ -90,7 +90,7 @@ function paceTable() {
 }
 
 function serverTypes() {
-  const src = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+  const src = require('./server-source')();
   return src.match(/const TYPES = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(t => t.replace(/'/g, ''));
 }
 

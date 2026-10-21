@@ -9,7 +9,7 @@ const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
-const server = read('server.js');
+const server = require('../scripts/server-source')();
 const report = read('scripts/round-report.js');
 const types = server.match(/const TYPES = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(t => t.replace(/'/g, ''));
 

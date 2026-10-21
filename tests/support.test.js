@@ -19,7 +19,7 @@ const path = require('node:path');
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
 const app = read('public/app.js');
 const discord = read('public/discord.js');
-const server = read('server.js');
+const server = require('../scripts/server-source')();
 
 test('the donate link opens the way Discord requires', () => {
   assert.match(discord, /openExternalLink\(\{ url \}\)/,

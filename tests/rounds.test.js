@@ -8,7 +8,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+const server = require('../scripts/server-source')();
 const types = server.match(/const TYPES = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(t => t.replace(/'/g, ''));
 
 test('the game knows about every round type it can plan', () => {

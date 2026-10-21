@@ -12,7 +12,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+const server = require('../scripts/server-source')();
 const index = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
 
 test('every asset the page loads carries a version stamp', () => {

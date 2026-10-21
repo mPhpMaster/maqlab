@@ -79,7 +79,7 @@ test('the privacy policy still describes what the replay keeps', () => {
 // the terms. Nothing tied any of the three together, so all three disagreed
 // for as long as nobody read them side by side.
 test('the legal pages agree with the sign-in the server actually enforces', () => {
-  const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+  const server = require('../scripts/server-source')();
   const signInRequired = /if \(!session\) return reply\(cb, \{ error: 'signin' \}\)/.test(server);
   assert.ok(signInRequired,
     'the join handler no longer requires a session — the legal pages say it does, so update them together');
@@ -100,7 +100,7 @@ test('the legal pages agree with the sign-in the server actually enforces', () =
 // The policy has to describe the controls the game actually has.
 test('the privacy policy describes download and delete, and they exist', () => {
   const privacy = read('privacy.html');
-  const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+  const server = require('../scripts/server-source')();
   assert.match(privacy, /Download my data/);
   assert.match(privacy, /Delete my account/);
   assert.ok(privacy.includes('نزّل بياناتي') && privacy.includes('احذف حسابي'), 'the Arabic policy does not name the two buttons');

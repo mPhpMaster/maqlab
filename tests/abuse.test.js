@@ -6,7 +6,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+const server = require('../scripts/server-source')();
 const handler = name => server.match(new RegExp(`socket\\.on\\('${name}'[\\s\\S]*?\\n  \\}\\);`))[0];
 
 test('creating a room needs a session, like joining one', () => {

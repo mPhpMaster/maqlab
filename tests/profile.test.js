@@ -6,7 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
-const server = read('server.js');
+const server = require('../scripts/server-source')();
 const schema = require('./helpers/schema')();
 
 test('every moderation column in the schema is on the list kept from non-admins', () => {

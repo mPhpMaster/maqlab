@@ -101,7 +101,7 @@ test('the queue has a ceiling', () => {
 // Everyone in the lobby gets a snapshot. If the answers went out with it, the
 // other players would be reading the answers to rounds they have not played.
 test('only the host is sent the questions themselves', () => {
-  const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+  const server = require('../scripts/server-source')();
   const block = server.match(/s\.hostQ = \{[\s\S]*?\n  if \(!c\)/)[0];
   assert.match(block, /if \(pid === room\.hostId\) s\.hostQ\.list/,
     'the host questions are no longer gated on the viewer being the host');

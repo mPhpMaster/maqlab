@@ -7,7 +7,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+const server = require('../scripts/server-source')();
 const shutdown = server.match(/async function shutdown\(signal\) \{[\s\S]*?\n\}/)[0];
 
 test('SIGTERM and SIGINT both run the shutdown', () => {

@@ -9,7 +9,7 @@ const path = require('node:path');
 const ach = require('../achievements');
 
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
-const server = read('server.js');
+const server = require('../scripts/server-source')();
 const app = read('public/app.js');
 const types = server.match(/const TYPES = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(t => t.replace(/'/g, ''));
 
