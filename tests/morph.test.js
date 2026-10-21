@@ -17,7 +17,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const app = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
+const app = require('../scripts/client-source')();
 
 function load(name) {
   const at = app.indexOf(`function ${name}(`);

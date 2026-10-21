@@ -10,7 +10,7 @@ const content = require('../content');
 
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
 const server = require('../scripts/server-source')();
-const app = read('public/app.js');
+const app = require('../scripts/client-source')();
 const readme = read('README.md');
 const privacy = read('public/privacy.html');
 

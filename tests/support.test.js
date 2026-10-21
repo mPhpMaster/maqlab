@@ -17,7 +17,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
-const app = read('public/app.js');
+const app = require('../scripts/client-source')();
 const discord = read('public/discord.js');
 const server = require('../scripts/server-source')();
 

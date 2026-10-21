@@ -26,11 +26,24 @@ test('every asset the page loads carries a version stamp', () => {
 });
 
 test('the stamp changes when any of those assets changes', () => {
-  const hashed = server.match(/\.update\(\[([^\]]*)\]/)[1];
-  for (const asset of ['app.js', 'avatar.js', 'style.css']) {
-    assert.ok(hashed.includes(`'${asset}'`),
+  const listed = server.match(/export const STAMPED = \[([^\]]*)\]/)[1];
+  for (const asset of ['app.js', 'avatar.js', 'style.css', 'discord.js']) {
+    assert.ok(listed.includes(`'${asset}'`),
       `${asset} is not in the hash, so editing it would not change the version`);
   }
+  // the client modules and stylesheets are listed from their folders, so a new one is covered
+  assert.ok(listed.includes("...listed('js')") && listed.includes("...listed('css')"), 'the js/ and css/ modules are not in the hash');
+  assert.match(server, /\.update\(STAMPED\.map\(/, 'the stamp is no longer a hash of the listed files');
+});
+
+test('every import the client sends carries the stamp', () => {
+  assert.match(server, /text\.replace\(STAMP_IMPORT, `\$1\$2\?v=\$\{ASSET_V\}\$3`\)/);
+  // The rule, run on the real import lines of the client.
+  const rule = new RegExp(server.match(/const STAMP_IMPORT = \/(.*)\/g;/)[1], 'g');
+  const src = require('../scripts/client-source')();
+  const imports = src.match(/^\s*import .*from '\.\/[\w-]+\.js';$|^import '\.\/js\/main\.js';$/gm) || [];
+  assert.ok(imports.length > 20, 'the client imports were not found');
+  for (const line of imports) assert.ok(line.replace(rule, '$1$2?v=X$3').includes('.js?v=X'), `not stamped: ${line}`);
 });
 
 test('the stylesheet in particular is stamped', () => {

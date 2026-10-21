@@ -1,0 +1,201 @@
+/* The newest screens and pieces: line them up, match replays, the connection
+   banner, result lists, and the modes added last. Loaded last. */
+
+/* line them up */
+.type-tag.order { background: rgba(255,190,90,.18); color: #ffc46b; }
+.order-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.ord { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 14px; border-radius: 14px;
+  background: rgba(255,255,255,.06); border: 1px solid var(--line); color: var(--text);
+  font-size: 15px; font-weight: 700; text-align: start; animation: fadeUp .3s ease-out backwards; }
+.ord .pos { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255,255,255,.08); font-size: 13px; font-weight: 900; color: var(--muted); }
+.ord .nm { flex: 1; }
+.ord .val { font-size: 12px; font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ord .yours { font-size: 11px; font-weight: 700; color: var(--muted); opacity: .8; }
+.ord.picked { background: rgba(255,190,90,.16); border-color: #ffc46b; }
+.ord.picked .pos { background: #ffc46b; color: #2b1e05; }
+.ord.reveal.right { background: rgba(79,224,176,.16); border-color: var(--mint); }
+.ord.reveal.near { background: rgba(255,190,90,.12); border-color: rgba(255,190,90,.5); }
+.no-anim .ord { animation: none; }
+
+/* ---- match replay: one collapsed card per round ---- */
+.rep { border: 1px solid var(--line); border-radius: 16px; background: var(--card); margin-top: 8px; overflow: hidden; }
+.rep > summary { display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer; list-style: none; font-size: 13px; }
+.rep > summary::-webkit-details-marker { display: none; }
+.rep > summary::after { content: '▾'; margin-inline-start: auto; color: var(--muted); transition: transform .2s; }
+.rep[open] > summary::after { transform: rotate(180deg); }
+.rep > summary:hover { background: var(--card2); }
+.rep .rn { font-weight: 900; color: var(--muted); font-size: 12px; min-width: 24px; }
+.rep .rq { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.repbody { padding: 4px 12px 12px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+.repq { font-weight: 700; line-height: 1.45; }
+.repi { border-top: 1px solid var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.repi:first-child { border-top: 0; padding-top: 0; }
+.repo { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 7px 10px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); }
+.repo.ok { border-color: var(--mint); background: rgba(79,224,176,.13); }
+.repo.no { opacity: .75; }
+.repo .txt { font-weight: 700; }
+.repo .by { color: var(--muted); font-size: 12px; }
+.repw { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-inline-start: auto; }
+.repp { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px 2px 3px; border-radius: 99px; background: var(--card2); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.repp svg { width: 18px; height: 18px; }
+.repp.ok { background: rgba(79,224,176,.22); }
+.repp.no { background: rgba(255,122,133,.18); }
+.reppts { margin-inline-start: auto; font-weight: 900; font-size: 12px; color: var(--mint); }
+.reppts.zero { color: var(--muted); }
+
+/* ---- connection banner: shown while the socket is down ---- */
+#conn { position: fixed; top: 0; left: 0; right: 0; z-index: 250; display: none; justify-content: center; pointer-events: none; }
+#conn.on { display: flex; }
+.conn-bar { margin-top: 10px; padding: 9px 18px; border-radius: 99px; background: #5a2440; border: 1px solid rgba(255,122,133,.5); color: var(--text); font-weight: 700; font-size: 13px; box-shadow: 0 10px 30px -10px rgba(0,0,0,.6); animation: pop .3s; max-width: 92vw; text-align: center; }
+
+/* ---- who answered what, on a result screen ---- */
+.answers { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.ans-title { text-align: center; color: var(--muted); font-size: 12px; font-weight: 800; margin-bottom: 2px; }
+.ansrow { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); font-size: 14px; }
+.ansrow svg { width: 26px; height: 26px; flex: none; }
+.ansrow .nm { font-weight: 700; }
+.ansrow .said { margin-inline-start: auto; font-weight: 800; text-align: end; }
+.ansrow.ok { border-color: var(--mint); background: rgba(79,224,176,.13); }
+.ansrow.no { border-color: rgba(255,122,133,.45); background: rgba(255,122,133,.10); }
+.ansrow.none .said { color: var(--muted); font-weight: 600; }
+
+/* ---- the spy round says what you are, what to do, and what it pays ---- */
+.spy-role.civ { color: var(--mint); }
+.spy-task { margin-top: 10px; font-weight: 700; color: #ded8fb; line-height: 1.5; }
+.spy-win { margin-top: 8px; display: inline-block; padding: 4px 12px; border-radius: 99px; background: var(--card2); font-size: 12px; font-weight: 800; color: var(--lemon); }
+
+/* ---- how many of us: pick a number the size of the room ---- */
+.type-tag.many { background: rgba(90,174,255,.22); color: var(--sky); }
+.many-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 4px; }
+.many-n { min-width: 54px; padding: 14px 10px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); color: var(--text); font-size: 20px; font-weight: 900; font-family: inherit; cursor: pointer; transition: transform .12s, background .2s; }
+.many-n:hover:not(:disabled) { background: var(--card2); transform: translateY(-2px); }
+.many-n.picked { background: var(--sky); color: var(--ink); border-color: var(--sky); }
+.many-n:disabled { opacity: .55; cursor: default; }
+
+/* ---- name something: clusters of the same answer ---- */
+.type-tag.name { background: rgba(255,130,196,.2); color: var(--pink); }
+.type-tag.two { background: rgba(185,160,255,.2); color: var(--lilac); }
+.type-tag small { opacity: .7; font-weight: 700; margin-inline-start: 5px; }
+
+/* Three lines to write, with the 🤥 that marks the lie attached to each one —
+   deciding which is the lie is part of writing it, not a second screen. */
+.tworow { display: flex; align-items: center; gap: 8px; }
+.tworow .input { flex: 1; min-width: 0; }
+.liepick {
+  flex: 0 0 auto; width: 44px; height: 44px; border-radius: 14px; font-size: 19px;
+  border: 2px solid var(--line); background: var(--card); opacity: .45;
+  transition: opacity .15s, border-color .15s, transform .1s;
+}
+.liepick:active { transform: scale(.94); }
+.liepick.on { opacity: 1; border-color: var(--coral); background: rgba(255,107,107,.16); }
+.ansrow.mineans { outline: 2px solid var(--lilac); outline-offset: -2px; }
+.ansrow .repw { margin-inline-start: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* The author's avatar beside a question. Jelly SVGs are width:100% by design,
+   so an unconstrained one swells to fill the whole card — which is exactly
+   what it did here on first play. */
+.q .qwho { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.q .qwho .jelly { width: 34px; height: 34px; flex: 0 0 auto; }
+
+/* The host's own questions, listed in the lobby. */
+.qlist { display: flex; flex-direction: column; gap: 6px; }
+.qlist .ansrow .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qlist .ansrow .said { color: var(--muted); font-size: 13px; }
+.qx { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 9px; border: 1px solid var(--line); background: var(--card2); color: var(--muted); font-weight: 800; }
+.qx:active { transform: scale(.92); }
+
+/* A way out of a blank box, kept deliberately quieter than the send button:
+   the point is to rescue a player who would otherwise sit the round out, not
+   to offer an easier option than writing something. */
+.btn.quiet { opacity: .62; font-size: 14px; min-height: 40px; font-weight: 700; }
+.btn.quiet:active { opacity: 1; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+.chipb {
+  padding: 6px 12px; border-radius: 99px; border: 1px solid var(--line);
+  background: var(--card2); color: var(--muted); font-size: 13px; font-weight: 700;
+}
+.chipb:active { transform: scale(.95); border-color: var(--lemon); color: var(--ink2, #fff); }
+
+/* Text written by players, and questions from the bank, are not always in the
+   language the interface is in — an English answer in an Arabic room, an Arabic
+   name on an English scoreboard. Without this the paragraph takes the page's
+   direction and the punctuation moves: measured, "…intestine?" rendered its
+   question mark 287px to the left of the first letter, i.e. before the
+   sentence. `plaintext` lets each string pick its own direction from its own
+   first letter, which is the only thing that can be right for both. */
+.q, .q-card h1, .sub, .opt, .nm, .my-answer, .ansrow .nm, .ansrow .said, .repo .txt,
+.rq, .best-lie .txt, .mrow .nm, .ord .nm, .qlist .ansrow .nm, .clue, .repp, .pod .nm,
+.flag, b {
+  unicode-bidi: plaintext;
+}
+
+/* The name is the point of a scoreboard row; the points chip is not. Without a
+   floor the name was the first thing flex took space from — a row with a gain
+   and a streak squeezed "Nova" into 25px and drew it as "...va". */
+.brow .nm { min-width: 4.5em; }
+.brow .streak { flex: 0 0 auto; }
+
+/* The support ask. Quiet by design and it sells nothing: a donation unlocks
+   no badge, no cosmetic and no advantage, which is both fair to players who
+   do not pay and the line that keeps an outbound link allowed in a Discord
+   Activity at all. */
+.support-card {
+  margin-top: 14px; padding: 14px; border-radius: 16px;
+  background: var(--card); border: 1px solid var(--line);
+}
+.support-card b { display: block; margin-bottom: 6px; font-size: 15px; }
+.support-card p { margin: 0 0 8px; font-size: 13px; line-height: 1.6; }
+.support-card .btn { margin-top: 4px; }
+
+/* The other two games. Same quiet register as the support card: it is an
+   offer, not a billboard, and it sits below the room list where someone who
+   has finished looking for a game to join will see it.
+
+   The name and the arrow are the only things that have to be readable at a
+   glance, so the row is laid out as icon / text / verb and takes its
+   direction from the page rather than from the markup. */
+.games-card {
+  margin-top: 14px; padding: 14px; border-radius: 16px;
+  background: var(--card); border: 1px solid var(--line);
+}
+.games-card > b { display: block; font-size: 15px; }
+.games-card > p { margin: 4px 0 10px; font-size: 13px; line-height: 1.6; }
+.game-row {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 10px 12px; margin-top: 8px; border-radius: 14px;
+  background: var(--card2); border: 1px solid var(--line);
+  color: var(--text); text-align: start; font: inherit;
+}
+.game-row:hover { border-color: var(--lemon); }
+.game-row .ge { font-size: 22px; flex: 0 0 auto; }
+.game-row .gt { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; }
+.game-row .gt b { font-size: 14px; font-weight: 800; }
+/* Two titles in two scripts, and one of them is English inside an Arabic
+   page: let each line lay itself out. */
+.game-row .gt b, .game-row .gt small { unicode-bidi: plaintext; }
+.game-row .gt small { color: var(--muted); font-size: 12px; line-height: 1.5; }
+.game-row .go { flex: 0 0 auto; color: var(--muted); font-size: 12px; font-weight: 800; white-space: nowrap; }
+
+/* On the final scoreboard there is no room for a card, so it is one line per
+   game and no descriptions. */
+.games-strip { margin-top: 16px; display: grid; gap: 8px; }
+.games-strip .game-row { margin-top: 0; }
+
+/* The minority round: two choices, nothing else competing for the eye. */
+.type-tag.minor { background: rgba(120,220,200,.18); color: #7fe0d0; }
+.two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+.two-up .opt.big { min-height: 110px; font-size: 19px; }
+.sides { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+.side { padding: 10px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+.side.ok { border-color: var(--mint); background: rgba(120,220,180,.12); }
+.side-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.side-head .cnt { font-weight: 800; color: var(--muted); }
+.side .repw { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* What is still on the board in What Went Missing. */
+.still { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 16px; }
+
+/* A mode the table is too small for: still switchable, but it says so. */
+.type-tog.short { opacity: .62; }
+.type-tog .need { font-style: normal; font-size: 10px; font-weight: 800; opacity: .85; margin-inline-start: 2px; }

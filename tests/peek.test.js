@@ -10,7 +10,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const server = require('../scripts/server-source')();
-const client = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
+const client = require('../scripts/client-source')();
 
 test('the server offers peek in every round the button lights up for', () => {
   // what the client enables, straight out of powerBar

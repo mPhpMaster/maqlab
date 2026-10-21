@@ -9,7 +9,7 @@ const path = require('node:path');
 
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
 const server = require('../scripts/server-source')();
-const app = read('public/app.js');
+const app = require('../scripts/client-source')();
 
 // The server's own rule, run here rather than copied.
 const safeNext = new Function(`${server.match(/const safeNext = [^\n]+/)[0]}\nreturn safeNext;`)();

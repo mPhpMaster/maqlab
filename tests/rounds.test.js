@@ -22,7 +22,7 @@ test('the game knows about every round type it can plan', () => {
 // round in a finished match threw while rendering and took the whole page with
 // it. Every type that records something other than items needs its own branch.
 test('the match replay can render every round type', () => {
-  const app = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
+  const app = require('../scripts/client-source')();
   const body = app.match(/const bodyFor = r =>[\s\S]*?quick\(r, r\.type\)\);/)[0];
   const quickish = ['blitz', 'emoji', 'odd'];
   for (const type of types) {
@@ -40,7 +40,7 @@ test('the match replay can render every round type', () => {
 // half-translated case, which is how the legal pages drifted.
 test('every reason the server pays points for has a label, in both languages', () => {
   const reasons = [...server.matchAll(/gain\(room, [^,]+, '([a-zA-Z]+)'/g)].map(m => m[1]);
-  const app = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
+  const app = require('../scripts/client-source')();
   for (const r of new Set(reasons)) {
     const n = (app.match(new RegExp(`g_${r}:`, 'g')) || []).length;
     assert.equal(n, 2, `gain reason "${r}" has ${n} labels, expected one per language — ` +
@@ -55,7 +55,7 @@ test('every reason the server pays points for has a label, in both languages', (
 test('every refusal the server can send has a message, in both languages', () => {
   const hostqSrc = fs.readFileSync(path.join(__dirname, '..', 'hostq.js'), 'utf8');
   const codes = [...(server + hostqSrc).matchAll(/error: '([a-z_]+)'/g)].map(m => m[1]);
-  const app = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
+  const app = require('../scripts/client-source')();
   for (const c of new Set(codes)) {
     const n = (app.match(new RegExp(`err_${c}:`, 'g')) || []).length;
     assert.equal(n, 2, `error "${c}" has ${n} messages, expected one per language — ` +

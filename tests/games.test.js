@@ -10,8 +10,8 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const app = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
-const css = fs.readFileSync(path.join(__dirname, '..', 'public', 'style.css'), 'utf8');
+const app = require('../scripts/client-source')();
+const css = require('../scripts/client-css')();
 
 const block = app.match(/const GAMES = \[([\s\S]*?)\n  \];/);
 assert.ok(block, 'the GAMES list is gone from public/app.js');

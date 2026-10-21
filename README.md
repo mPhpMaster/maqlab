@@ -77,7 +77,7 @@ The game runs inside Discord (launched from the rocket 🚀 button in a voice ch
 
 **Two things the Activity iframe will not forgive**, both already handled here and both worth knowing before you change `public/discord.js`:
 - It can only talk to the mapped domain. The Discord SDK is therefore vendored into `public/vendor/` and imported by path; a CDN import is blocked and kills the bootstrap on its first line.
-- Discord's proxy serves stale assets for a long time regardless of cache headers. The server stamps `app.js` and `avatar.js` with a hash of their contents, and `app.js` passes that stamp on to its import of `discord.js`. If you add another client module, give it the same treatment or you will spend an afternoon debugging code that is not running.
+- Discord's proxy serves stale assets for a long time regardless of cache headers. The server stamps every script and stylesheet with a hash of all of them, and adds that stamp to every import inside the client modules it serves (`js/*.js`), so a new module in `js/` or stylesheet in `css/` is covered without doing anything. `discord.js` is imported from `js/boot.js` by URL with the same stamp. If you add a file outside those folders, add it to `STAMPED` in `server/http-pages.js` or you will spend an afternoon debugging code that is not running.
 
 ## Files
 - `server/`: the game engine as ES modules, one per part (rooms, snapshots, round types, sockets, HTTP routes, startup and shutdown); `server/main.js` sets things up in order, and `server.js` is the entry point that loads it
@@ -86,7 +86,7 @@ The game runs inside Discord (launched from the rocket 🚀 button in a voice ch
 - `auth.js`: signed session tokens, Discord sign-in, admin checks
 - `bots.js`: what a bot does in each round (the server decides when)
 - `replay.js`: what is kept from each round so `/match/<id>` can replay it
-- `public/`: the front end (`app.js`, `avatar.js` for the characters, `style.css`, `discord.js` for the Discord Activity integration)
+- `public/`: the front end. `app.js` is the entry point and the code is in `js/`, one ES module per part, started in order by `js/main.js`; the server adds the current `?v=` stamp to every import it serves. Styles are `style.css` plus `css/`. Also `avatar.js` for the characters and `discord.js` for the Discord Activity integration
 
 ---
 

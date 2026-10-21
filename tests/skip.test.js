@@ -20,7 +20,7 @@ const path = require('node:path');
 
 const root = path.join(__dirname, '..');
 const server = require('../scripts/server-source')();
-const app = fs.readFileSync(path.join(root, 'public', 'app.js'), 'utf8');
+const app = require('../scripts/client-source')();
 
 const TYPES = server.match(/const TYPES = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(t => t.replace(/'/g, ''));
 const nextHandler = server.match(/socket\.on\('next'[\s\S]*?\n  \}\);/)[0];

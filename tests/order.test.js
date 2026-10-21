@@ -10,7 +10,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const src = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
+const src = require('../scripts/client-source')();
 
 // the helper, lifted from app.js so the rule is checked and not just described
 const orderSeq = (draft, items) => draft.filter(id => items.some(it => it.id === id));

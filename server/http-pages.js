@@ -38,11 +38,31 @@ export const OG_BLOCK = /<!--og-->[\s\S]*?<!--\/og-->/;
 // cache headers say, so the URL itself has to change when the code does. The
 // stamp is a hash of the client modules: it moves on a real change and
 // stays put across restarts that changed nothing.
+// Every file the page loads as code or style, the client modules in js/ and
+// css/ included, so a change to any one of them moves the stamp.
+const listed = dir => { try { return fs.readdirSync(path.join(ROOT, 'public', dir)).filter(f => /\.(js|css)$/.test(f)).sort().map(f => `${dir}/${f}`); } catch { return []; } };
+export const STAMPED = ['app.js', 'discord.js', 'avatar.js', 'style.css', ...listed('js'), ...listed('css')];
 export const ASSET_V = crypto.createHash('sha1')
-  .update(['app.js', 'discord.js', 'avatar.js', 'style.css'].map(f => {
+  .update(STAMPED.map(f => {
     try { return fs.readFileSync(path.join(ROOT, 'public', f)); } catch { return ''; }
   }).join('|'))
   .digest('hex').slice(0, 10);
+
+// The client is a set of modules importing one another. A browser resolves
+// "./core.js" without the importing page's ?v=, so Discord's proxy could hand
+// back a stale module next to a fresh one, or the same module twice under two
+// addresses with two copies of its state. Every import the server sends out
+// carries the current stamp instead. Read once: the files only change with a
+// deploy, which restarts the process.
+const STAMP_IMPORT = /((?:\bfrom|\bimport)\s*['"])(\.{1,2}\/[\w/-]+\.js)(['"])/g;
+const stampedJs = new Map();
+export function stampedModule(rel) {
+  if (!stampedJs.has(rel)) {
+    const text = fs.readFileSync(path.join(ROOT, 'public', rel), 'utf8');
+    stampedJs.set(rel, text.replace(STAMP_IMPORT, `$1$2?v=${ASSET_V}$3`));
+  }
+  return stampedJs.get(rel);
+}
 export const attr = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 export const SITE_TITLE = 'MAQLAB | مقلب';
 export const SITE_DESC = 'A party game for your whole crew: lie well, catch the liars, guess faster than your friends. · لعبة حفلات جماعية: اكذب بذكاء، اكشف الكذابين، وخمّن أسرع من ربعك.';
@@ -58,6 +78,8 @@ export function page(req, title, desc, image) {
     // cache headers — so a player could get new markup with the old stylesheet,
     // which is markup carrying class names the stylesheet has never heard of.
     .replace('href="/style.css"', `href="/style.css?v=${ASSET_V}"`)
+    // and the rest of the stylesheets, which follow it in css/
+    .replace(/href="\/css\/([\w-]+\.css)"/g, (_, f) => `href="/css/${f}?v=${ASSET_V}"`)
     .replace(OG_BLOCK, [
     '<meta property="og:type" content="website">',
     '<meta property="og:site_name" content="MAQLAB">',
@@ -175,6 +197,14 @@ app.get('/privacy', (_, res) => res.sendFile(path.join(ROOT, 'public', 'privacy.
 // generously and kept serving a stale client long after a fix had shipped,
 // which cost real debugging time. The page and its modules must revalidate
 // every load; the vendored SDK is pinned by filename and never changes.
+// The client modules, with every import stamped (see stampedModule).
+app.get(['/app.js', '/js/:file'], (req, res, next) => {
+  const rel = req.params.file ? `js/${req.params.file}` : 'app.js';
+  if (!/^(app|js\/[\w-]+)\.js$/.test(rel) || !STAMPED.includes(rel)) return next();
+  res.type('application/javascript');
+  res.setHeader('Cache-Control', req.query.v === ASSET_V ? 'public, max-age=31536000, immutable' : 'no-cache');
+  res.send(stampedModule(rel));
+});
 app.use(express.static(path.join(ROOT, 'public'), {
   setHeaders(res, filePath) {
     // Fonts never change in place: a new version gets a new file name.

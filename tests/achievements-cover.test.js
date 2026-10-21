@@ -10,7 +10,7 @@ const ach = require('../achievements');
 
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
 const server = require('../scripts/server-source')();
-const app = read('public/app.js');
+const app = require('../scripts/client-source')();
 const types = server.match(/const TYPES = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(t => t.replace(/'/g, ''));
 
 // The counter each type's own achievements are built on. A type with no entry

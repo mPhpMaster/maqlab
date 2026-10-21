@@ -9,7 +9,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const src = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
+const src = require('../scripts/client-source')();
 
 // the selector, lifted verbatim from app.js
 const PLURAL = {
