@@ -273,8 +273,16 @@ const searchProfiles = term =>
       where name ilike $1 or user_id = $2 order by total_score desc limit 25`,
     [`%${term.replace(/[%_\\]/g, m => '\\' + m)}%`, term]).then(r => r.rows);
 
+// Called once on shutdown, after the last room has been written.
+async function close() {
+  if (!pool) return;
+  const p = pool;
+  pool = null;
+  await p.end();
+}
+
 module.exports = {
-  init, on, getProfile, touchProfile, rankOf, recentGames, leaderboard, weeklyBoard, weeklyRank, recordGame, addAchievements, getMatch, saveMatch, getReplay, saveRoom, dropRoom, liveRooms, seenBy, markSeen,
+  init, on, close, getProfile, touchProfile, rankOf, recentGames, leaderboard, weeklyBoard, weeklyRank, recordGame, addAchievements, getMatch, saveMatch, getReplay, saveRoom, dropRoom, liveRooms, seenBy, markSeen,
   follow, unfollow, following, followCounts, isFollowing,
   createReport, createSuggestion,
   isBanned, setBan, unban, resetProfile,

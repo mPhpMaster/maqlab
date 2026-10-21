@@ -1833,7 +1833,7 @@ io.on('connection', socket => {
     // Joining has always needed a Discord account; creating did not, so a
     // script could open rooms nobody could ever sit down in.
     if (!session) return reply(cb, { error: 'signin' });
-    if (limited('create', 3000) || roomsFull()) return reply(cb, { error: 'busy' });
+    if (shuttingDown || limited('create', 3000) || roomsFull()) return reply(cb, { error: 'busy' });
     const room = createRoom();
     // The room opens in the language the person creating it is reading. They
     // can still change it; it is a starting point, not a decision taken for
@@ -2151,11 +2151,11 @@ const RESUME_GRACE_MS = 20 * 1000;
 const SAVE_EVERY_MS = 3000;
 const lastSave = new Map();
 function saveRoom(room, force = false) {
-  if (!db.on() || !persist.worthSaving(room)) return;
+  if (!db.on() || !persist.worthSaving(room)) return null;
   const now = Date.now();
-  if (!force && now - (lastSave.get(room.code) || 0) < SAVE_EVERY_MS) return;
+  if (!force && now - (lastSave.get(room.code) || 0) < SAVE_EVERY_MS) return null;
   lastSave.set(room.code, now);
-  db.saveRoom(room.code, persist.dump(room)).catch(e => console.error('could not save room', room.code, e.message));
+  return db.saveRoom(room.code, persist.dump(room)).catch(e => console.error('could not save room', room.code, e.message));
 }
 function forgetRoom(code) {
   lastSave.delete(code);
@@ -2176,6 +2176,7 @@ async function restoreRooms() {
     try {
       const room = persist.load(data);
       rooms.set(room.code, room);
+      if (room.discordInstance) discordInstanceRooms.set(room.discordInstance, room.code);
       const resume = RESUME[room.phase];
       if (resume) {
         // Whatever was left on the clock, plus enough time to get back in.
@@ -2704,6 +2705,7 @@ app.post('/api/discord/room', (req, res) => {
   if (roomsFull()) return res.status(503).json({ error: 'busy' });
   const room = createRoom();
   room.settings.public = false; // a voice-channel game isn't advertised to strangers
+  room.discordInstance = instanceId;
   discordInstanceRooms.set(instanceId, room.code);
   res.json({ code: room.code });
 });
@@ -2719,7 +2721,7 @@ app.use((err, req, res, _next) => {
 process.on('unhandledRejection', e => console.error('unhandled rejection:', e && e.message ? e.message : e));
 process.on('uncaughtException', e => console.error('uncaught exception:', e && e.stack ? e.stack : e));
 
-db.init()
+const booted = db.init()
   .then(ok => {
     console.log(ok ? 'database connected' : 'no DATABASE_URL — profiles, leaderboard and moderation are off');
     // Games that were in progress when this process last stopped. Done after
@@ -2729,4 +2731,35 @@ db.init()
   })
   .catch(e => console.error('database unavailable, running without it:', e.message));
 
-server.listen(PORT, () => console.log(`MAQLAB running on http://localhost:${PORT}`));
+// Listening waits for the rooms to be back. It used to start at once, so a
+// phone reconnecting straight after a deploy asked for its room before it had
+// been read back, was told it did not exist, and forgot it. A database too
+// slow to answer does not get to hold the game up for longer than this.
+const BOOT_WAIT_MS = 15 * 1000;
+Promise.race([booted, new Promise(r => setTimeout(r, BOOT_WAIT_MS))])
+  .then(() => server.listen(PORT, () => console.log(`MAQLAB running on http://localhost:${PORT}`)));
+
+// Render stops the old instance with SIGTERM on every deploy and kills it
+// about 30 seconds later. Rooms were saved at most every few seconds, so the
+// last answers before a deploy could be lost, and sockets were cut without
+// a word. Now: stop opening rooms, write every room down as it stands, close
+// the sockets (clients reconnect to the new instance and rejoin), close the
+// database, and leave well inside the window.
+const SHUTDOWN_MS = 20 * 1000;
+let shuttingDown = false;
+async function shutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  const t0 = Date.now();
+  console.log(`${signal}: saving rooms and closing`);
+  setTimeout(() => { console.error('shutdown took too long, exiting'); process.exit(0); }, SHUTDOWN_MS).unref();
+  const saves = [...rooms.values()].map(r => saveRoom(r, true)).filter(Boolean);
+  await Promise.allSettled(saves);
+  console.log(`saved ${saves.length} room(s) in ${Date.now() - t0} ms`);
+  await new Promise(r => io.close(() => r()));
+  await db.close().catch(() => {});
+  console.log(`closed in ${Date.now() - t0} ms`);
+  process.exit(0);
+}
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

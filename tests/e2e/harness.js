@@ -18,8 +18,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // No DATABASE_URL: every game here also runs the "database is down" path,
 // which is the one players hit when Neon is unreachable.
-async function startServer(port) {
-  const env = { ...process.env, PORT: String(port), SESSION_SECRET: SECRET, DATABASE_URL: '', NEON_DATABASE_URL: '' };
+// Pass { db } to run against a real Postgres (the restart test needs one).
+async function startServer(port, { db = '' } = {}) {
+  const env = { ...process.env, PORT: String(port), SESSION_SECRET: SECRET, DATABASE_URL: db, NEON_DATABASE_URL: '' };
   // E2E_SERVER lets the suite be pointed at another build, to show it fails on one.
   const proc = spawn(process.execPath, [process.env.E2E_SERVER || 'server.js'], { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });
   let log = '';
@@ -27,7 +28,11 @@ async function startServer(port) {
   proc.stderr.on('data', d => { log += d; });
   for (let i = 0; i < 300 && !log.includes('running on'); i++) await sleep(50);
   if (!log.includes('running on')) { proc.kill(); throw new Error('server did not start:\n' + log); }
-  return { url: `http://localhost:${port}`, log: () => log, stop: () => proc.kill() };
+  const exited = new Promise(r => proc.on('exit', code => r(code)));
+  // stop() is a deploy (SIGTERM, which Windows can only deliver as a kill);
+  // it resolves with the exit code once the process is gone.
+  const stop = (signal = 'SIGTERM') => { proc.kill(signal); return exited; };
+  return { url: `http://localhost:${port}`, log: () => log, stop };
 }
 
 const call = (s, ev, arg, ms = 3000) => new Promise(r => {
@@ -38,16 +43,31 @@ const call = (s, ev, arg, ms = 3000) => new Promise(r => {
 // One player: a socket, the latest snapshot it was sent, and the answer it
 // gives in each phase. `seen` holds every phase it was shown, for the tests.
 function player(url, id) {
-  const sock = io(url, { auth: { token: session(id, id) }, transports: ['websocket'], forceNew: true, reconnection: false });
-  const p = { id, sock, s: null, me: null, done: new Set(), seen: new Set(), errors: [] };
-  sock.on('room', s => {
+  const p = { id, sock: null, s: null, me: null, token: null, code: null, done: new Set(), seen: new Set(), errors: [] };
+  attach(p, url);
+  return p;
+}
+function attach(p, url) {
+  p.sock = io(url, { auth: { token: session(p.id, p.id) }, transports: ['websocket'], forceNew: true, reconnection: false });
+  p.sock.on('room', s => {
     p.s = s;
     p.seen.add(s.phase);
-    const mine = s.players.find(x => x.userId === id);
+    const mine = s.players.find(x => x.userId === p.id);
     if (mine) p.me = mine.id;
     act(p);
   });
-  return p;
+}
+
+// What the client does after a restart: a new socket, then join with the
+// seat token the first join handed back.
+async function rejoin(p, url) {
+  p.sock.removeAllListeners();
+  p.sock.disconnect();
+  attach(p, url);
+  for (let i = 0; i < 100 && !p.sock.connected; i++) await sleep(50);
+  const r = await call(p.sock, 'join', { code: p.code, token: p.token });
+  if (r.error) throw new Error(`${p.id} rejoin failed: ${r.error}`);
+  return r;
 }
 
 // Answers once per phase and item. Anything the server refuses is recorded,
@@ -106,6 +126,7 @@ async function playGame(url, { n, types, rounds = 3, tag = 'g', during, when = s
     for (const p of players) {
       const r = await call(p.sock, 'join', { code: made.code });
       if (r.error) throw new Error(`${p.id} join failed: ${r.error}`);
+      p.token = r.token; p.code = made.code;
     }
     const patch = { rounds, pace: 'fast' };
     if (types) patch.types = Object.fromEntries(types.map(t => [t, true]));
@@ -159,4 +180,4 @@ async function playGame(url, { n, types, rounds = 3, tag = 'g', during, when = s
   }
 }
 
-module.exports = { startServer, playGame, sleep };
+module.exports = { startServer, playGame, rejoin, sleep };

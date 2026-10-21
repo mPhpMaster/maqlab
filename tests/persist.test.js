@@ -106,3 +106,20 @@ test('every phase a round can wait in has a way to be resumed', () => {
   // and the quick rounds are added from QUICK, so the table cannot drift from it
   assert.match(src, /for \(const q of Object\.values\(QUICK\)\) \{/);
 });
+
+// A restart used to lose which Discord voice channel a room belonged to, so
+// the next launch of the Activity in that channel opened a new, empty room.
+test('a room keeps its Discord voice channel across a restart', () => {
+  const persist = require('../persist');
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const room = {
+    code: 'ABCDE', hostId: 'p1', phase: 'lobby', settings: {}, round: 0, gameNo: 0, current: null,
+    players: new Map([['p1', { id: 'p1', name: 'A', connected: true, socketId: 's' }]]),
+    used: {}, discordInstance: 'i-123',
+  };
+  assert.equal(persist.load(JSON.parse(JSON.stringify(persist.dump(room)))).discordInstance, 'i-123');
+  const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+  assert.match(server, /if \(room\.discordInstance\) discordInstanceRooms\.set\(room\.discordInstance, room\.code\);/, 'restore no longer re-links the channel to its room');
+  assert.match(server, /room\.discordInstance = instanceId;/, 'a new Activity room no longer remembers its channel');
+});

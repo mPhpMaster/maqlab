@@ -36,6 +36,10 @@ function dump(room) {
     rivals: room.rivals,
     balloon: room.balloon,
     log: room.log,
+    // The Discord voice channel this room belongs to. Without it a restart
+    // gave the channel a new, empty room the next time anyone launched the
+    // Activity, while the game they were playing sat restored and unreachable.
+    discordInstance: room.discordInstance || null,
     used: Object.fromEntries(Object.entries(room.used || {}).map(([k, set]) => [k, [...set]])),
     players: [...room.players.values()].map(p => ({ ...p, socketId: null })),
     // Time left on the clock, not the deadline itself. An absolute deadline
@@ -64,6 +68,7 @@ function load(data) {
     rivals: data.rivals || {},
     balloon: data.balloon || { size: 0, target: 30, pops: {} },
     log: data.log || [],
+    discordInstance: data.discordInstance || null,
     used: Object.fromEntries(Object.entries(data.used || {}).map(([k, arr]) => [k, new Set(arr)])),
     players: new Map((data.players || []).map(p => [p.id, {
       ...p,
