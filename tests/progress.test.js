@@ -77,3 +77,11 @@ test('no submit keeps its own copy of the check', () => {
   assert.ok(!/connected\(room\)\.every\(/.test(server), 'a submit is checking "everyone in?" on its own again');
   assert.match(server, /function checkProgress\(room\) \{\n  advanceIfAllIn\(room\);\n\}/);
 });
+
+test('the timer ring shows in every answering phase, from the same table', () => {
+  const app = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
+  const ring = app.match(/function timerRing\(\) \{[\s\S]*?\n  \}/)[0];
+  assert.match(ring, /if \(!s\.deadline \|\| !s\.answering\)/);
+  assert.ok(!/'spyClue'|'write'/.test(ring), 'the timer ring keeps its own list of phases again');
+  assert.match(server, /answering: !!progress\.ANSWERED\[room\.phase\]/);
+});

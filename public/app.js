@@ -958,7 +958,7 @@ const { getDiscordBootstrap } = await import('./discord.js' + new URL(import.met
   }
   function timerRing() {
     const s = state.room;
-    if (!s.deadline || !['write', 'vote', 'guess', 'blitz', 'likelyVote', 'emoji', 'odd', 'order', 'spyClue', 'spyVote'].includes(s.phase)) return '<div style="width:48px"></div>';
+    if (!s.deadline || !s.answering) return '<div style="width:48px"></div>';
     return `<div class="timer" data-deadline="${s.deadline}"><svg viewBox="0 0 48 48"><circle class="track" cx="24" cy="24" r="20"/><circle class="prog" cx="24" cy="24" r="20" stroke-dasharray="125.66" stroke-dashoffset="0"/></svg><span>0</span></div>`;
   }
   function gameTop() {

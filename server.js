@@ -245,6 +245,10 @@ function snapshot(room, pid) {
     // skipped. Decided here off the set the server already keeps, so the
     // client does not hold its own copy of which phases are which.
     clock: isRevealPhase(room.phase) || room.phase === 'scores' ? 'next' : 'skip',
+    // Whether players are answering right now, from the same table that
+    // decides when everyone is in. The timer ring used to keep its own list,
+    // which stopped at ten phases, so the newer modes had no ring.
+    answering: !!progress.ANSWERED[room.phase],
     // How many people each mode needs, so the lobby can say so on the toggle
     // itself. Sent rather than copied into the client: the client had no idea
     // these thresholds existed, so a host could switch everything else off
