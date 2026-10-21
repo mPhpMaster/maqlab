@@ -7,7 +7,7 @@ const path = require('node:path');
 
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
 const server = read('server.js');
-const schema = read('db/schema.sql');
+const schema = require('./helpers/schema')();
 
 test('every moderation column in the schema is on the list kept from non-admins', () => {
   const table = schema.match(/create table if not exists profiles \(([\s\S]*?)\n\);/)[1];

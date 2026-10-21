@@ -39,7 +39,7 @@ test('every round type has something of its own to earn', () => {
 // The counters are per-game on the server and lifetime in the database, and
 // the two spellings are different. A mismatch loses the count silently.
 test('each new counter is carried from the game all the way to the profile', () => {
-  const schema = read('db/schema.sql');
+  const schema = require('./helpers/schema')();
   const db = read('db.js');
   for (const [game, column] of [
     ['perfectOrders', 'perfect_orders'], ['nameCrowd', 'name_crowd'],

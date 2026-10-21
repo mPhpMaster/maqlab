@@ -1,7 +1,10 @@
 -- MAQLAB persistent store.
 -- Live game state (rooms, rounds, votes) stays in memory in server.js on
 -- purpose — only things that must outlive a restart live here.
--- This file is applied on every boot, so every statement must be idempotent.
+-- The schema as it stood when numbered migrations began (2026-10-22). It was
+-- applied on every boot until then, so production already has all of it; it
+-- stays idempotent so that its one recorded run there changes nothing.
+-- New changes go in the next numbered file, never in this one.
 
 create table if not exists profiles (
   user_id      text primary key,          -- a Discord id; playing requires signing in

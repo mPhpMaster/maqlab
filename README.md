@@ -82,7 +82,7 @@ The game runs inside Discord (launched from the rocket 🚀 button in a voice ch
 ## Files
 - `server.js`: the game engine (rooms, round scheduling, scoring, powers, titles)
 - `content.js`: all the content in English and Arabic — 1,743 entries in 12 banks (bluff 198, number 148, blitz 304, likely 156, emoji 186, odd 147, order 100, many 83, name 76, spy 143, minor 102, higher 100). Two Truths and a Lie is written by the players, and What Went Missing is built from the odd bank. `tests/docs.test.js` fails when these numbers drift from the banks. `npm run check` validates the banks for duplicates, schema, and answers that give themselves away by length.
-- `db.js` + `db/schema.sql`: profiles, match results, match replays, follows, reports, suggestions
+- `db.js` + `db/migrations/` (numbered SQL files, each applied once and recorded in `schema_migrations`): profiles, match results, match replays, follows, reports, suggestions
 - `auth.js`: signed session tokens, Discord sign-in, admin checks
 - `bots.js`: what a bot does in each round (the server decides when)
 - `replay.js`: what is kept from each round so `/match/<id>` can replay it

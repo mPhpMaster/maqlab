@@ -18,7 +18,8 @@ async function init() {
   // whole game goes down over a database nobody was using.
   p.on('error', e => console.error('database pool error:', e.message));
   try {
-    await p.query(fs.readFileSync(path.join(__dirname, 'db', 'schema.sql'), 'utf8'));
+    const applied = await migrate(p);
+    if (applied.length) console.log('applied migrations:', applied.join(', '));
   } catch (e) {
     // Leave pool null so on() reports the truth: callers must not try to use it.
     await p.end().catch(() => {});
@@ -26,6 +27,43 @@ async function init() {
   }
   pool = p;
   return true;
+}
+
+// Schema changes are numbered files in db/migrations, each applied once, in
+// order, inside its own transaction, and recorded in schema_migrations. The
+// schema used to be one file re-run on every boot, which only works while
+// every statement in it can safely run again; a rename or a data fix cannot.
+//
+// Render runs the old and new instance side by side during a deploy, so the
+// advisory lock makes the second one wait instead of applying a file twice.
+const MIGRATIONS_DIR = path.join(__dirname, 'db', 'migrations');
+const MIGRATION_LOCK = 7314001;
+async function migrate(p, dir = MIGRATIONS_DIR) {
+  const client = await p.connect();
+  try {
+    await client.query('select pg_advisory_lock($1)', [MIGRATION_LOCK]);
+    await client.query(`create table if not exists schema_migrations (
+      name text primary key, applied_at timestamptz not null default now())`);
+    const done = new Set((await client.query('select name from schema_migrations')).rows.map(r => r.name));
+    const applied = [];
+    for (const name of fs.readdirSync(dir).filter(f => f.endsWith('.sql')).sort()) {
+      if (done.has(name)) continue;
+      await client.query('begin');
+      try {
+        await client.query(fs.readFileSync(path.join(dir, name), 'utf8'));
+        await client.query('insert into schema_migrations (name) values ($1)', [name]);
+        await client.query('commit');
+      } catch (e) {
+        await client.query('rollback').catch(() => {});
+        throw new Error(`migration ${name} failed: ${e.message}`);
+      }
+      applied.push(name);
+    }
+    return applied;
+  } finally {
+    await client.query('select pg_advisory_unlock($1)', [MIGRATION_LOCK]).catch(() => {});
+    client.release();
+  }
 }
 
 const on = () => !!pool;
@@ -282,7 +320,7 @@ async function close() {
 }
 
 module.exports = {
-  init, on, close, getProfile, touchProfile, rankOf, recentGames, leaderboard, weeklyBoard, weeklyRank, recordGame, addAchievements, getMatch, saveMatch, getReplay, saveRoom, dropRoom, liveRooms, seenBy, markSeen,
+  init, on, close, migrate, getProfile, touchProfile, rankOf, recentGames, leaderboard, weeklyBoard, weeklyRank, recordGame, addAchievements, getMatch, saveMatch, getReplay, saveRoom, dropRoom, liveRooms, seenBy, markSeen,
   follow, unfollow, following, followCounts, isFollowing,
   createReport, createSuggestion,
   isBanned, setBan, unban, resetProfile,
