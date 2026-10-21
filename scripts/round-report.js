@@ -25,7 +25,8 @@ const path = require('path');
 const { Pool } = require('pg');
 
 const URL = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL || '';
-if (!URL) {
+// Loaded by tests for tally(); only a direct run needs the database.
+if (require.main === module && !URL) {
   console.error('no NEON_DATABASE_URL or DATABASE_URL in the environment');
   process.exit(1);
 }
@@ -112,19 +113,56 @@ function quantile(sorted, q) {
   return sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
 }
 
+// Whether a player was in the room for round n. joined is the round they
+// arrived in (0 for the lobby), left the round they went in, or null.
+const present = (p, n) => p.joined == null || n == null
+  ? true
+  : n > p.joined && (p.left == null || n < p.left);
+
+// How many people leave before the end, split the ways that could explain it.
+// Only matches that record arrivals and departures (from 22 Oct 2026) count.
+function dropOff(rows) {
+  const groups = {};
+  const add = (key, left) => { const g = groups[key] || (groups[key] = { people: 0, left: 0 }); g.people += 1; if (left) g.left += 1; };
+  let matches = 0;
+  for (const row of rows) {
+    const d = typeof row.data === 'string' ? JSON.parse(row.data) : row.data;
+    const people = (d.players || []).filter(p => !p.bot).concat(d.gone || []);
+    if (!people.length || !people.some(p => p.joined != null)) continue;
+    matches += 1;
+    const size = people.length <= 2 ? '1-2 people' : people.length <= 4 ? '3-4 people' : '5+ people';
+    const where = d.public == null ? 'room: unknown' : d.public ? 'room: public' : 'room: private';
+    const modes = d.modes == null ? 'modes: unknown' : d.modes >= 12 ? 'modes: 12+' : 'modes: under 12';
+    const length = `rounds: ${d.rounds || (d.log || []).length}`;
+    for (const p of people) {
+      const left = p.left != null;
+      for (const key of ['all', size, where, modes, length, p.joined > 0 ? 'joined late' : 'joined in lobby']) add(key, left);
+    }
+  }
+  return { matches, groups };
+}
+
 function tally(rows) {
   const stat = {};
   for (const row of rows) {
     const d = typeof row.data === 'string' ? JSON.parse(row.data) : row.data;
-    const humans = (d.players || []).filter(p => !p.bot).map(p => p.pid);
-    if (!humans.length) continue;
+    const people = (d.players || []).filter(p => !p.bot);
+    if (!people.length) continue;
     for (const r of d.log || []) {
       const rule = TOOK_PART[r.type];
       if (!rule) continue;
       const s = stat[r.type] || (stat[r.type] = { rounds: 0, slots: 0, took: 0, ms: [], byPace: {} });
       const part = new Set(rule(r));
       s.rounds += 1;
-      for (const pid of humans) { s.slots += 1; if (part.has(pid)) s.took += 1; }
+      // Only the people who were there for this round. A player who joined in
+      // round 6 used to be counted as skipping rounds 1 to 5, and one who left
+      // as skipping every round after. Matches from before 22 Oct 2026 do not
+      // say when anyone came or went, so for them everyone counts as before.
+      for (const p of people) {
+        if (!present(p, r.n)) continue;
+        s.slots += 1;
+        if (part.has(p.pid)) s.took += 1;
+      }
       const t = timings(r);
       s.ms.push(...t);
       // Matches recorded before 2 Oct 2026 do not say which pace they were
@@ -168,7 +206,19 @@ function report(stat, pace, label) {
   }
 }
 
-(async () => {
+function reportDropOff({ matches, groups }, label) {
+  console.log(`
+${label}: who left before the end`);
+  if (!matches) { console.log('  no matches record arrivals and departures yet (they do from 22 Oct 2026)'); return; }
+  console.log(`  ${matches} matches`);
+  for (const [key, g] of Object.entries(groups)) {
+    console.log(`  ${key.padEnd(18)} ${String(g.people).padStart(5)} people   left early ${pct(g.left, g.people).toFixed(0).padStart(3)}%`);
+  }
+}
+
+module.exports = { TOOK_PART, tally, dropOff, present };
+
+if (require.main === module) (async () => {
   const types = serverTypes();
   const missing = types.filter(t => !TOOK_PART[t]);
   if (missing.length) {
@@ -194,8 +244,10 @@ function report(stat, pace, label) {
     const at = new Date(COMPARE);
     report(tally(rows.filter(r => r.finished_at < at)), pace, `BEFORE ${COMPARE}`);
     report(tally(rows.filter(r => r.finished_at >= at)), pace, `SINCE ${COMPARE}`);
+    reportDropOff(dropOff(rows.filter(r => r.finished_at >= at)), `SINCE ${COMPARE}`);
   } else {
     report(tally(rows), pace, 'all of it');
+    reportDropOff(dropOff(rows), 'all of it');
   }
   await pool.end();
 })().catch(e => { console.error('failed:', e.message); process.exit(1); });

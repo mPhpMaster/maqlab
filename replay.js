@@ -125,6 +125,17 @@ const roster = ranked =>
   ranked.map((p, i) => ({
     pid: p.id, userId: p.userId || null, name: p.name, avatar: p.avatar,
     bot: !!p.bot, score: p.score, place: i + 1,
+    // The round they arrived in (0: the lobby) and the round they left in, so
+    // the report can count a player only for the rounds they were there for.
+    joined: p.joinedRound ?? null, left: p.leftRound ?? null,
   }));
 
-module.exports = { MAX_ROUNDS, roundEntry, roster, say };
+// People who left with nothing on the board are not on the scoreboard, but
+// they are the clearest sign of a game someone gave up on.
+const gone = (players, ranked) => {
+  const shown = new Set(ranked.map(p => p.id));
+  return players.filter(p => !p.bot && !shown.has(p.id))
+    .map(p => ({ pid: p.id, joined: p.joinedRound ?? null, left: p.leftRound ?? null }));
+};
+
+module.exports = { MAX_ROUNDS, roundEntry, roster, gone, say };
