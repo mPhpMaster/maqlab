@@ -1,0 +1,9 @@
+# Text files are LF in the working tree as well as in the repository. Several
+# tests read server.js and match on "\n", and a global core.autocrlf=true on
+# Windows rewrote files as CRLF on every checkout, which failed six tests that
+# had nothing wrong with them.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ttf binary
+*.woff2 binary
