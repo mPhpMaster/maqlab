@@ -106,6 +106,7 @@ function timings(r) {
 }
 
 const pct = (a, b) => (b ? (a * 100) / b : 0);
+const share = (ended, k) => pct(ended[k] || 0, Object.values(ended).reduce((a, b) => a + b, 0));
 function quantile(sorted, q) {
   if (!sorted.length) return null;
   const i = (sorted.length - 1) * q;
@@ -151,7 +152,8 @@ function tally(rows) {
     for (const r of d.log || []) {
       const rule = TOOK_PART[r.type];
       if (!rule) continue;
-      const s = stat[r.type] || (stat[r.type] = { rounds: 0, slots: 0, took: 0, ms: [], byPace: {} });
+      const s = stat[r.type] || (stat[r.type] = { rounds: 0, slots: 0, took: 0, ms: [], byPace: {}, ended: {} });
+      for (const how of Object.values(r.ended || {})) for (const [k, n] of Object.entries(how)) s.ended[k] = (s.ended[k] || 0) + n;
       const part = new Set(rule(r));
       s.rounds += 1;
       // Only the people who were there for this round. A player who joined in
@@ -198,6 +200,15 @@ function report(stat, pace, label) {
       `${(med == null ? '—' : (med / 1000).toFixed(1) + 's').padStart(7)} ` +
       `${(p90 == null ? '—' : (p90 / 1000).toFixed(1) + 's').padStart(6)}   ${share}`
     );
+  }
+  // How answering ended, where the match records it (from 22 Oct 2026). A
+  // mode that keeps running out of clock is one people do not finish.
+  const withEnds = rows.filter(([, s]) => Object.keys(s.ended || {}).length);
+  if (withEnds.length) {
+    console.log('\n  how answering ended    all in   clock   host');
+    for (const [type, s] of withEnds.sort((a, b) => share(b[1].ended, 'clock') - share(a[1].ended, 'clock'))) {
+      console.log(`  ${type.padEnd(20)} ${['all', 'clock', 'host'].map(k => (share(s.ended, k).toFixed(0) + '%').padStart(7)).join(' ')}`);
+    }
   }
   const noTimes = rows.filter(([, s]) => !s.ms.length).map(([t]) => t);
   if (noTimes.length) {

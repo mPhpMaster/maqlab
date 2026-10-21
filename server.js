@@ -571,6 +571,18 @@ function broadcast(room) {
 }
 
 function clearTimer(room) { if (room.timer) clearTimeout(room.timer); room.timer = null; }
+// How each answering phase ended: everyone answered, the clock ran out, or
+// the host moved it on. Counted per phase, kept in the match replay, and read
+// by the round report; it says which modes people do not finish, without
+// keeping a word of what anyone wrote.
+function noteEnd(room, how) {
+  const c = room.current;
+  if (!c || !progress.ANSWERED[room.phase]) return;
+  const e = (c.ended = c.ended || {});
+  const k = (e[room.phase] = e[room.phase] || {});
+  k[how] = (k[how] || 0) + 1;
+}
+
 function setTimer(room, sec, fn) {
   clearTimer(room);
   // When this phase began. The quick rounds have always timed their answers;
@@ -585,7 +597,7 @@ function setTimer(room, sec, fn) {
   // Not persisted — a room restored from the database is restored mid-phase
   // and sets its own clock again.
   room.onTime = fn;
-  room.timer = setTimeout(fn, sec * 1000);
+  room.timer = setTimeout(() => { noteEnd(room, 'clock'); fn(); }, sec * 1000);
   // Every phase change comes through here, which makes it the one checkpoint
   // worth writing down without waiting for the throttle.
   saveRoom(room, true);
@@ -1808,6 +1820,7 @@ const ON_ALL_IN = {
 // it did, so a submit broadcasts only when nothing else will.
 function advanceIfAllIn(room) {
   if (!progress.allAnswered(room.phase, room.current, connected(room))) return false;
+  noteEnd(room, 'all');
   ON_ALL_IN[room.phase](room);
   return true;
 }
@@ -2015,6 +2028,7 @@ io.on('connection', socket => {
     if (limited('next', 500)) return reply(cb, { ok: true });
     const fn = room.onTime;
     if (!fn || room.phase === 'lobby' || room.phase === 'final') return reply(cb, { error: 'late' });
+    noteEnd(room, 'host');
     clearTimer(room);
     fn();
     reply(cb, { ok: true });
@@ -2721,6 +2735,9 @@ app.get('/health', (_, res) => {
     players,
     database: db.on() ? 'connected' : 'off',
     discord: DISCORD_CLIENT_ID ? 'configured' : 'off',
+    // Server errors since this process started, and the latest one's first
+    // line. A number that moves is the signal; the logs have the rest.
+    errors: errorsSeen,
   });
 });
 
@@ -2816,11 +2833,12 @@ app.post('/api/discord/room', (req, res) => {
 // progress never touches it. Express 4 does not catch rejections
 // from async handlers, so both nets are needed.
 app.use((err, req, res, _next) => {
+  noteError(err);
   console.error('request failed:', req.method, req.originalUrl, '-', err.message);
   if (!res.headersSent) res.status(503).json({ error: 'unavailable' });
 });
-process.on('unhandledRejection', e => console.error('unhandled rejection:', e && e.message ? e.message : e));
-process.on('uncaughtException', e => console.error('uncaught exception:', e && e.stack ? e.stack : e));
+process.on('unhandledRejection', e => { noteError(e); console.error('unhandled rejection:', e && e.message ? e.message : e); });
+process.on('uncaughtException', e => { noteError(e); console.error('uncaught exception:', e && e.stack ? e.stack : e); });
 
 const booted = db.init()
   .then(ok => {
@@ -2846,6 +2864,15 @@ Promise.race([booted, new Promise(r => setTimeout(r, BOOT_WAIT_MS))])
 // a word. Now: stop opening rooms, write every room down as it stands, close
 // the sockets (clients reconnect to the new instance and rejoin), close the
 // database, and leave well inside the window.
+// Counted for /health. Only the first line of the message, cut short, so
+// nothing a player typed can ride along in it.
+const errorsSeen = { count: 0, last: null, at: null };
+function noteError(e) {
+  errorsSeen.count += 1;
+  errorsSeen.last = String((e && e.message) || e || '').split('\n')[0].slice(0, 120);
+  errorsSeen.at = new Date().toISOString();
+}
+
 const SHUTDOWN_MS = 20 * 1000;
 let shuttingDown = false;
 async function shutdown(signal) {

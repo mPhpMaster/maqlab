@@ -48,6 +48,8 @@ function roundEntry(room, L) {
   // rounds you type in, and it is the only way to tell a round people did not
   // understand from one they did not have time for.
   if (c.ms && Object.keys(c.ms).length) e.ms = { ...c.ms };
+  // How each answering phase ended (all in, clock, host), counts only.
+  if (c.ended) e.ended = c.ended;
   // Whether a player took the offered lie as it came, edited it, or wrote
   // their own after asking. The only way to tell whether the way out of a
   // blank box is being used at all.
