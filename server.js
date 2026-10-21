@@ -2434,6 +2434,7 @@ const tooSoon = (id, ms) => {
   return false;
 };
 
+const BAN_FIELDS = ['banned_at', 'ban_reason', 'banned_by'];
 app.get('/api/profile/:userId', async (req, res) => {
   if (needsDb(res)) return;
   const me = auth.sessionFrom(req.headers);
@@ -2444,11 +2445,15 @@ app.get('/api/profile/:userId', async (req, res) => {
     db.recentGames(profile.user_id, 10),
     db.followCounts(profile.user_id),
   ]);
+  // Moderation is between the player and the admins. The whole row used to go
+  // to anyone who opened a profile, ban reason and banning admin included.
+  const viewerIsAdmin = auth.isAdmin(me && me.id);
+  if (!viewerIsAdmin) for (const k of BAN_FIELDS) delete profile[k];
   res.json({
     profile, rank, games, follows,
     isMe: !!me && me.id === profile.user_id,
     isFollowing: me ? await db.isFollowing(me.id, profile.user_id) : false,
-    viewerIsAdmin: auth.isAdmin(me && me.id),
+    viewerIsAdmin,
   });
 });
 
