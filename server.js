@@ -2349,7 +2349,13 @@ app.get('/privacy', (_, res) => res.sendFile(path.join(__dirname, 'public', 'pri
 // every load; the vendored SDK is pinned by filename and never changes.
 app.use(express.static(path.join(__dirname, 'public'), {
   setHeaders(res, filePath) {
-    if (filePath.includes(`${path.sep}vendor${path.sep}`)) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    // Fonts never change in place: a new version gets a new file name.
+    if (filePath.includes(`${path.sep}vendor${path.sep}`) || filePath.includes(`${path.sep}fonts${path.sep}`)) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    // A module asked for under the current stamp is exactly these bytes until
+    // the next deploy changes the stamp, so it can be kept. Everything else,
+    // the page itself and any request under an old or missing stamp, is
+    // checked every time, as before.
+    else if (/\.(js|css)$/.test(filePath) && res.req.query.v === ASSET_V) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     else if (/\.(html|js|css)$/.test(filePath)) res.setHeader('Cache-Control', 'no-cache');
   },
 }));
