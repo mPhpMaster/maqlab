@@ -96,3 +96,15 @@ test('the legal pages agree with the sign-in the server actually enforces', () =
   const privacy = read('privacy.html');
   assert.match(privacy, /Playing (requires|needs) a Discord sign-in/i, 'the privacy policy disagrees with the terms');
 });
+
+// The policy has to describe the controls the game actually has.
+test('the privacy policy describes download and delete, and they exist', () => {
+  const privacy = read('privacy.html');
+  const server = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+  assert.match(privacy, /Download my data/);
+  assert.match(privacy, /Delete my account/);
+  assert.ok(privacy.includes('نزّل بياناتي') && privacy.includes('احذف حسابي'), 'the Arabic policy does not name the two buttons');
+  assert.match(server, /app\.get\('\/api\/account\/export'/);
+  assert.match(server, /app\.post\('\/api\/account\/delete'/);
+  assert.match(server, /res\.setHeader\('X-Robots-Tag', 'noindex'\);/);
+});

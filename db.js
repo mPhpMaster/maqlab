@@ -311,6 +311,56 @@ const searchProfiles = term =>
       where name ilike $1 or user_id = $2 order by total_score desc limit 25`,
     [`%${term.replace(/[%_\\]/g, m => '\\' + m)}%`, term]).then(r => r.rows);
 
+// ---------------- a player's own data ----------------
+// Everything held about one player, for them to take away.
+async function exportAccount(userId) {
+  const [profile, games, following, followers, reports, suggestions, seen, matches] = await Promise.all([
+    one('select * from profiles where user_id = $1', [userId]),
+    q('select room_code, game_no, match_id, score, place, players, rounds, won, finished_at from game_results where user_id = $1 order by finished_at desc', [userId]).then(r => r.rows),
+    q('select followee_id as user_id, created_at from follows where follower_id = $1', [userId]).then(r => r.rows),
+    q('select follower_id as user_id, created_at from follows where followee_id = $1', [userId]).then(r => r.rows),
+    q('select reported_name, reason, details, created_at from reports where reporter_id = $1', [userId]).then(r => r.rows),
+    q('select body, created_at from suggestions where user_id = $1', [userId]).then(r => r.rows),
+    one('select count(*)::int as n from seen_content where user_id = $1', [userId]),
+    q(`select id from matches where data->'players' @> jsonb_build_array(jsonb_build_object('userId', $1::text))`, [userId]).then(r => r.rows.map(x => x.id)),
+  ]);
+  if (!profile) return null;
+  // The fact of a ban is theirs to know; which admin set it is not.
+  delete profile.banned_by;
+  return { exportedAt: new Date().toISOString(), profile, games, following, followers, reportsFiled: reports, suggestions, questionsSeen: seen ? seen.n : 0, matches };
+}
+
+// Removes a player. Their profile, results, follows and question memory go
+// (the foreign keys cascade). Match replays stay readable for everyone else
+// in them, with this player's name and picture taken out. Reports they filed
+// or that name them are kept for moderation with the name removed, and their
+// suggestions are deleted. One transaction: all of it or none of it.
+const DELETED_NAME = 'Deleted player';
+async function deleteAccount(userId) {
+  const client = await pool.connect();
+  try {
+    await client.query('begin');
+    const { rows } = await client.query(
+      `select id, data from matches where data->'players' @> jsonb_build_array(jsonb_build_object('userId', $1::text)) for update`, [userId]);
+    for (const m of rows) {
+      const data = m.data;
+      data.players = data.players.map(p => (p.userId === userId ? { ...p, userId: null, name: DELETED_NAME, avatar: {} } : p));
+      await client.query('update matches set data = $2 where id = $1', [m.id, data]);
+    }
+    await client.query("update reports set reporter_id = 'deleted', reporter_name = $2 where reporter_id = $1", [userId, DELETED_NAME]);
+    await client.query("update reports set reported_id = 'deleted', reported_name = $2 where reported_id = $1", [userId, DELETED_NAME]);
+    await client.query('delete from suggestions where user_id = $1', [userId]);
+    const gone = await client.query('delete from profiles where user_id = $1', [userId]);
+    await client.query('commit');
+    return { deleted: gone.rowCount > 0, matches: rows.length };
+  } catch (e) {
+    await client.query('rollback').catch(() => {});
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
 // Called once on shutdown, after the last room has been written.
 async function close() {
   if (!pool) return;
@@ -320,7 +370,7 @@ async function close() {
 }
 
 module.exports = {
-  init, on, close, migrate, getProfile, touchProfile, rankOf, recentGames, leaderboard, weeklyBoard, weeklyRank, recordGame, addAchievements, getMatch, saveMatch, getReplay, saveRoom, dropRoom, liveRooms, seenBy, markSeen,
+  init, on, close, migrate, exportAccount, deleteAccount, getProfile, touchProfile, rankOf, recentGames, leaderboard, weeklyBoard, weeklyRank, recordGame, addAchievements, getMatch, saveMatch, getReplay, saveRoom, dropRoom, liveRooms, seenBy, markSeen,
   follow, unfollow, following, followCounts, isFollowing,
   createReport, createSuggestion,
   isBanned, setBan, unban, resetProfile,

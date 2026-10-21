@@ -2373,6 +2373,9 @@ app.get('/match/:id', async (req, res) => {
       if (rep && card.available()) image = `/match/${req.params.id}/card.png`;
     }
   }
+  // Shareable by link, but not something for search engines to list: the
+  // page carries every name and answer from the game.
+  res.setHeader('X-Robots-Tag', 'noindex');
   res.type('html').send(page(req, title, desc, image));
 });
 app.get('/profile', (req, res) => res.type('html').send(page(req, SITE_TITLE, SITE_DESC)));
@@ -2507,6 +2510,31 @@ const tooSoon = (id, ms) => {
   lastPost.set(id, n);
   return false;
 };
+
+// ---- a player's own data ----
+app.get('/api/account/export', async (req, res) => {
+  const s = sessionOr401(req, res); if (!s) return;
+  if (needsDb(res)) return;
+  const data = await db.exportAccount(s.id);
+  if (!data) return res.status(404).json({ error: 'not_found' });
+  res.setHeader('Content-Disposition', `attachment; filename="maqlab-${s.id}.json"`);
+  res.json(data);
+});
+
+app.post('/api/account/delete', async (req, res) => {
+  const s = sessionOr401(req, res); if (!s) return;
+  if (needsDb(res)) return;
+  // Sent by the confirm button, so a stray request cannot delete anyone.
+  if (req.body?.confirm !== 'delete') return res.status(400).json({ error: 'confirm' });
+  // A ban would go with the profile, and signing in again would start clean.
+  // Banned accounts are removed by an admin instead.
+  if (await db.isBanned(s.id)) return res.status(403).json({ error: 'banned' });
+  const r = await db.deleteAccount(s.id);
+  kickEverywhere(s.id);
+  auth.clearCookie(res);
+  console.log(`account deleted (${r.matches} replays anonymised)`);
+  res.json({ ok: true });
+});
 
 const BAN_FIELDS = ['banned_at', 'ban_reason', 'banned_by'];
 app.get('/api/profile/:userId', async (req, res) => {
