@@ -70,6 +70,12 @@ import { openMatch } from './people.js';
     state.joining = true; render();
     const r = await new Promise(res => socket.emit('join', { code, token: state.tokens[code], name: state.profile.name, avatar: state.profile.avatar }, res));
     state.joining = false;
+    // Signed out (or the session ran out) on a room link: stay on it. The
+    // preview and its sign-in button are what this visitor needs, and sign-in
+    // comes back to this same link. Sending them home lost the invite. The
+    // token goes, or the screen keeps waiting on it; the seat is found again
+    // by the account once they are signed in.
+    if (r && r.error === 'signin') { forget(code); render(); return; }
     if (!r || r.error) {
       forget(code);
       if (r && r.error) toast(t('err_' + r.error), 'err');

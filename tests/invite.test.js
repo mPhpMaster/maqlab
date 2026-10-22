@@ -63,3 +63,11 @@ test('the new lines are said in both languages', () => {
     assert.equal(n, 2, `${key} appears ${n} times; it needs one English and one Arabic line`);
   }
 });
+
+// A room link opened signed out, with a seat token left from an earlier visit,
+// tried to rejoin before anyone knew who was there; the server said "signin"
+// and the client went home, so the invite and its sign-in button were lost.
+test('a room link opened signed out stays on the room', () => {
+  const join = app.match(/export async function join\(code, silent\) \{[\s\S]*?\n  \}/)[0];
+  assert.ok(join.indexOf("r.error === 'signin'") > -1 && join.indexOf("r.error === 'signin'") < join.indexOf('forget(code)'), 'a signed-out join still goes home');
+});
