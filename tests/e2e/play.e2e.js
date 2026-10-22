@@ -6,7 +6,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
-const { startServer, playGame, joinLate, call, sleep } = require('./harness');
+const { startServer, playGame, joinLate, rejoin, call, sleep } = require('./harness');
 
 const server = require('../../scripts/server-source')();
 const TYPES = server.match(/const TYPES = \[(.*?)\];/)[1].match(/'(\w+)'/g).map(s => s.replace(/'/g, ''));
@@ -110,6 +110,44 @@ test('someone joining mid-game watches it, and plays the next one', async () => 
     await sleep(300);
     assert.equal(late.s.players.find(p => p.id === late.me).watching, false, 'still watching after the game ended');
   } finally { late && late.sock.disconnect(); g.players.forEach(p => p.sock.disconnect()); }
+});
+
+// The Discord Activity does not always keep the seat token. Someone who comes
+// back without it is still the same account, and gets their own seat back:
+// their points, and their turn to answer, not a watcher's seat beside it.
+test('a player who lost their seat token gets their own seat back mid-game', async () => {
+  let before, back, seats;
+  const g = await playGame(srv.url, {
+    n: 3, rounds: 4, tag: 'notoken', timeoutMs: 120000,
+    when: s => s.round >= 2,
+    types: ['order'],
+    during: async players => {
+      const p = players[1];
+      before = p.s.players.find(x => x.id === p.me);
+      p.token = null;
+      back = await rejoin(p, srv.url);
+      await sleep(300);
+      seats = p.s.players.filter(x => x.userId === p.id);
+    },
+  });
+  assert.ok(g.final, `stopped in ${g.phase} at round ${g.round}`);
+  assert.equal(back.token, before.id, 'they were given a new seat');
+  assert.equal(seats.length, 1, 'the account sits in the room twice');
+  assert.equal(seats[0].watching, false, 'they came back as a watcher');
+  assert.ok(seats[0].score >= before.score, 'they lost their points');
+  assert.deepEqual(g.errors, [], 'an answer was turned away after coming back');
+});
+
+test('a seat token is not a way into someone else\'s seat', async () => {
+  const g = await playGame(srv.url, {
+    n: 3, rounds: 3, tag: 'steal', types: ['higher'],
+    during: async players => {
+      const [a, b] = players;
+      const r = await call(b.sock, 'join', { code: b.code, token: a.me });
+      assert.equal(r.token, b.me, 'a player took over another player\'s seat with their id');
+    },
+  });
+  assert.ok(g.final);
 });
 
 test('the server logged no uncaught errors', () => {

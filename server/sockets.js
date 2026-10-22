@@ -80,6 +80,12 @@ io.on('connection', socket => {
     name = cleanName(profile ? profile.name : session.name);
     avatar = cleanAvatar(avatar);
     let p = token && r.players.get(token);
+    // The seat token lives in the browser, and the Discord Activity does not
+    // always keep it. Without this a player who came back mid-game sat down
+    // again as a newcomer: watching, on zero points, unable to answer, next to
+    // their own empty seat. The account is who they are, so it finds the seat.
+    if (p && p.userId && p.userId !== session.id) p = null;
+    if (!p) p = [...r.players.values()].find(x => !x.bot && x.userId === session.id) || null;
     if (!p) {
       // Watchers take a seat too: they are players from the next game on.
       if ([...r.players.values()].filter(x => x.connected).length >= MAX_PLAYERS) return reply(cb, { error: 'full' });
