@@ -170,6 +170,7 @@ import { accountBar, lobbyList, previewCard, signedIn } from './extras.js';
         <div class="glass col" style="padding:16px;margin-top:10px">
           ${meCard()}
           ${signedIn() ? `<button class="btn block" data-act="create">${t('create')}</button>
+          <div class="row" style="margin-top:8px"><button class="btn sky grow" data-act="quick">⚡ ${t('quickPlay')}</button><button class="btn ghost grow" data-act="practice">🤖 ${t('practice')}</button></div>
           <div class="divider">${t('or')}</div>
           <div class="join-row">
             <input id="code" class="input code" maxlength="5" placeholder="ABCDE" value="${esc(state.draft.code)}" autocomplete="off" autocapitalize="characters" spellcheck="false">

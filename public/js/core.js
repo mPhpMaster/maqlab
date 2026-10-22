@@ -316,6 +316,10 @@ import { openMatch } from './people.js';
     if (prev && prev.round !== snap.round) state.draft.order = [];
     const changed = !prev || prev.phase !== snap.phase || prev.round !== snap.round || (snap.current && prev.current && snap.current.idx !== prev.current.idx);
     if (changed) onPhase(prev, snap);
+    // The match is saved a moment after the final screen appears, and that
+    // screen is not redrawn for later updates, so the share button it already
+    // has is shown here when the link exists.
+    if (snap.phase === 'final' && snap.matchId) { const b = $app.querySelector('[data-act="share-result"]'); if (b) b.hidden = false; }
     else if (prev && prev.current && snap.current) {
       const added = snap.current.doubled.filter(id => !prev.current.doubled.includes(id) && id !== myId());
       added.forEach(id => { const p = P(id); if (p) { toast(t('doubledBy', { n: p.name })); sfx.power(); } });

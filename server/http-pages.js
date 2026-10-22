@@ -71,6 +71,8 @@ export function page(req, title, desc, image) {
   const base = `${req.protocol}://${req.get('host')}`;
   const og = image ? `${base}${image}` : `${base}/og.jpg`;
   return INDEX_HTML
+    // The tab and a pasted link show the match ("🏆 Hana — 2,080"), not just the game.
+    .replace(/<title>[^<]*<\/title>/, `<title>${attr(title)}</title>`)
     .replace('src="/app.js"', `src="/app.js?v=${ASSET_V}"`)
     .replace('src="/avatar.js"', `src="/avatar.js?v=${ASSET_V}"`)
     // The stylesheet needs the stamp as much as the scripts do. It was the one

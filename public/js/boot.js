@@ -6,7 +6,7 @@ const { getDiscordBootstrap } = await import('../discord.js' + new URL(import.me
 import { IN_DISCORD, store } from './base.js';
 import { state, t, toast } from './state.js';
 import { join, leaveRoom, onRoute, parseRoute, render, socket } from './core.js';
-import { afterSignIn, loadLobbies, loadMe } from './extras.js';
+import { afterSignIn, firstVisit, loadLobbies, loadMe } from './extras.js';
 
   // ================= boot =================
   // Inside the Activity the session rides as a bearer token: the iframe is on
@@ -38,7 +38,7 @@ import { afterSignIn, loadLobbies, loadMe } from './extras.js';
     state.discordDone = true;
     state.lastKey = '';
     // Not in Discord: this is an ordinary web visit, so ask who we are.
-    if (!info) { await loadMe(); render(); afterSignIn(); return; }
+    if (!info) { await loadMe(); render(); afterSignIn(); firstVisit(); return; }
     if (info.failed) { state.discordError = info.failed; await loadMe(); render(); toast(t('discordFailed', { e: info.failed }), 'err'); return; }
 
     // The bootstrap already carries the answer /api/auth/me would give, and

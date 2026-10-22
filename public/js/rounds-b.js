@@ -374,7 +374,7 @@ import { flash } from './extras.js';
           <button class="btn sm ghost quiet" data-act="donate">${t('supportSmall')}</button>
         </div>
       </div></div>
-      ${dock(`<div class="row">${isHost() ? `<button class="btn grow" data-act="again">${t('playAgain')}</button>` : ''}<button class="btn ghost grow" data-act="leave">${t('home')}</button></div>`)}
+      ${dock(`<button class="btn sm ghost block" data-act="share-result" style="margin-bottom:8px" ${s.matchId ? '' : 'hidden'}>📤 ${t('shareResult')}</button><div class="row">${isHost() ? `<button class="btn grow" data-act="again">${t('playAgain')}</button>` : ''}<button class="btn ghost grow" data-act="leave">${t('home')}</button></div>`)}
     </div>`;
   }
   export function rivalsCard(r) {

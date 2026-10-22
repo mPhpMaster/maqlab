@@ -4,6 +4,7 @@ import { $app, STR, store } from './base.js';
 import { HAT_LOCK, J, TYPES, closeModal, confirmBox, ctx, esc, fmt, hatLocked, isHost, modal, now, sfx, showAchievements, startMusic, state, t, toast, tone } from './state.js';
 import { emit, join, leaveRoom, render, socket } from './core.js';
 import { openAbout, openAdmin, openLeaderboard, openSuggest } from './people.js';
+import { actions } from './actions.js';
 
   // ---------- game feel ----------
   // eyes follow the pointer
@@ -198,6 +199,15 @@ import { openAbout, openAdmin, openLeaderboard, openSuggest } from './people.js'
   // ?login=ok|failed|banned. Said once, then taken off the address so a reload
   // does not say it again. Back on an invite link and signed in, the player
   // goes straight into the room: that is the tap they signed in to make.
+  export function firstVisit() {
+    if (state.inDiscord || !signedIn() || state.route.name !== 'home' || store.get('introSeen', false)) return;
+    store.set('introSeen', true);
+    modal(`<h3>${t('introTitle')}</h3><ol>${STR[state.lang].introSteps.map(s => `<li>${s}</li>`).join('')}</ol>
+      <div class="row"><button class="btn grow" id="intro-go">🤖 ${t('practice')}</button><button class="btn ghost grow" data-close>${t('introLater')}</button></div>`,
+    // A modal sits outside #app, where taps are not routed by data-act.
+    m => { m.querySelector('#intro-go').onclick = () => { closeModal(); actions.practice(); }; });
+  }
+
   export function afterSignIn() {
     const outcome = new URLSearchParams(location.search).get('login');
     if (!outcome) return;

@@ -63,7 +63,31 @@ import { openAbout, openAdmin, openLeaderboard, openProfile, openSuggest } from 
       sfx.send();
       const r = await emit('create', { lang: state.lang });
       if (r.code) { history.pushState(null, '', `/room/${r.code}`); state.route = parseRoute(); join(r.code); }
-      else if (r && r.error) toast(t('err_' + r.error), 'err');
+    },
+    // Straight into a game: the fullest open room that is waiting, or a new
+    // one if there is none. One tap instead of choosing between a code and
+    // a room nobody is in yet.
+    async quick() {
+      if (!needName()) return;
+      sfx.send();
+      const r = await api('/api/lobbies');
+      const open = (r.lobbies || []).find(l => l.players < 12);
+      if (open) { history.pushState(null, '', `/room/${open.code}`); state.route = parseRoute(); join(open.code); return; }
+      actions.create();
+    },
+    // Three rounds against bots, in a room nobody else can see: the way to
+    // learn the game before playing it with people.
+    async practice() {
+      if (!needName()) return;
+      sfx.send();
+      store.set('introSeen', true);
+      const r = await emit('create', { lang: state.lang });
+      if (!r.code) return;
+      history.pushState(null, '', `/room/${r.code}`); state.route = parseRoute();
+      await join(r.code);
+      if (state.code !== r.code) return;
+      await emit('settings', { rounds: 3, public: false });
+      await emit('start');
     },
     'join-code'() {
       if (!needName()) return;
@@ -160,7 +184,19 @@ import { openAbout, openAdmin, openLeaderboard, openProfile, openSuggest } from 
       if (r.ok) { sfx.power(); buzz([20, 40, 20]); toast(k === 'peek' ? t('peekDone') : t('doubleDone'), 'ok'); }
     },
     next() { sfx.tap(); emit('next'); },
-    again() { emit('lobby'); },
+    // One tap: back to the lobby and straight into the next game, same room,
+    // same settings. Whoever wants out still has the Home button.
+    async again() { await emit('lobby'); await emit('start'); },
+    // The result as a link: the phone's share sheet where there is one,
+    // WhatsApp otherwise, the clipboard as the last resort.
+    async 'share-result'() {
+      const id = state.room && state.room.matchId;
+      if (!id) return;
+      const url = `${location.origin}/match/${id}`;
+      const text = t('shareResultText');
+      if (navigator.share) { try { await navigator.share({ title: 'MAQLAB', text, url }); } catch {} return; }
+      openLink(`https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`);
+    },
     leave: leaveRoom,
   };
 

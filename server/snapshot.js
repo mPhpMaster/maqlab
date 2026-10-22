@@ -240,7 +240,7 @@ export function snapshot(room, pid) {
     }
   }
   if (ph === 'scores' || ph === 'final') { s.gains = room.gains; s.prevRank = room.prevRank; }
-  if (ph === 'final') { s.awards = room.awards; s.bestLie = room.bestLie; s.rivals = room.rivals; }
+  if (ph === 'final') { s.awards = room.awards; s.bestLie = room.bestLie; s.rivals = room.rivals; s.matchId = room.lastMatchId || null; }
   return s;
 }
 

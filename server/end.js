@@ -104,6 +104,10 @@ export async function recordResults(room) {
         rounds: room.settings.rounds,
       },
     });
+    // The final screen can offer the result as a link once it exists. Saved
+    // a moment after the screen first appears, so it is sent again.
+    room.lastMatchId = matchId;
+    if (room.phase === 'final') broadcast(room);
   } catch (e) {
     console.error('could not save match replay', e.message);
   }
