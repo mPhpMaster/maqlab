@@ -1,0 +1,82 @@
+# Running MAQLAB
+
+What to do when shipping, when something breaks, and once a week, so none of it has to be worked out again.
+
+## Shipping a change
+
+1. Push to `master`. GitHub Actions runs the content check, the unit tests, and the end-to-end games (every mode, restarts and account deletion on a real Postgres). Render deploys `master` on its own.
+2. When Render says the deploy is live, run:
+   ```
+   node scripts/deploy-check.js
+   ```
+   It checks the commit Render serves against this checkout, the database and Discord connections, the server error count, and that the asset stamp matches a hash of the local files (so the browser is getting exactly these bytes). Every line should say `ok`.
+3. If the change touched the Discord Activity, sign-in, headers, caching or the client modules, do the Activity smoke test below.
+
+### What a deploy does to games in progress
+
+Render stops the old instance with SIGTERM and starts the new one. The old one stops opening rooms, writes every room down, closes its sockets and database, and exits within 20 seconds. The new one reads the saved rooms back before it starts listening, and players' phones reconnect and rejoin their seats. A game carries on from the round it was on, with its scores. `tests/e2e/restart.e2e.js` plays exactly this, by SIGTERM and by kill.
+
+## Discord Activity smoke test
+
+In a Discord server where the Activity is installed, from a voice channel:
+
+- [ ] Launch it from the rocket button. The lobby appears without a long "joining" wait.
+- [ ] Your Discord name and picture are there, with no sign-in button.
+- [ ] A second person in the same voice channel lands in the same room.
+- [ ] Start a game. Play one round to its reveal and the scores.
+- [ ] The fonts look like the website (Rubik), not a fallback.
+- [ ] Open the same build in a browser: sign-in with Discord works and returns to the page you were on.
+
+## The free plans, and what they allow
+
+- **Render (free web service)**: 750 instance hours a month for the whole account. The external pinger keeps this one awake around the clock, which uses 744 of them, so **a second free service on the same Render account would run the month out**. 512 MB memory and a shared CPU: rooms are capped at 300.
+- **Neon (free)**: the database. It scales to zero when idle, which the game handles (the first query after a quiet spell is slower).
+- If the pinger stops, the first visitor after 15 idle minutes waits about 20 to 50 seconds while Render wakes the service; the page says it is waking the server.
+
+## Database changes
+
+Schema changes are numbered files in `db/migrations/` (`002_add_something.sql`, then `003_...`). Each runs once, in order, inside a transaction, and is recorded in `schema_migrations`. Rules:
+
+- Never edit a file that has shipped. Write the next one.
+- Write each change so the previous build still works against it (add a column before using it, stop using a column one deploy before dropping it): Render runs the old and new instance side by side for a moment, and a rollback keeps the newer schema.
+- `tests/e2e/migrate.e2e.js` checks a fresh database, a second boot, and a database shaped like production.
+
+## Restoring the database
+
+In the Neon console, open the project, then **Branches** → create a branch from a point in time before the problem (the free plan keeps a limited history; check how far back in the console). Check it with `npm run test:e2e`-style reads or the round report pointed at it. Then put that branch's connection string in Render's `DATABASE_URL` and redeploy. Migrations that are already recorded are not run again.
+
+## Rolling back
+
+Render dashboard → the service → **Events** → an earlier deploy → **Rollback**. Or `git revert` the change and push, which goes through CI first. A rollback does not undo a migration (see above).
+
+## Once a week
+
+- **What players skip and where rounds stall:**
+  ```
+  node --env-file-if-exists=.env scripts/round-report.js --since <a week ago>
+  ```
+  Skips per mode, answer times against the clock, how answering ended (everyone in, clock, host), and who left before the end, split by table size, public or private, mode count and length. Change one thing at a time and measure it the next week.
+- **Errors:** the `errors` count in `/health` (also printed by the deploy check). A count that moves: read Render's logs around the time in `errors.at`.
+- **Content security policy:** the policy is report-only. Search Render's logs for `csp:`. After a week of real traffic with none, switch the header in `server/http-pages.js` from `Content-Security-Policy-Report-Only` to `Content-Security-Policy`, deploy, and run the Activity smoke test.
+
+## Secrets
+
+- `.env` and `.neon` hold real production credentials. Never print them, paste them, or commit them (both are gitignored).
+- The Discord client secret lives only in Render's environment. Do not open, copy or reset it: resetting it breaks sign-in until Render has the new one.
+- `SESSION_SECRET` is generated by Render. Changing it signs everyone out.
+
+## Running the tests locally
+
+```
+npm test
+npm run test:e2e
+```
+
+The restart, migration, account and report cases need a Postgres. Laragon ships one; a throwaway cluster outside Laragon's own data:
+
+```
+D:/laragon/bin/postgresql/postgresql/bin/initdb.exe -D D:/DevCache/maqlab-pg-test -U postgres --auth=trust -E UTF8
+D:/laragon/bin/postgresql/postgresql/bin/pg_ctl.exe -D D:/DevCache/maqlab-pg-test -o "-p 5499" -l D:/DevCache/maqlab-pg-test.log start
+```
+
+then run the suite with `E2E_DATABASE_URL=postgres://postgres@localhost:5499/postgres`.

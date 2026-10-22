@@ -79,6 +79,10 @@ The game runs inside Discord (launched from the rocket 🚀 button in a voice ch
 - It can only talk to the mapped domain. The Discord SDK is therefore vendored into `public/vendor/` and imported by path; a CDN import is blocked and kills the bootstrap on its first line.
 - Discord's proxy serves stale assets for a long time regardless of cache headers. The server stamps every script and stylesheet with a hash of all of them, and adds that stamp to every import inside the client modules it serves (`js/*.js`), so a new module in `js/` or stylesheet in `css/` is covered without doing anything. `discord.js` is imported from `js/boot.js` by URL with the same stamp. If you add a file outside those folders, add it to `STAMPED` in `server/http-pages.js` or you will spend an afternoon debugging code that is not running.
 
+## Running it in production
+
+Shipping, the Discord Activity smoke test, the free-plan limits, database migrations and restores, rollbacks, the weekly checks and secrets are in [docs/runbook.md](docs/runbook.md). After a deploy, `node scripts/deploy-check.js` says whether the live site is serving exactly this checkout.
+
 ## Files
 - `server/`: the game engine as ES modules, one per part (rooms, snapshots, round types, sockets, HTTP routes, startup and shutdown); `server/main.js` sets things up in order, and `server.js` is the entry point that loads it
 - `content.js`: all the content in English and Arabic — 1,743 entries in 12 banks (bluff 198, number 148, blitz 304, likely 156, emoji 186, odd 147, order 100, many 83, name 76, spy 143, minor 102, higher 100). Two Truths and a Lie is written by the players, and What Went Missing is built from the odd bank. `tests/docs.test.js` fails when these numbers drift from the banks, and `tests/content-depth.test.js` fails if a bank would repeat within a regular player's first 20 games. Read [docs/content-review.md](docs/content-review.md) before adding questions. `npm run check` validates the banks for duplicates, schema, and answers that give themselves away by length.
