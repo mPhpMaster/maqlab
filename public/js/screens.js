@@ -95,7 +95,10 @@ import { accountBar, lobbyList, previewCard, signedIn } from './extras.js';
     }).join('')}</div>`;
   }
   export function qCard(type, text, sub = '') {
-    return `<div class="q-card glass"><span class="type-tag ${type}">${TYPES[type]} ${t('type_' + type)}</span><h1>${esc(text)}</h1>${sub ? `<div class="sub">${sub}</div>` : ''}</div>`;
+    // The question is in the room's language, which need not be the
+    // interface's; a screen reader needs to know which one it is reading.
+    const qlang = (state.room && state.room.settings && state.room.settings.lang) || state.lang;
+    return `<div class="q-card glass"><span class="type-tag ${type}">${TYPES[type]} ${t('type_' + type)}</span><h1 lang="${qlang}">${esc(text)}</h1>${sub ? `<div class="sub">${sub}</div>` : ''}</div>`;
   }
   export function powerBar() {
     const s = state.room, c = s.current, m = me();

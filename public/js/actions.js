@@ -209,6 +209,13 @@ import { openAbout, openAdmin, openLeaderboard, openProfile, openSuggest } from 
     const fn = actions[el.dataset.act];
     if (fn) fn(el, e);
   });
+  const NOT_BUTTON = '[data-act]:not(button):not(a):not(input):not(select):not(textarea)';
+  $app.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches(NOT_BUTTON)) { e.preventDefault(); e.target.click(); }
+  });
+  const reachable = () => $app.querySelectorAll(`${NOT_BUTTON}:not([tabindex])`).forEach(el => { el.tabIndex = 0; el.setAttribute('role', 'button'); });
+  new MutationObserver(reachable).observe($app, { childList: true, subtree: true });
+  reachable();
   $app.addEventListener('submit', async e => {
     e.preventDefault();
     const f = e.target.dataset.form;

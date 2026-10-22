@@ -199,3 +199,9 @@
 /* A mode the table is too small for: still switchable, but it says so. */
 .type-tog.short { opacity: .62; }
 .type-tog .need { font-style: normal; font-size: 10px; font-weight: 800; opacity: .85; margin-inline-start: 2px; }
+
+/* ---- keyboard focus: buttons drop the browser outline for taps, so a
+   keyboard user needs one back, and only a keyboard user gets it ---- */
+:focus-visible, .btn:focus-visible, .input:focus-visible, [data-act]:focus-visible {
+  outline: 3px solid var(--sky); outline-offset: 2px; border-radius: 12px;
+}

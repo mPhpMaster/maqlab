@@ -188,13 +188,36 @@ import { api, signedIn } from './extras.js';
     setTimeout(() => el.remove(), 2300);
     sfx.fanfare(); buzz([40, 30, 40]);
   }
+  // Where focus was before a modal opened, to give it back on close.
+  let modalReturn = null;
+  const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), select, [tabindex]:not([tabindex="-1"])';
   export function modal(html, mount) {
-    $modal.innerHTML = `<div class="modal-bg"><div class="modal">${html}</div></div>`;
-    const bg = $modal.firstElementChild;
+    if (!$modal.firstElementChild) modalReturn = document.activeElement;
+    $modal.innerHTML = `<div class="modal-bg"><div class="modal" role="dialog" aria-modal="true" tabindex="-1">${html}</div></div>`;
+    const bg = $modal.firstElementChild, box = bg.firstElementChild;
     bg.addEventListener('click', e => { if (e.target === bg || e.target.closest('[data-close]')) closeModal(); });
-    mount && mount(bg.firstElementChild);
+    // Escape closes it, and Tab goes round inside it rather than out to the
+    // page behind, which a keyboard user cannot see.
+    bg.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
+      if (e.key !== 'Tab') return;
+      const all = [...box.querySelectorAll(FOCUSABLE)].filter(el => el.offsetParent !== null);
+      if (!all.length) { e.preventDefault(); return; }
+      const first = all[0], last = all[all.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    const h = box.querySelector('h2, h3');
+    if (h) { h.id = h.id || 'modal-title'; box.setAttribute('aria-labelledby', h.id); }
+    mount && mount(box);
+    (box.querySelector('[autofocus]') || box).focus({ preventScroll: true });
   }
-  export const closeModal = () => { $modal.innerHTML = ''; state.editor = null; };
+  export const closeModal = () => {
+    const had = !!$modal.firstElementChild;
+    $modal.innerHTML = ''; state.editor = null;
+    if (had && modalReturn && document.contains(modalReturn)) modalReturn.focus({ preventScroll: true });
+    modalReturn = null;
+  };
   export function confirmBox(text, cb) {
     modal(`<h3>${esc(text)}</h3><div class="row"><button class="btn coral grow" id="cf-ok">${t('yes')}</button><button class="btn ghost grow" data-close>${t('cancel')}</button></div>`,
       m => { m.querySelector('#cf-ok').onclick = () => { closeModal(); cb(); }; });
